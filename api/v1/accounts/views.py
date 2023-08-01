@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 
 import requests
 import json
@@ -9,9 +8,11 @@ from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
 
 from .serializers import ( 
-    LoginSerializer, 
+    LoginSerializer,
+    UserSerializer
 )
 from api.v1.accounts.functions import authenticate
+from accounts.models import User
 
 @api_view(["POST"])
 @permission_classes((AllowAny,))
@@ -32,3 +33,54 @@ def login(request):
         }            
 
     return Response(response_data, status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def user_list(request):
+    if User.objects.all():
+        user = User.objects.all()  
+        serializer = UserSerializer(user, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def user_details(request, pk):
+    if User.objects.get(id=pk):
+        user = User.objects.get(id=pk)
+        serializer = UserSerializer(user, many=False)
+        print("hwlel",pk)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)

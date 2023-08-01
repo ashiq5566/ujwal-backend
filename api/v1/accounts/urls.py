@@ -5,11 +5,13 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from .views import  login
+from .views import  login, user_list, user_details
 
 urlpatterns = [
     #student_side
     re_path(r"^login/$", login),
+    re_path(r"^users/$", user_list),
+    re_path(r"^users/(?P<pk>.*)/$", user_details),
  
     re_path(r"^token/$", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     re_path(r"^token/refresh/$", TokenRefreshView.as_view(), name="token_refresh"),
