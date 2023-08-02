@@ -79,8 +79,7 @@ def user_register(request):
                     name="Student_cordinator"
                 )
                 ru_group.user_set.add(user)
-                
-                
+                  
             response_data = {
             "statusCode":6000,
             "data":{

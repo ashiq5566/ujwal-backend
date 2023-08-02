@@ -7,12 +7,6 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
 class UserSerializer(serializers.ModelSerializer):
-    # first_name = serializers.CharField()
-    # last_name = serializers.CharField()
-    # username = serializers.CharField()
-    # role = serializers.CharField()
-    # email = serializers.CharField()
-    # role = serializers.CharField()
     
     class Meta:
         model = User
