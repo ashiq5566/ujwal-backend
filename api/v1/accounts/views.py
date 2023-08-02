@@ -14,6 +14,8 @@ from .serializers import (
 )
 from api.v1.accounts.functions import authenticate
 from accounts.models import User
+from main.models import Departments
+
 
 @api_view(["POST"])
 @permission_classes((AllowAny,))
@@ -50,43 +52,62 @@ def user_register(request):
         password = serializer.data.get("password")
         email = serializer.data.get("email")
         role = serializer.data.get("role")
+        department = serializer.data.get("department")
         
         if not User.objects.filter(username=username).exists():
-            user = User.objects.create(first_name=first_name,last_name=last_name,username=username,password=password,email=email,role=role)
-            #group creation after saving the user
-            if role == 'Admin':
-                ru_group, created = Group.objects.get_or_create(
-                    name="Admin"
+            if Departments.objects.filter(id=department).latest("department_name"):
+                dep = Departments.objects.filter(id=department).latest("department_name")
+                user = User.objects.create(
+                    first_name=first_name,
+                    last_name=last_name,
+                    username=username,
+                    password=password,
+                    email=email,
+                    role=role,
+                    department=dep
                 )
-                ru_group.user_set.add(user)
-            elif role == 'Placement_officer':
-                ru_group, created = Group.objects.get_or_create(
-                    name="Placement_officer"
-                )
-                ru_group.user_set.add(user)
-            elif role == 'HOD':
-                ru_group, created = Group.objects.get_or_create(
-                    name="HOD"
-                )
-                ru_group.user_set.add(user)
-            elif role == 'Staff_Coordinator':
-                ru_group, created = Group.objects.get_or_create(
-                    name="Staff_Coordinator"
-                )
-                ru_group.user_set.add(user)
-            else:
-                ru_group, created = Group.objects.get_or_create(
-                    name="Student_cordinator"
-                )
-                ru_group.user_set.add(user)
+                #group creation after saving the user
+                if role == 'Admin':
+                    ru_group, created = Group.objects.get_or_create(
+                        name="Admin"
+                    )
+                    ru_group.user_set.add(user)
+                elif role == 'Placement_officer':
+                    ru_group, created = Group.objects.get_or_create(
+                        name="Placement_officer"
+                    )
+                    ru_group.user_set.add(user)
+                elif role == 'HOD':
+                    ru_group, created = Group.objects.get_or_create(
+                        name="HOD"
+                    )
+                    ru_group.user_set.add(user)
+                elif role == 'Staff_Coordinator':
+                    ru_group, created = Group.objects.get_or_create(
+                        name="Staff_Coordinator"
+                    )
+                    ru_group.user_set.add(user)
+                else:
+                    ru_group, created = Group.objects.get_or_create(
+                        name="Student_cordinator"
+                    )
+                    ru_group.user_set.add(user)
                   
-            response_data = {
-            "statusCode":6000,
-            "data":{
-                "title":"Success",
-                "message":"registered SuccessFully"
-            }
-        }
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "message":"registered SuccessFully"
+                    }
+                }
+            else:
+                 response_data = {
+                    "statusCode":6001,
+                    "data":{
+                        "title":"SignUp Failed",
+                        "message":"department not exists"
+                    }
+                }
         else:
             response_data = {
             "statusCode":6001,
