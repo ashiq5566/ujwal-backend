@@ -40,7 +40,8 @@ def authenticate(username: str, password: str, request):
                 "data":{
                     "id":user.id,
                     "username":user.username,
-                    "role":user.role
+                    "role":user.role,
+                    "email":user.email
 
                 },
                 "refresh": response.json().get("refresh"),
