@@ -1,6 +1,7 @@
 
 import requests
 import json
+from django.contrib.auth.models import Group
 
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -13,6 +14,8 @@ from .serializers import (
 )
 from api.v1.accounts.functions import authenticate
 from accounts.models import User
+from main.models import Departments
+
 
 @api_view(["POST"])
 @permission_classes((AllowAny,))
@@ -33,6 +36,91 @@ def login(request):
         }            
 
     return Response(response_data, status=status.HTTP_200_OK)
+
+
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def user_register(request):
+    serializer = UserSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        first_name = serializer.data.get("first_name")
+        last_name = serializer.data.get("last_name")
+        username = serializer.data.get("username")
+        password = serializer.data.get("password")
+        email = serializer.data.get("email")
+        role = serializer.data.get("role")
+        department = serializer.data.get("department")
+        
+        if not User.objects.filter(username=username).exists():
+            if Departments.objects.filter(id=department).latest("department_name"):
+                dep = Departments.objects.filter(id=department).latest("department_name")
+                user = User.objects.create(
+                    first_name=first_name,
+                    last_name=last_name,
+                    username=username,
+                    password=password,
+                    email=email,
+                    role=role,
+                    department=dep
+                )
+                #group creation after saving the user
+                if role == 'Admin':
+                    ru_group, created = Group.objects.get_or_create(
+                        name="Admin"
+                    )
+                    ru_group.user_set.add(user)
+                elif role == 'Placement_officer':
+                    ru_group, created = Group.objects.get_or_create(
+                        name="Placement_officer"
+                    )
+                    ru_group.user_set.add(user)
+                elif role == 'HOD':
+                    ru_group, created = Group.objects.get_or_create(
+                        name="HOD"
+                    )
+                    ru_group.user_set.add(user)
+                elif role == 'Staff_Coordinator':
+                    ru_group, created = Group.objects.get_or_create(
+                        name="Staff_Coordinator"
+                    )
+                    ru_group.user_set.add(user)
+                else:
+                    ru_group, created = Group.objects.get_or_create(
+                        name="Student_cordinator"
+                    )
+                    ru_group.user_set.add(user)
+                  
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "message":"registered SuccessFully"
+                    }
+                }
+            else:
+                 response_data = {
+                    "statusCode":6001,
+                    "data":{
+                        "title":"SignUp Failed",
+                        "message":"department not exists"
+                    }
+                }
+        else:
+            response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"SignUp Failed",
+                "message":"username exists"
+            }
+        }
+            
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -65,7 +153,6 @@ def user_details(request, pk):
     if User.objects.get(id=pk):
         user = User.objects.get(id=pk)
         serializer = UserSerializer(user, many=False)
-        print("hwlel",pk)
         
         response_data = {
             "statusCode":6000,

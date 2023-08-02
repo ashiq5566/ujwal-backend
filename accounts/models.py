@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group
 from main.models import Departments
 
 # Create your models here.
@@ -22,4 +22,5 @@ class User(AbstractUser):
             self.department = None
         elif self.role in ['Admin', 'Placement_officer']:
             self.department = None
+            
         super().save(*args, **kwargs)
