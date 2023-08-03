@@ -10,7 +10,9 @@ from rest_framework.decorators import permission_classes, api_view
 
 from .serializers import ( 
     LoginSerializer,
-    UserSerializer
+    UserSerializer,
+    DepartmentPostSerializer,
+    DepartmentsGetSerializer
 )
 from api.v1.accounts.functions import authenticate
 from accounts.models import User
@@ -153,6 +155,69 @@ def user_details(request, pk):
     if User.objects.get(id=pk):
         user = User.objects.get(id=pk)
         serializer = UserSerializer(user, many=False)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_department(request):
+    serializer = DepartmentPostSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        department_id = serializer.validated_data['department_name']
+        
+        if Departments.objects.filter(department_id=department_id).exists():
+            response_data = {
+                "statusCode": 6001,
+                "data": {
+                    "title": "Department Already Exists",
+                    "message": f"Department with ID {department_id} already exists."
+                }
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Department created successfully."
+            }
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    response_data = {
+        "statusCode": 6001,
+        "data": {
+            "title": "Validation Error",
+            "message": "Department creation failed.",
+            "errors": serializer.errors
+        }
+    }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def department_list(request):
+    if Departments.objects.all():
+        departments = Departments.objects.all()  
+        serializer = DepartmentsGetSerializer(departments, many=True)
         
         response_data = {
             "statusCode":6000,
