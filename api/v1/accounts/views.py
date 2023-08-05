@@ -180,17 +180,17 @@ def create_department(request):
     serializer = DepartmentPostSerializer(data=request.data)
     
     if serializer.is_valid():
-        department_id = serializer.validated_data['department_name']
+        department_name = serializer.validated_data['department_name']
         
-        if Departments.objects.filter(department_id=department_id).exists():
+        if Departments.objects.filter(department_name=department_name).exists():
             response_data = {
                 "statusCode": 6001,
                 "data": {
                     "title": "Department Already Exists",
-                    "message": f"Department with ID {department_id} already exists."
+                    "message": f"Department with name {department_name} already exists."
                 }
             }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(response_data, status=status.HTTP_409_CONFLICT)
         
         serializer.save()
         response_data = {
