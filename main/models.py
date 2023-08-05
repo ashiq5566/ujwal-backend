@@ -97,3 +97,37 @@ class Trainers(models.Model):
         self.trainer_save()
         super().save(*args, **kwargs)
 
+class Student(models.Model):
+    student_id = models.CharField(max_length=10,unique=True, null=False)
+    admission_number = models.CharField(max_length=10, unique=True, null=False)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    date_of_birth = models.DateField()
+    address = models.TextField()
+    gender = models.CharField(max_length=15)
+    phone = models.CharField(max_length=15, null=False)
+    email = models.EmailField(null=False)
+    marital_status = models.CharField(max_length=15)
+    admission_year = models.IntegerField(null=False)
+    roll_number = models.CharField(max_length=10, null=False)
+    parent_name = models.CharField(max_length=100)
+    parent_phone_number = models.CharField(max_length=15,unique=True)
+    parent_email = models.EmailField()
+    program = models.ForeignKey(Programs, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.admission_number}-{self.first_name} {self.last_name}"
+    
+    def student_save(self):
+        if not self.student_id:
+            last_student = Student.objects.order_by('-student_id').first()
+            if last_student:
+                code = int(last_student.student_id[1:]) + 1
+                self.student_id = f'S{code:02}'
+            else:
+                self.student_id = 'S01'
+    
+    def save(self, *args, **kwargs):
+        self.student_save()
+        super().save(*args, **kwargs)
+

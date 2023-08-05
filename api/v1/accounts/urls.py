@@ -18,6 +18,8 @@ urlpatterns = [
     re_path(r"^trainers/$", trainers_list),
     re_path(r"^add_recruiter/$", add_recruiter),
     re_path(r"^recruiters/$", recruiters_list),
+    re_path(r"^add_program/$", add_program),
+    re_path(r"^programs/$", program_list),
 
  
     re_path(r"^token/$", TokenObtainPairView.as_view(), name="token_obtain_pair"),
