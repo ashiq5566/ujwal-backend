@@ -12,4 +12,6 @@ admin.site.register(Programs)
 admin.site.register(Recruiters)
 admin.site.register(Trainers)
 admin.site.register(Student)
+admin.site.register(Semesters)
+admin.site.register(Program_Semester)
 

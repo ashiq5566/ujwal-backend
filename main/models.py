@@ -132,3 +132,16 @@ class Student(models.Model):
         self.student_save()
         super().save(*args, **kwargs)
 
+class Semesters(models.Model):
+    semester = models.CharField(max_length=50, null=False)
+
+    def __str__(self):
+        return self.semester
+    
+class Program_Semester(models.Model):
+    program = models.ForeignKey(Programs,on_delete=models.CASCADE)
+    semester = models.ForeignKey(Semesters,on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.program}-{self.semester}" 

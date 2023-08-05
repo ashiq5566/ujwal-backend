@@ -349,13 +349,25 @@ def add_program(request):
     serializer = ProgramPostSerializer(data=request.data)
     
     if serializer.is_valid():
+        number_of_semester = serializer.validated_data['number_of_semester']
+        for i in range(1,number_of_semester+1):
+            semester_name='Semester '+str(i)
+            if not Semesters.objects.filter(semester=semester_name).exists():
+                Semesters(semester=semester_name).save()
+
+        program_instance = serializer.save()
         
-        serializer.save()
+
+        for i in range(number_of_semester,0,-1):
+            semester_name='Semester '+str(i)
+            semester_instance = Semesters.objects.get(semester=semester_name)
+            Program_Semester(program=program_instance,semester=semester_instance).save()
+
         response_data = {
             "statusCode": 6000,
             "data": {
                 "title": "Success",
-                "message": "Department created successfully."
+                "message": "Program created successfully."
             }
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
@@ -364,7 +376,7 @@ def add_program(request):
         "statusCode": 6001,
         "data": {
             "title": "Validation Error",
-            "message": "Department creation failed.",
+            "message": "Program creation failed.",
             "errors": serializer.errors
         }
     }
