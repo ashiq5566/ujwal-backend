@@ -42,3 +42,13 @@ class RecruitersGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recruiters
         fields = '__all__'
+
+class ProgramPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Programs
+        exclude = ['program_id']
+
+class ProgramsGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Programs
+        fields = '__all__'
