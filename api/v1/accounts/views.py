@@ -298,13 +298,12 @@ def add_recruiter(request):
     serializer = RecruiterPostSerializer(data=request.data)
     
     if serializer.is_valid():
-        
         serializer.save()
         response_data = {
             "statusCode": 6000,
             "data": {
                 "title": "Success",
-                "message": "Department created successfully."
+                "message": "Recruiter created successfully."
             }
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
@@ -313,7 +312,7 @@ def add_recruiter(request):
         "statusCode": 6001,
         "data": {
             "title": "Validation Error",
-            "message": "Department creation failed.",
+            "message": "Recruiter creation failed.",
             "errors": serializer.errors
         }
     }
