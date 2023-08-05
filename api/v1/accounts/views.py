@@ -8,15 +8,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
 
-from .serializers import ( 
-    LoginSerializer,
-    UserSerializer,
-    DepartmentPostSerializer,
-    DepartmentsGetSerializer
-)
+from .serializers import *
 from api.v1.accounts.functions import authenticate
 from accounts.models import User
-from main.models import Departments
+from main.models import *
 
 
 @api_view(["POST"])
@@ -73,7 +68,7 @@ def user_register(request):
                 )
                 user.set_password(password)
                 user.save()
-                
+
                 #group creation after saving the user
                 if role == 'Admin':
                     ru_group, created = Group.objects.get_or_create(
@@ -224,6 +219,112 @@ def department_list(request):
     if Departments.objects.all():
         departments = Departments.objects.all()  
         serializer = DepartmentsGetSerializer(departments, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def add_trainer(request):
+    serializer = TrainerPostSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        
+        serializer.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Department created successfully."
+            }
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    response_data = {
+        "statusCode": 6001,
+        "data": {
+            "title": "Validation Error",
+            "message": "Department creation failed.",
+            "errors": serializer.errors
+        }
+    }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def trainers_list(request):
+    if Trainers.objects.all():
+        trainers = Trainers.objects.all()  
+        serializer = TrainersGetSerializer(trainers, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def add_recruiter(request):
+    serializer = RecruiterPostSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        
+        serializer.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Department created successfully."
+            }
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    response_data = {
+        "statusCode": 6001,
+        "data": {
+            "title": "Validation Error",
+            "message": "Department creation failed.",
+            "errors": serializer.errors
+        }
+    }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def recruiters_list(request):
+    if Recruiters.objects.all():
+        recruiter = Recruiters.objects.all()  
+        serializer = RecruitersGetSerializer(recruiter, many=True)
         
         response_data = {
             "statusCode":6000,

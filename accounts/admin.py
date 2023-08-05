@@ -6,4 +6,6 @@ from main.models import *
 admin.site.register(User)
 admin.site.register(Departments)
 admin.site.register(Programs)
+admin.site.register(Recruiters)
+admin.site.register(Trainers)
 

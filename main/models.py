@@ -45,3 +45,55 @@ class Programs(models.Model):
                 self.program_id = 'TA1'
         super().save(*args, **kwargs)
 
+
+class Recruiters(models.Model):
+    recruiter_id = models.CharField(max_length=10,unique=True, null=False)
+    company_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    address = models.TextField()
+    website = models.URLField()
+    contact_number = models.CharField(max_length=15)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.company_name
+
+    def company_save(self):
+        if not self.recruiter_id:
+            last_company = Recruiters.objects.order_by('-recruiter_id').first()
+            if last_company:
+                code = int(last_company.recruiter_id[1:]) + 1
+                self.recruiter_id = f'C{code:02}'
+            else:
+                self.recruiter_id = 'C01'
+    
+    def save(self, *args, **kwargs):
+        self.company_save()
+        super().save(*args, **kwargs)
+    
+
+class Trainers(models.Model):
+    trainer_id = models.CharField(max_length=10,unique=True, null=False)
+    trainer_name = models.CharField(max_length=100, null=False)
+    training_company = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=15)
+    website = models.URLField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.trainer_name} - company:{self.training_company}"
+    
+    def trainer_save(self):
+        if not self.trainer_id:
+            last_trainer = Trainers.objects.order_by('-trainer_id').first()
+            if last_trainer:
+                code = int(last_trainer.trainer_id[1:]) + 1
+                self.trainer_id = f'T{code:02}'
+            else:
+                self.trainer_id = 'T01'
+    
+    def save(self, *args, **kwargs):
+        self.trainer_save()
+        super().save(*args, **kwargs)
+
