@@ -79,7 +79,7 @@ class Trainers(models.Model):
     training_company = models.CharField(max_length=100)
     email = models.EmailField()
     phone_number = models.CharField(max_length=15)
-    website = models.URLField()
+    website = models.CharField(max_length=150)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
