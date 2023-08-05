@@ -57,17 +57,23 @@ def user_register(request):
         department = serializer.data.get("department")
         
         if not User.objects.filter(username=username).exists():
-            if Departments.objects.filter(id=department).latest("department_name"):
-                dep = Departments.objects.filter(id=department).latest("department_name")
+            
+            if True:
+                if(department):
+                    dep = Departments.objects.filter(id=department).latest("department_name")
+                else:
+                    dep=None
                 user = User.objects.create(
                     first_name=first_name,
                     last_name=last_name,
                     username=username,
-                    password=password,
                     email=email,
                     role=role,
                     department=dep
                 )
+                user.set_password(password)
+                user.save()
+                
                 #group creation after saving the user
                 if role == 'Admin':
                     ru_group, created = Group.objects.get_or_create(
