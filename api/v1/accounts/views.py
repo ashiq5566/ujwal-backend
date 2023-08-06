@@ -406,3 +406,44 @@ def program_list(request):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
+
+# @api_view(['PUT'])
+# @permission_classes([AllowAny])
+# def update_program(request, program_id):
+#     try:
+#         program_instance = Programs.objects.get(id=program_id)
+#     except Programs.DoesNotExist:
+#         response_data = {
+#             "statusCode": 6002,
+#             "data": {
+#                 "title": "Not Found",
+#                 "message": "Program not found."
+#             }
+#         }
+#         return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+
+#     serializer = ProgramPostSerializer(program_instance, data=request.data)
+
+#     if serializer.is_valid():
+#         program_instance = serializer.save()
+
+
+#         response_data = {
+#             "statusCode": 6000,
+#             "data": {
+#                 "title": "Success",
+#                 "message": "Program updated successfully."
+#             }
+#         }
+#         return Response(response_data, status=status.HTTP_200_OK)
+
+#     response_data = {
+#         "statusCode": 6001,
+#         "data": {
+#             "title": "Validation Error",
+#             "message": "Program update failed.",
+#             "errors": serializer.errors
+#         }
+#     }
+#     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)

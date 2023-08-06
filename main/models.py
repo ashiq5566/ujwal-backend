@@ -145,3 +145,43 @@ class Program_Semester(models.Model):
 
     def __str__(self):
         return f"{self.program}-{self.semester}" 
+    
+class Student_program_semester(models.Model):
+    STATUS_CHOICES = (
+        ('completed', 'Completed'),
+        ('ongoing', 'Ongoing'),
+        ('upcoming', 'Upcoming'),
+    )
+    student = models.ForeignKey(Student,on_delete=models.CASCADE)
+    semester = models.ForeignKey(Program_Semester,on_delete=models.CASCADE)
+    year = models.IntegerField() 
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+
+    def __str__(self):
+        return f"{self.student},{self.semester},{self.status}"
+    
+class FocusingArea(models.Model):
+    area_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.area_name  
+    
+class AllotTrainer(models.Model):
+    allotment_id = models.CharField(max_length=10, unique=True, null=False)
+    trainer = models.ForeignKey(Trainers, on_delete=models.CASCADE)
+    start_date = models.DateField(null=False)
+    end_date = models.DateField(null=False)
+    venue = models.CharField(max_length=100)
+    focusing_area = models.ManyToManyField(FocusingArea)
+
+    def __str__(self):
+        return f"{self.trainer}"
+    def save(self, *args, **kwargs):
+        if not self.pk:  # Only generate ID for new instances
+            last_instance = AllotTrainer.objects.last()
+            if last_instance:
+                last_id = int(last_instance.allotment_id[2:])
+                self.allotment_id = f'TA{last_id + 1}'
+            else:
+                self.allotment_id = 'TA1'
+        super().save(*args, **kwargs)
