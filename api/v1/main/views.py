@@ -286,3 +286,60 @@ def update_program(request, program_id):
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def focusing_areas(request):
+    if FocusingArea.objects.all():
+        focusingArea = FocusingArea.objects.all()  
+        print(focusingArea)
+        serializer = FocusinAreaGetSerializer(focusingArea, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def programs_by_department(request, pk):
+    print("test data1")
+    if Departments.objects.get(id=pk):
+        print("test data2")
+        department = Departments.objects.get(id=pk)
+        program=Programs.objects.filter(department=department)
+        print(program)
+        serializer = ProgramsGetSerializer(program, many=False).data
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)

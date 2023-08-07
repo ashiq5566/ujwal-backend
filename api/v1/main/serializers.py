@@ -44,3 +44,8 @@ class ProgramsGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Programs
         fields = '__all__'
+
+class FocusinAreaGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FocusingArea
+        fields = '__all__'
