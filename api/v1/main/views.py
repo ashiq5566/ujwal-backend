@@ -318,13 +318,11 @@ def focusing_areas(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def programs_by_department(request, pk):
-    print("test data1")
     if Departments.objects.get(id=pk):
-        print("test data2")
         department = Departments.objects.get(id=pk)
-        program=Programs.objects.filter(department=department)
-        print(program)
-        serializer = ProgramsGetSerializer(program, many=False).data
+        program=Programs.objects.get(department=department)
+        print("sdsd",program)
+        serializer = ProgramsGetSerializer(program, many=False)
         
         response_data = {
             "statusCode":6000,
