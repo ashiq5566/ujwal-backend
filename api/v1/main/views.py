@@ -320,9 +320,9 @@ def focusing_areas(request):
 def programs_by_department(request, pk):
     if Departments.objects.get(id=pk):
         department = Departments.objects.get(id=pk)
-        program=Programs.objects.get(department=department)
+        program=Programs.objects.filter(department=department)
         print("sdsd",program)
-        serializer = ProgramsGetSerializer(program, many=False)
+        serializer = ProgramsGetSerializer(program, many=True)
         
         response_data = {
             "statusCode":6000,

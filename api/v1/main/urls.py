@@ -14,5 +14,5 @@ urlpatterns = [
     re_path(r'^update_programs/(?P<program_id>\d+)/$', update_program),
     re_path(r"^programs/$", program_list),
     re_path(r"^focusing_areas/$", focusing_areas),
-    re_path(r'^program/(?P<pk>\d+)/$',programs_by_department),
+    re_path(r'^programs_by_department/(?P<pk>\d+)/$',programs_by_department),
 ]
