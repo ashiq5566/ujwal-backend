@@ -341,3 +341,80 @@ def programs_by_department(request, pk):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def semesters(request):
+    if Semesters.objects.all():
+        semesters = Semesters.objects.all()  
+        serializer = SemestersGetSerializer(semesters, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def program_semester_by_program(request, pk):
+    if Programs.objects.get(id=pk):
+        program = Programs.objects.get(id=pk)
+        program_semester=Program_Semester.objects.filter(program=program)
+        serializer = ProgramSemesterGetSerializer(program_semester, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def program_semesters(request):
+    if Program_Semester.objects.all():
+        program_Semester = Program_Semester.objects.all()  
+        serializer = ProgramSemesterGetSerializer(program_Semester, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
