@@ -26,7 +26,7 @@ def create_department(request):
         
         if Departments.objects.filter(department_name=department_name).exists():
             response_data = {
-                "statusCode": 6001,
+                "StatusCode": 6001,
                 "data": {
                     "title": "Department Already Exists",
                     "message": f"Department with name {department_name} already exists."
@@ -36,7 +36,7 @@ def create_department(request):
         
         serializer.save()
         response_data = {
-            "statusCode": 6000,
+            "StatusCode": 6000,
             "data": {
                 "title": "Success",
                 "message": "Department created successfully."
@@ -45,7 +45,7 @@ def create_department(request):
         return Response(response_data, status=status.HTTP_201_CREATED)
     
     response_data = {
-        "statusCode": 6001,
+        "StatusCode": 6001,
         "data": {
             "title": "Validation Error",
             "message": "Department creation failed.",
@@ -62,7 +62,7 @@ def department_list(request):
         serializer = DepartmentsGetSerializer(departments, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -70,7 +70,7 @@ def department_list(request):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"NotFound"
@@ -89,7 +89,7 @@ def add_trainer(request):
         
         serializer.save()
         response_data = {
-            "statusCode": 6000,
+            "StatusCode": 6000,
             "data": {
                 "title": "Success",
                 "message": "Department created successfully."
@@ -98,7 +98,7 @@ def add_trainer(request):
         return Response(response_data, status=status.HTTP_201_CREATED)
     
     response_data = {
-        "statusCode": 6001,
+        "StatusCode": 6001,
         "data": {
             "title": "Validation Error",
             "message": "Department creation failed.",
@@ -115,7 +115,7 @@ def trainers_list(request):
         serializer = TrainersGetSerializer(trainers, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -123,7 +123,7 @@ def trainers_list(request):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"NotFound"
@@ -141,7 +141,7 @@ def add_recruiter(request):
     if serializer.is_valid():
         serializer.save()
         response_data = {
-            "statusCode": 6000,
+            "StatusCode": 6000,
             "data": {
                 "title": "Success",
                 "message": "Recruiter created successfully."
@@ -150,7 +150,7 @@ def add_recruiter(request):
         return Response(response_data, status=status.HTTP_201_CREATED)
     
     response_data = {
-        "statusCode": 6001,
+        "StatusCode": 6001,
         "data": {
             "title": "Validation Error",
             "message": "Recruiter creation failed.",
@@ -167,7 +167,7 @@ def recruiters_list(request):
         serializer = RecruitersGetSerializer(recruiter, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -175,7 +175,7 @@ def recruiters_list(request):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"NotFound"
@@ -205,7 +205,7 @@ def add_program(request):
             Program_Semester(program=program_instance,semester=semester_instance).save()
 
         response_data = {
-            "statusCode": 6000,
+            "StatusCode": 6000,
             "data": {
                 "title": "Success",
                 "message": "Program created successfully."
@@ -214,7 +214,7 @@ def add_program(request):
         return Response(response_data, status=status.HTTP_201_CREATED)
     
     response_data = {
-        "statusCode": 6001,
+        "StatusCode": 6001,
         "data": {
             "title": "Validation Error",
             "message": "Program creation failed.",
@@ -231,7 +231,7 @@ def program_list(request):
         serializer = ProgramsGetSerializer(programs, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -239,7 +239,7 @@ def program_list(request):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"NotFound"
@@ -256,7 +256,7 @@ def update_program(request, program_id):
         program_instance = Programs.objects.get(id=program_id)
     except Programs.DoesNotExist:
         response_data = {
-            "statusCode": 6002,
+            "StatusCode": 6002,
             "data": {
                 "title": "Not Found",
                 "message": "Program not found."
@@ -271,7 +271,7 @@ def update_program(request, program_id):
 
 
         response_data = {
-            "statusCode": 6000,
+            "StatusCode": 6000,
             "data": {
                 "title": "Success",
                 "message": "Program updated successfully."
@@ -280,7 +280,7 @@ def update_program(request, program_id):
         return Response(response_data, status=status.HTTP_200_OK)
 
     response_data = {
-        "statusCode": 6001,
+        "StatusCode": 6001,
         "data": {
             "title": "Validation Error",
             "message": "Program update failed.",
@@ -299,7 +299,7 @@ def focusing_areas(request):
         serializer = FocusinAreaGetSerializer(focusingArea, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -307,7 +307,7 @@ def focusing_areas(request):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"NotFound"
@@ -327,7 +327,7 @@ def programs_by_department(request, pk):
         serializer = ProgramsGetSerializer(program, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -335,7 +335,7 @@ def programs_by_department(request, pk):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"NotFound"
@@ -352,7 +352,7 @@ def semesters(request):
         serializer = SemestersGetSerializer(semesters, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -360,7 +360,7 @@ def semesters(request):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"NotFound"
@@ -378,7 +378,7 @@ def program_semester_by_program(request, pk):
         serializer = ProgramSemesterGetSerializer(program_semester, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -386,7 +386,7 @@ def program_semester_by_program(request, pk):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"NotFound"
@@ -404,7 +404,7 @@ def program_semesters(request):
         serializer = ProgramSemesterGetSerializer(program_Semester, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -412,7 +412,7 @@ def program_semesters(request):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"NotFound"
@@ -425,8 +425,10 @@ def program_semesters(request):
 @api_view(['POST'])
 @permission_classes([AllowAny,])
 def add_training_schedule(request):
+    print(request.data,"request.data")
     serializer = TrainingScheduleSerializer(data=request.data)
     if serializer.is_valid():
+        print("validationg serializer")
         trainer_id = request.data['trainer_id']
         start_date_str = request.data['start_date_str']
         end_date_str = request.data['end_date_str']
@@ -443,8 +445,8 @@ def add_training_schedule(request):
                     participants = Program_Semester.objects.filter(id__in=participants_ids)
                     
                     # Convert date string to the desired format
-                    start_date = datetime.strptime(start_date_str, '%d-%m-%y').strftime('%Y-%m-%d')
-                    end_date = datetime.strptime(end_date_str, '%d-%m-%y').strftime('%Y-%m-%d')
+                    start_date = datetime.strptime(start_date_str, '%d-%m-%Y').strftime('%Y-%m-%d')
+                    end_date = datetime.strptime(end_date_str, '%d-%m-%Y').strftime('%Y-%m-%d')
 
                     
                     allot_trainer=AllotTrainer(trainer=trainer,start_date=start_date,end_date=end_date,venue=venue)
@@ -460,7 +462,7 @@ def add_training_schedule(request):
                         participant.save()
 
                     response_data = {
-                        'Statuscode' : 6000,
+                        'StatusCode' : 6000,
                         'data' : {
                             'title': 'Success',
                             'message' : "Schedule Added SuccessFully"
@@ -468,7 +470,7 @@ def add_training_schedule(request):
                     }
                 else:
                     response_data = {
-                        'Statuscode' : 6001,
+                        'StatusCode' : 6001,
                         'data' : {
                             'title': 'failed',
                             'message' : "Participants Not Found"
@@ -476,7 +478,7 @@ def add_training_schedule(request):
                     }
             else:
                 response_data = {
-                    'Statuscode' : 6001,
+                    'StatusCode' : 6001,
                     'data' : {
                         'title': 'failed',
                         'message' : "Trainer Not Found"
@@ -484,7 +486,7 @@ def add_training_schedule(request):
                 } 
         else:
             response_data = {
-                'Statuscode' : 6001,
+                'StatusCode' : 6001,
                 'data' : {
                     'title': 'failed',
                     'message' : "Focusing Area Not Found"
@@ -508,7 +510,7 @@ def training_schedule(request):
         serializer = TrainingSchedulesSerializer(schedule, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -516,7 +518,7 @@ def training_schedule(request):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"Schedule Not Found"
@@ -532,7 +534,7 @@ def training_schedule_detail(request, pk):
         serializer = TrainingSchedulesSerializer(schedule, many=False)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -540,7 +542,7 @@ def training_schedule_detail(request, pk):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"Schedule Not Found"
@@ -553,9 +555,11 @@ def training_schedule_detail(request, pk):
 @api_view(['POST'])
 @permission_classes([AllowAny,])
 def add_recruitment_schedule(request):
+    print(request.data,"request.data")
     serializer = RecruitmentScheduleSerializer(data=request.data)
-
+    
     if serializer.is_valid():
+        print("validationg serializer")
         recruiter_id = request.data['recruiter_id']
         date_str = request.data['date']  
         venue = request.data['venue']
@@ -581,7 +585,7 @@ def add_recruitment_schedule(request):
                 recruitment_branch.save()
                 recruitment_branch.program_semester.set(participants)
                 response_data = {
-                    'Statuscode' : 6000,
+                    'StatusCode' : 6000,
                     'data' : {
                         'title': 'Success',
                         'message' : "Schedule Added SuccessFully"
@@ -589,7 +593,7 @@ def add_recruitment_schedule(request):
                 }
             else:
                 response_data = {
-                'Statuscode' : 6001,
+                'StatusCode' : 6001,
                 'data' : {
                     'title': 'failed',
                     'message' : "Participants Not Found"
@@ -597,7 +601,7 @@ def add_recruitment_schedule(request):
             }
         else:
             response_data = {
-                'Statuscode' : 6001,
+                'StatusCode' : 6001,
                 'data' : {
                     'title': 'failed',
                     'message' : "Recruiter Not Found"
@@ -619,7 +623,7 @@ def recruitment_schedule(request):
         serializer = RecruitmentSchedulesSerializer(schedule, many=True)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -627,7 +631,7 @@ def recruitment_schedule(request):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"Schedule Not Found"
@@ -643,7 +647,7 @@ def recruitment_schedule_detail(request, pk):
         serializer = RecruitmentSchedulesSerializer(schedule, many=False)
         
         response_data = {
-            "statusCode":6000,
+            "StatusCode":6000,
             "data":{
                 "title":"Success",
                 "data":serializer.data
@@ -651,7 +655,7 @@ def recruitment_schedule_detail(request, pk):
         }
     else:
         response_data = {
-            "statusCode":6001,
+            "StatusCode":6001,
             "data":{
                 "title":"Failed",
                 "data":"Schedule Not Found"
