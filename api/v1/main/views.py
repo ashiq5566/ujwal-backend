@@ -8,6 +8,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
 
+from datetime import timedelta, datetime
+
 from .serializers import *
 from api.v1.accounts.functions import authenticate
 from accounts.models import User
@@ -417,4 +419,119 @@ def program_semesters(request):
             }
         }
 
+    return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny,])
+def add_training_shcedule(request):
+    pass
+    response_data:{
+        "title": "Success"
+    }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny,])
+def add_recruitment_shcedule(request):
+    serializer = RecruitmentShceduleSerializer(data=request.data)
+
+    if serializer.is_valid():
+        recruiter_id = request.data['recruiter_id']
+        date_str = request.data['date']  
+        venue = request.data['venue']
+        designation = request.data['designation']
+        participants_ids = request.data['participants_ids']
+        apply_link = request.data['apply_link']
+        
+        if Recruiters.objects.filter(id=recruiter_id).exists():
+            recruiter = Recruiters.objects.get(id=recruiter_id)
+            if Program_Semester.objects.filter(id__in=participants_ids).exists():
+                participants = Program_Semester.objects.filter(id__in=participants_ids)
+                date = datetime.strptime(date_str, '%d-%m-%y').strftime('%Y-%m-%d')
+                
+                allot_recruiter = Schedule_Recruitment(recruiter=recruiter,
+                    date=date,
+                    venue=venue,
+                    designation=designation,
+                    apply_link=apply_link
+                )
+                allot_recruiter.save()
+                
+                recruitment_branch = Recruitment_Participating_Branches(scheduled_recruitment=allot_recruiter)
+                recruitment_branch.save()
+                recruitment_branch.program_semester.set(participants)
+                response_data = {
+                    'Statuscode' : 6000,
+                    'data' : {
+                        'title': 'Success',
+                        'message' : "Schedule Added SuccessFully"
+                    }
+                }
+            else:
+                response_data = {
+                'Statuscode' : 6001,
+                'data' : {
+                    'title': 'failed',
+                    'message' : "Participants Not Found"
+                }
+            }
+        else:
+            response_data = {
+                'Statuscode' : 6001,
+                'data' : {
+                    'title': 'failed',
+                    'message' : "Recruiter Not Found"
+                }
+            }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def recruitment_shcedule(request):
+    if Schedule_Recruitment.objects.all():
+        schedule = Schedule_Recruitment.objects.all()   
+        serializer = RecruitmentShcedulesSerializer(schedule, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"Schedule Not Found"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def recruitment_shcedule_detail(request, pk):
+    if Schedule_Recruitment.objects.filter(id=pk).exists():
+        schedule = Schedule_Recruitment.objects.get(id=pk)   
+        serializer = RecruitmentShcedulesSerializer(schedule, many=False)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"Schedule Not Found"
+            }
+        }
     return Response(response_data,status=status.HTTP_200_OK)

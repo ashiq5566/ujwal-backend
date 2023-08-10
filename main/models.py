@@ -26,6 +26,7 @@ class Departments(models.Model):
             programs = Programs.objects.filter(department=self)
             programs.update(is_active=False)
             
+            
 class Programs(models.Model):
     program_id = models.CharField(max_length=10, unique=True, null=False)
     program_name = models.CharField(max_length=50, null=False)
@@ -44,6 +45,7 @@ class Programs(models.Model):
             else:
                 self.program_id = 'TA1'
         super().save(*args, **kwargs)
+        
 
 
 class Recruiters(models.Model):
@@ -51,7 +53,7 @@ class Recruiters(models.Model):
     company_name = models.CharField(max_length=100)
     email = models.EmailField()
     address = models.TextField()
-    website = models.CharField(max_length=150)
+    website = models.URLField(null=True,blank=True)
     contact_number = models.CharField(max_length=15)
     is_active = models.BooleanField(default=True)
 
@@ -185,3 +187,24 @@ class AllotTrainer(models.Model):
             else:
                 self.allotment_id = 'TA1'
         super().save(*args, **kwargs)
+        
+
+class Schedule_Recruitment(models.Model):
+    STATUS_CHOICES = (
+        ('completed', 'Completed'),
+        ('ongoing', 'Ongoing'),
+    )
+    recruiter = models.ForeignKey(Recruiters,on_delete=models.CASCADE, null=False)
+    venue = models.CharField(max_length=50, null=True)
+    designation=models.CharField(max_length=50)
+    date=models.DateField(null=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES,default='ongoing')
+    apply_link = models.URLField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.recruiter}-{self.designation}({self.date})"
+    
+    
+class Recruitment_Participating_Branches(models.Model):
+    scheduled_recruitment=models.ForeignKey(Schedule_Recruitment,on_delete=models.CASCADE, null=False)
+    program_semester=models.ManyToManyField(Program_Semester)

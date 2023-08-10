@@ -62,4 +62,29 @@ class ProgramSemesterGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Program_Semester
         fields = '__all__'
+
+
+class TrainingShceduleSerializer(serializers.Serializer):
+    trainer_id = serializers.IntegerField()
+    start_date_str = serializers.DateField()
+    end_date_str = serializers.DateField()
+    venue = serializers.CharField()
+    foc_areas_ids = serializers.ListField(child=serializers.IntegerField())
+    participants_ids = serializers.ListField(child=serializers.IntegerField())
+    
+
+class RecruitmentShceduleSerializer(serializers.Serializer):
+    recruiter_id = serializers.IntegerField()
+    date = serializers.CharField()  
+    venue = serializers.CharField()
+    designation = serializers.CharField()
+    participants_ids = serializers.ListField(child=serializers.IntegerField())
+    apply_link = serializers.URLField()
+    
+class RecruitmentShcedulesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Schedule_Recruitment
+        fields = '__all__'
+    
+
         
