@@ -424,18 +424,136 @@ def program_semesters(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny,])
-def add_training_shcedule(request):
-    pass
-    response_data:{
-        "title": "Success"
-    }
+def add_training_schedule(request):
+    serializer = TrainingScheduleSerializer(data=request.data)
+    if serializer.is_valid():
+        trainer_id = request.data['trainer_id']
+        start_date_str = request.data['start_date_str']
+        end_date_str = request.data['end_date_str']
+        venue = request.data['venue']
+        foc_areas_ids = request.data['foc_areas_ids']
+        participants_ids = request.data['participants_ids']
+        
+                
+        if FocusingArea.objects.filter(id__in=foc_areas_ids).exists():
+            foc_areas = FocusingArea.objects.filter(id__in=foc_areas_ids)
+            if Trainers.objects.filter(id=trainer_id).exists():
+                trainer = Trainers.objects.get(id=trainer_id)
+                if Program_Semester.objects.filter(id__in=participants_ids).exists():
+                    participants = Program_Semester.objects.filter(id__in=participants_ids)
+                    
+                    # Convert date string to the desired format
+                    start_date = datetime.strptime(start_date_str, '%d-%m-%y').strftime('%Y-%m-%d')
+                    end_date = datetime.strptime(end_date_str, '%d-%m-%y').strftime('%Y-%m-%d')
+
+                    
+                    allot_trainer=AllotTrainer(trainer=trainer,start_date=start_date,end_date=end_date,venue=venue)
+                    allot_trainer.save()
+                    allot_trainer.focusing_area.set(foc_areas) 
+
+                    #Creating paricipence according to the traing allotment and store in TrainingParticipent model
+                    for pgm_sem in participants:
+                        participant = TrainingParticipant(
+                            allot_trainer=allot_trainer,
+                            program_semester=pgm_sem
+                        )
+                        participant.save()
+
+                    response_data = {
+                        'Statuscode' : 6000,
+                        'data' : {
+                            'title': 'Success',
+                            'message' : "Schedule Added SuccessFully"
+                        }
+                    }
+                else:
+                    response_data = {
+                        'Statuscode' : 6001,
+                        'data' : {
+                            'title': 'failed',
+                            'message' : "Participants Not Found"
+                        }
+                    }
+            else:
+                response_data = {
+                    'Statuscode' : 6001,
+                    'data' : {
+                        'title': 'failed',
+                        'message' : "Trainer Not Found"
+                    }
+                } 
+        else:
+            response_data = {
+                'Statuscode' : 6001,
+                'data' : {
+                    'title': 'failed',
+                    'message' : "Focusing Area Not Found"
+                }
+            }
+    else:
+         response_data = {
+            "StatusCode": 6001,
+            "title": "Validation Error",
+            "message": serializer._errors
+        }
     return Response(response_data,status=status.HTTP_200_OK)
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def training_schedule(request):
+    if AllotTrainer.objects.all():
+        schedule = AllotTrainer.objects.all()   
+        serializer = TrainingSchedulesSerializer(schedule, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"Schedule Not Found"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def training_schedule_detail(request, pk):
+    if AllotTrainer.objects.filter(id=pk).exists():
+        schedule = AllotTrainer.objects.get(id=pk)   
+        serializer = TrainingSchedulesSerializer(schedule, many=False)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"Schedule Not Found"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny,])
-def add_recruitment_shcedule(request):
-    serializer = RecruitmentShceduleSerializer(data=request.data)
+def add_recruitment_schedule(request):
+    serializer = RecruitmentScheduleSerializer(data=request.data)
 
     if serializer.is_valid():
         recruiter_id = request.data['recruiter_id']
@@ -485,15 +603,20 @@ def add_recruitment_shcedule(request):
                     'message' : "Recruiter Not Found"
                 }
             }
-
+    else:
+         response_data = {
+            "StatusCode": 6001,
+            "title": "Validation Error",
+            "message": serializer._errors
+        }
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny,])
-def recruitment_shcedule(request):
+def recruitment_schedule(request):
     if Schedule_Recruitment.objects.all():
         schedule = Schedule_Recruitment.objects.all()   
-        serializer = RecruitmentShcedulesSerializer(schedule, many=True)
+        serializer = RecruitmentSchedulesSerializer(schedule, many=True)
         
         response_data = {
             "statusCode":6000,
@@ -514,10 +637,10 @@ def recruitment_shcedule(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny,])
-def recruitment_shcedule_detail(request, pk):
+def recruitment_schedule_detail(request, pk):
     if Schedule_Recruitment.objects.filter(id=pk).exists():
         schedule = Schedule_Recruitment.objects.get(id=pk)   
-        serializer = RecruitmentShcedulesSerializer(schedule, many=False)
+        serializer = RecruitmentSchedulesSerializer(schedule, many=False)
         
         response_data = {
             "statusCode":6000,

@@ -64,16 +64,21 @@ class ProgramSemesterGetSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TrainingShceduleSerializer(serializers.Serializer):
+class TrainingScheduleSerializer(serializers.Serializer):
     trainer_id = serializers.IntegerField()
-    start_date_str = serializers.DateField()
-    end_date_str = serializers.DateField()
+    start_date_str = serializers.CharField()
+    end_date_str = serializers.CharField()
     venue = serializers.CharField()
     foc_areas_ids = serializers.ListField(child=serializers.IntegerField())
     participants_ids = serializers.ListField(child=serializers.IntegerField())
+
+class TrainingSchedulesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AllotTrainer
+        fields = '__all__'
     
 
-class RecruitmentShceduleSerializer(serializers.Serializer):
+class RecruitmentScheduleSerializer(serializers.Serializer):
     recruiter_id = serializers.IntegerField()
     date = serializers.CharField()  
     venue = serializers.CharField()
@@ -81,7 +86,7 @@ class RecruitmentShceduleSerializer(serializers.Serializer):
     participants_ids = serializers.ListField(child=serializers.IntegerField())
     apply_link = serializers.URLField()
     
-class RecruitmentShcedulesSerializer(serializers.ModelSerializer):
+class RecruitmentSchedulesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule_Recruitment
         fields = '__all__'

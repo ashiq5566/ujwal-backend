@@ -26,12 +26,14 @@ urlpatterns = [
     re_path(r"^program_semesters/$", program_semesters),
     
     #training
-    re_path(r"^training/add_schedule/$", add_training_shcedule),
+    re_path(r"^training/add_schedule/$", add_training_schedule),
+    re_path(r"^training/schedules/$", training_schedule),
+    re_path(r"^training/schedules/(?P<pk>\d+)/$", training_schedule_detail),
     re_path(r"^focusing_areas/$", focusing_areas),
     
     #recruitment
-    re_path(r"^recruitment/add_schedule/$", add_recruitment_shcedule),
-    re_path(r"^recruitment/schedules/$", recruitment_shcedule),
-    re_path(r"^recruitment/schedules/(?P<pk>\d+)/$", recruitment_shcedule_detail),
+    re_path(r"^recruitment/add_schedule/$", add_recruitment_schedule),
+    re_path(r"^recruitment/schedules/$", recruitment_schedule),
+    re_path(r"^recruitment/schedules/(?P<pk>\d+)/$", recruitment_schedule_detail),
     
 ]

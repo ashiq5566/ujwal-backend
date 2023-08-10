@@ -167,7 +167,9 @@ class FocusingArea(models.Model):
 
     def __str__(self):
         return self.area_name  
+
     
+       
 class AllotTrainer(models.Model):
     allotment_id = models.CharField(max_length=10, unique=True, null=False)
     trainer = models.ForeignKey(Trainers, on_delete=models.CASCADE)
@@ -187,7 +189,16 @@ class AllotTrainer(models.Model):
             else:
                 self.allotment_id = 'TA1'
         super().save(*args, **kwargs)
-        
+   
+      
+class TrainingParticipant(models.Model):
+    allot_trainer = models.ForeignKey(AllotTrainer, on_delete=models.CASCADE)
+    program_semester = models.ForeignKey(Program_Semester,on_delete=models.CASCADE)
+    
+
+    def __str__(self):
+        return f"{self.allot_trainer} - {self.program_semester}"     
+
 
 class Schedule_Recruitment(models.Model):
     STATUS_CHOICES = (
