@@ -17,12 +17,10 @@ class User(AbstractUser):
     department = models.ForeignKey("main.Departments", on_delete=models.CASCADE, blank=True, null=True)
     user_active=models.BooleanField(default=True)
     def save(self, *args, **kwargs):
-        if not self.id:  # Only hash password when creating a new user
-            self.password = make_password(self.password)
         if self.is_superuser:
             self.role = 'Admin'
             self.department = None
         elif self.role in ['Admin', 'Placement_officer']:
             self.department = None
             
-        super().save(*args, **kwargs)
+        return super(User, self).save(*args, **kwargs)

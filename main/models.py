@@ -150,7 +150,7 @@ class Student(models.Model):
             username = self.username
             password = self.password
 
-            user = User.objects.create(username=username, password=password)
+            user = User.objects.create_user(username=username, password=password)
             self.password = encrypt(password)
             
             s_group, created = Group.objects.get_or_create(

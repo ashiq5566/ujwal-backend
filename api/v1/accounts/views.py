@@ -272,7 +272,7 @@ def student_register(request):
                         username=username,
                         password=password,
                         image=image    
-                    )
+                    )                    
                     response_data = {
                         "statusCode":6000,
                         "data":{
