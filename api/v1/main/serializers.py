@@ -90,6 +90,7 @@ class RecruitmentSchedulesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule_Recruitment
         fields = '__all__'
+
     
 
         

@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
-from main.models import Departments
+from django.contrib.auth.hashers import make_password
 
 # Create your models here.
 class User(AbstractUser):
+
     Role_choices = (
         ('Admin', 'Admin'),
         ('Placement_officer', 'Placement officer'),
@@ -13,10 +14,11 @@ class User(AbstractUser):
     )
 
     role = models.CharField(max_length=50, choices=Role_choices, blank=True, null=True)
-    department = models.ForeignKey(Departments, on_delete=models.CASCADE, blank=True, null=True)
+    department = models.ForeignKey("main.Departments", on_delete=models.CASCADE, blank=True, null=True)
     user_active=models.BooleanField(default=True)
-
     def save(self, *args, **kwargs):
+        if not self.id:  # Only hash password when creating a new user
+            self.password = make_password(self.password)
         if self.is_superuser:
             self.role = 'Admin'
             self.department = None

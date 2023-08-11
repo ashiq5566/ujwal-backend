@@ -1,5 +1,16 @@
+from django.contrib.auth.models import Group
 from django.db import models
+from api.v1.accounts.functions import encrypt, decrypt
+from accounts.models import User
 
+
+DOCUMENT_TYPE_CHOICES = [
+    ('sslc', 'SSLC'),
+    ('cv', 'CV'),
+    ('plus_two', 'Plus Two Certificate'),
+    ('degree_certificate', 'Degree Certificate'),
+    ('experience_certificate', 'Experience Certificate'),
+]
 
 class Departments(models.Model):
     department_id = models.CharField(max_length=10,unique=True, null=False)
@@ -101,6 +112,7 @@ class Trainers(models.Model):
         super().save(*args, **kwargs)
 
 class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     student_id = models.CharField(max_length=10,unique=True, null=False)
     admission_number = models.CharField(max_length=10, unique=True, null=False)
     first_name = models.CharField(max_length=50)
@@ -112,16 +124,20 @@ class Student(models.Model):
     email = models.EmailField(null=False)
     marital_status = models.CharField(max_length=15)
     admission_year = models.IntegerField(null=False)
-    roll_number = models.CharField(max_length=10, null=False)
+    roll_number = models.CharField(max_length=10, null=True,blank=True)
     parent_name = models.CharField(max_length=100)
     parent_phone_number = models.CharField(max_length=15,unique=True)
     parent_email = models.EmailField()
     program = models.ForeignKey(Programs, on_delete=models.CASCADE)
+    username = models.CharField(max_length=50, null=True,blank=True)
+    password = models.CharField(blank=True, null=True)
+    image = models.ImageField(upload_to='students/', null=True, blank=True)
+    
 
     def __str__(self):
         return f"{self.admission_number}-{self.first_name} {self.last_name}"
     
-    def student_save(self):
+    def save(self, *args, **kwargs):
         if not self.student_id:
             last_student = Student.objects.order_by('-student_id').first()
             if last_student:
@@ -129,10 +145,30 @@ class Student(models.Model):
                 self.student_id = f'S{code:02}'
             else:
                 self.student_id = 'S01'
-    
-    def save(self, *args, **kwargs):
-        self.student_save()
+        
+        if self._state.adding:
+            username = self.username
+            password = self.password
+
+            user = User.objects.create(username=username, password=password)
+            self.password = encrypt(password)
+            
+            s_group, created = Group.objects.get_or_create(
+                name="student"
+            )
+            s_group.user_set.add(user)
+            self.user = user
+        
         super().save(*args, **kwargs)
+
+class StudentDocument(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    document_type = models.CharField(max_length=50, choices=DOCUMENT_TYPE_CHOICES)
+    document_file = models.FileField(upload_to='student_documents/',null=True,blank=True)
+    mark = models.CharField(null=True,blank=True)
+
+    def __str__(self):
+        return f"{self.get_document_type_display()}"
 
 class Semesters(models.Model):
     semester = models.CharField(max_length=50, null=False)
@@ -141,8 +177,8 @@ class Semesters(models.Model):
         return self.semester
     
 class Program_Semester(models.Model):
-    program = models.ForeignKey(Programs,on_delete=models.CASCADE)
-    semester = models.ForeignKey(Semesters,on_delete=models.CASCADE)
+    program = models.ForeignKey("main.Programs",on_delete=models.CASCADE)
+    semester = models.ForeignKey("main.Semesters",on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -154,8 +190,8 @@ class Student_program_semester(models.Model):
         ('ongoing', 'Ongoing'),
         ('upcoming', 'Upcoming'),
     )
-    student = models.ForeignKey(Student,on_delete=models.CASCADE)
-    semester = models.ForeignKey(Program_Semester,on_delete=models.CASCADE)
+    student = models.ForeignKey("main.Student",on_delete=models.CASCADE)
+    semester = models.ForeignKey("main.Program_Semester",on_delete=models.CASCADE)
     year = models.IntegerField() 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
 

@@ -1,10 +1,29 @@
 import json
 import requests
-
-# from pprint import pprint
-
-
+from django.conf import settings
+from cryptography.fernet import Fernet
+import base64
 from accounts.models import User
+
+
+
+
+def encrypt(text):
+    text = str(text)
+    f = Fernet(settings.ENCRYPT_KEY)
+    #input should be in bytes
+    encrypted_data = f.encrypt(text.encode('ascii'))
+    encrypted_data = base64.urlsafe_b64encode(encrypted_data).decode("ascii") 
+
+    return encrypted_data
+
+
+def decrypt(text):
+    text= base64.urlsafe_b64decode(text)
+    f = Fernet(settings.ENCRYPT_KEY)
+    decrypted_data = f.decrypt(text).decode("ascii")
+
+    return decrypted_data
 
 
 def authenticate(username: str, password: str, request):
