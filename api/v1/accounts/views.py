@@ -46,7 +46,7 @@ def login(request):
                 response = requests.post(request_url, headers=headers, data=json.dumps(data))
                 
                 response_data = {
-                    'Statuscode' : 6000,
+                    'statusCode' : 6000,
                     'data' : {
                         'title': 'Success',
                         'response' : response.json(),
@@ -54,7 +54,7 @@ def login(request):
                 }
             else:
                 response_data = {
-                    'Statuscode' : 6001,
+                    'statusCode' : 6001,
                     'data' : {
                         'title': 'failed',
                         'message' : "Incorrect password"
@@ -62,7 +62,7 @@ def login(request):
                 }
         else:
             response_data = {
-                'Statuscode' : 6001,
+                'statusCode' : 6001,
                 'data' : {
                     'title': 'failed',
                     'message' : "User not exists"
@@ -70,7 +70,7 @@ def login(request):
             }
     else:
         response_data = {
-            "StatusCode": 6001,
+            "statusCode": 6001,
             "data":{
                 "title": "Validation Error",
                 "message": serialized_data._errors
