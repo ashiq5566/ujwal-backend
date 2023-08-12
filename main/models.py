@@ -150,12 +150,13 @@ class Student(models.Model):
             username = self.username
             password = self.password
 
-            user = User.objects.create_user(username=username, password=password)
+            user = User.objects.create_user(username=username, password=password, role="student", email=self.email)
             self.password = encrypt(password)
             
             s_group, created = Group.objects.get_or_create(
                 name="student"
             )
+            user.role = "student"
             s_group.user_set.add(user)
             self.user = user
         

@@ -49,6 +49,13 @@ def login(request):
                     'statusCode' : 6000,
                     'data' : {
                         'title': 'Success',
+                                "data":{
+                            "id":user.id,
+                            "username":user.username,
+                            "role":user.role,
+                            "email":user.email
+
+                        },
                         'response' : response.json(),
                     }
                 }

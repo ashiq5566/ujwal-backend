@@ -11,6 +11,7 @@ class User(AbstractUser):
         ('HOD', 'HOD'),
         ('Staff_Coordinator', 'Staff Coordinator'),
         ('Student_cordinator','Student cordinator'),
+        ('student','Student'),
     )
 
     role = models.CharField(max_length=50, choices=Role_choices, blank=True, null=True)
