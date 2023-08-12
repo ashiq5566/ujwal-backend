@@ -256,3 +256,14 @@ class Schedule_Recruitment(models.Model):
 class Recruitment_Participating_Branches(models.Model):
     scheduled_recruitment=models.ForeignKey(Schedule_Recruitment,on_delete=models.CASCADE, null=False)
     program_semester=models.ManyToManyField(Program_Semester)
+    
+    
+   
+class Attendence(models.Model):
+    training_participant=models.ForeignKey(TrainingParticipant,on_delete=models.CASCADE)
+    date = models.DateField()
+    present_students = models.ManyToManyField(Student,related_name='present_attendences')
+    absent_student=models.ManyToManyField(Student,related_name='absent_attendences')
+
+    def __str__(self):
+        return f"{self.date}-{self.training_participant}"

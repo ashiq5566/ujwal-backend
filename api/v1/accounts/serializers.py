@@ -42,4 +42,5 @@ class StudentDocumentsSerializer(serializers.Serializer):
     document_type = serializers.CharField()
     document_file = serializers.FileField()
     mark = serializers.CharField()
+
         
