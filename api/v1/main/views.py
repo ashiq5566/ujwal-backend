@@ -571,7 +571,7 @@ def add_recruitment_schedule(request):
             recruiter = Recruiters.objects.get(id=recruiter_id)
             if Program_Semester.objects.filter(id__in=participants_ids).exists():
                 participants = Program_Semester.objects.filter(id__in=participants_ids)
-                date = datetime.strptime(date_str, '%d-%m-%y').strftime('%Y-%m-%d')
+                date = datetime.strptime(date_str, '%d-%m-%Y').strftime('%Y-%m-%d')
                 
                 allot_recruiter = Schedule_Recruitment(recruiter=recruiter,
                     date=date,
