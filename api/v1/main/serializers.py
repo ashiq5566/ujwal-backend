@@ -91,6 +91,10 @@ class RecruitmentSchedulesSerializer(serializers.ModelSerializer):
         model = Schedule_Recruitment
         fields = '__all__'
 
+class TrainingParticipentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrainingParticipant
+        fields = '__all__'
     
 
         

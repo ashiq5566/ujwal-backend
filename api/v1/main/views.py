@@ -662,3 +662,29 @@ def recruitment_schedule_detail(request, pk):
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def training_participents_details(request):
+    if TrainingParticipant.objects.all():
+        training_participant = TrainingParticipant.objects.all()  
+        serializer = TrainingParticipentsSerializer(training_participant, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
