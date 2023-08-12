@@ -688,3 +688,29 @@ def training_participents_details(request):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def recruitment_participents_details(request):
+    if Recruitment_Participating_Branches.objects.all():
+        recruitment_participant = Recruitment_Participating_Branches.objects.all()  
+        serializer = RecruitmentParticipentsSerializer(recruitment_participant, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)

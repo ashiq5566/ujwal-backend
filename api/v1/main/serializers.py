@@ -95,6 +95,12 @@ class TrainingParticipentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrainingParticipant
         fields = '__all__'
+
+class RecruitmentParticipentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recruitment_Participating_Branches
+        fields = '__all__'
+    
     
 
         
