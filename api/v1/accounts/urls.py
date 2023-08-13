@@ -24,4 +24,6 @@ urlpatterns = [
     #toke generation using jwt
     re_path(r"^token/$", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     re_path(r"^token/refresh/$", TokenRefreshView.as_view(), name="token_refresh"),
+
+    
 ]

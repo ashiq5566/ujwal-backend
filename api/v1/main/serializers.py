@@ -105,6 +105,12 @@ class RecruitmentParticipentsSerializer(serializers.ModelSerializer):
 class AttendanceSerializer(serializers.Serializer):
     date = serializers.CharField()
     absent_student = serializers.ListField(child=serializers.IntegerField())
+
+class StudentProgramSemesterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student_semester
+        fields = '__all__'
+        
     
     
 

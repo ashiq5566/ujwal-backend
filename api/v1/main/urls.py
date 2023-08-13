@@ -40,4 +40,7 @@ urlpatterns = [
     
     # attendance
     re_path(r"^training/add_attendance/(?P<pk>\d+)/$", attendance),
+
+    #student program semester
+    re_path(r"^student_program_semester_details/$", student_program_semester_details),
 ]
