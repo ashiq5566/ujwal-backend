@@ -817,24 +817,88 @@ def attendance(request, pk):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def student_program_semester_details(request):
-    if Student_semester.objects.all():
-        student_program_semester = Student_semester.objects.all()  
-        serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
-        
-        response_data = {
-            "statusCode":6000,
-            "data":{
-                "title":"Success",
-                "data":serializer.data
-            }
-        }
-    else:
-        response_data = {
+    
+    date = request.GET.get('date')
+    program_semester_id = request.GET.get('program_semester_id')
+    
+
+    
+    if date and program_semester_id:
+        if Program_Semester.objects.filter(id=program_semester_id).exists():
+            if Student_program_semester.objects.filter(semester_id=program_semester_id).exists():
+                if Student_program_semester.objects.filter(semester_id=program_semester_id,start_date__isnull=False).exists():
+                    if Student_program_semester.objects.filter(semester_id=program_semester_id, end_date__isnull=False).exists():
+                        student_program_semester = Student_program_semester.objects.filter(
+                            semester_id=program_semester_id,
+                            start_date__lte=date,
+                            end_date__gte=date         
+                        )
+                        serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
+                        response_data = {
+                            "statusCode":6000,
+                            "data":{
+                                "title":"Success",
+                                "data":serializer.data
+                            }
+                        }
+                    else:
+                        student_program_semester = Student_program_semester.objects.filter(
+                            semester_id=program_semester_id,
+                            start_date__lte=date   
+                        )
+                        serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
+                        response_data = {
+                            "statusCode":6000,
+                            "data":{
+                                "title":"Success",
+                                "data":serializer.data
+                            }
+                        }
+                else:
+                     response_data = {
+                        "statusCode":6001,
+                        "data":{
+                            "title":"Failed",
+                            "data":"start date is null"
+                        }
+                }
+            else:
+                response_data = {
+                    "statusCode":6001,
+                    "data":{
+                        "title":"Failed",
+                        "data":"student program semester instance NotFound"
+                    }
+                }
+        else:
+            response_data = {
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "data":"program semester NotFound"
             }
         }
+            
+    else:
+        if Student_program_semester.objects.all():
+            student_program_semester = Student_program_semester.objects.all()  
+            serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
+            
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":"NotFound"
+                }
+            }
 
     return Response(response_data,status=status.HTTP_200_OK)
+

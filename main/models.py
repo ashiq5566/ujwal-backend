@@ -193,7 +193,8 @@ class Student_program_semester(models.Model):
     )
     student = models.ForeignKey("main.Student",on_delete=models.CASCADE)
     semester = models.ForeignKey("main.Program_Semester",on_delete=models.CASCADE)
-    year = models.IntegerField() 
+    start_date = models.DateField(null=True,blank=True) 
+    end_date = models.DateField(null=True,blank=True)     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
 
     def __str__(self):
@@ -268,17 +269,3 @@ class Attendence(models.Model):
     def __str__(self):
         return f"{self.date}-{self.training_participant}"
     
-class Student_semester(models.Model):
-    STATUS_CHOICES = (
-        ('completed', 'Completed'),
-        ('ongoing', 'Ongoing'),
-        ('upcoming', 'Upcoming'),
-    )
-    student = models.ForeignKey(Student,on_delete=models.CASCADE)
-    semester = models.ForeignKey(Program_Semester,on_delete=models.CASCADE)
-    start_date = models.DateField() 
-    end_date = models.DateField() 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
-
-    def __str__(self):
-        return f"{self.student},{self.semester},{self.status}"

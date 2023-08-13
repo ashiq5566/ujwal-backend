@@ -108,7 +108,7 @@ class AttendanceSerializer(serializers.Serializer):
 
 class StudentProgramSemesterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Student_semester
+        model = Student_program_semester
         fields = '__all__'
         
     
