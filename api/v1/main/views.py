@@ -822,54 +822,53 @@ def student_program_semester_details(request):
     program_semester_id = request.GET.get('program_semester_id')
     
 
+    
     if date and program_semester_id:
-        program_semester = Program_Semester.objects.filter(id=program_semester_id)
-
-        if program_semester:
-            student_program_semester = Student_program_semester.objects.filter(semester_id=program_semester_id)
-
-            if student_program_semester:
-                start_date = Student_program_semester.objects.filter(semester_id=program_semester_id, start_date__isnull=False)
-                end_date = Student_program_semester.objects.filter(semester_id=program_semester_id, end_date__isnull=False)
-
-                if start_date and end_date:
+        if Program_Semester.objects.filter(id=program_semester_id).exists():
+            if Student_program_semester.objects.filter(semester_id=program_semester_id).exists():
+                if Student_program_semester.objects.filter(semester_id=program_semester_id,start_date__isnull=False, end_date__isnull=False).exists():
                     student_program_semester = Student_program_semester.objects.filter(
                         semester_id=program_semester_id,
                         start_date__lte=date,
-                        end_date__gte=date
+                        end_date__gte=date         
                     )
+                    serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
+                    response_data = {
+                        "statusCode":6000,
+                        "data":{
+                            "title":"Success",
+                            "data":serializer.data
+                        }
+                    }
                 else:
                     student_program_semester = Student_program_semester.objects.filter(
                         semester_id=program_semester_id,
-                        start_date__lte=date
+                        start_date__lte=date   
                     )
-
-                serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
-                response_data = {
-                    "statusCode":6000,
-                    "data":{
-                        "title":"Success",
-                        "data":serializer.data
+                    serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
+                    response_data = {
+                        "statusCode":6000,
+                        "data":{
+                            "title":"Success",
+                            "data":serializer.data
+                        }
                     }
-                }
-
             else:
                 response_data = {
-                    "statusCode": 6001,
-                    "data": {
-                        "title": "Failed",
-                        "data": "student program semester instance NotFound"
+                    "statusCode":6001,
+                    "data":{
+                        "title":"Failed",
+                        "data":"student program semester instance NotFound"
                     }
                 }
         else:
             response_data = {
-                "statusCode": 6001,
-                "data": {
-                    "title": "Failed",
-                    "data": "program semester NotFound"
-                }
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"program semester NotFound"
             }
-    
+        }
             
     else:
         if Student_program_semester.objects.all():
