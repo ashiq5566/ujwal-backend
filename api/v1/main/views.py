@@ -823,14 +823,6 @@ def student_program_semester_details(request):
     date = request.GET.get('date')
     program_semester_id = request.GET.get('program_semester_id')
 
-    # results = Student_program_semester.objects.filter(
-    # Q(semester_id=program_semester_id) & (
-    #     Q(start_date__isnull=False, end_date__isnull=True) |
-    #     Q(start_date__isnull=False, end_date__isnull=False, start_date__lte=date, end_date__gte=date)
-    # )
-    # )
-    # print(results,"results")
-
     if date and program_semester_id:
         results = Student_program_semester.objects.filter(
         Q(semester_id=program_semester_id) & (
