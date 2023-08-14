@@ -326,26 +326,53 @@ def student_register(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def students(request):
-    if Student.objects.all():
-        student = Student.objects.all()
-        serializer = StudentListSerializer(student, many=True)
-        
-        response_data = {
-                "statusCode":6000,
-                "data":{
-                    "title":"Success",
-                    "data":serializer.data
+    ids_param = request.query_params.get("ids")
+    print(ids_param,"ids_param")
+    
+    if ids_param:
+        ids_list = [int(id) for id in ids_param.strip("[]").split(",")]
+        if Student.objects.filter(id__in=ids_list):
+            
+            
+            students = Student.objects.filter(id__in=ids_list)
+            serializer = StudentListSerializer(students, many=True)
+            response_data = {
+                "statusCode": 6000,
+                "data": {
+                    "title": "Success",
+                    "data": serializer.data
                 }
             }
-    else:
-        response_data = {
+        else:
+            response_data = {
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "data":"student not found"
             }
-        }     
-    return Response(response_data,status=status.HTTP_200_OK)
+        }
+    else:
+        if Student.objects.all():
+            students = Student.objects.all()  # Fetch all students if no ids parameter is provided
+            serializer = StudentListSerializer(students, many=True)
+            response_data = {
+                "statusCode": 6000,
+                "data": {
+                    "title": "Success",
+                    "data": serializer.data
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":"student not found"
+                }
+            }
+    
+    
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 
