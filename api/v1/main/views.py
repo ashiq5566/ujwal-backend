@@ -15,6 +15,8 @@ from api.v1.accounts.functions import authenticate
 from accounts.models import User
 from main.models import *
 
+from django.db.models import Q
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -820,56 +822,30 @@ def student_program_semester_details(request):
     
     date = request.GET.get('date')
     program_semester_id = request.GET.get('program_semester_id')
-    
 
-    
+    # results = Student_program_semester.objects.filter(
+    # Q(semester_id=program_semester_id) & (
+    #     Q(start_date__isnull=False, end_date__isnull=True) |
+    #     Q(start_date__isnull=False, end_date__isnull=False, start_date__lte=date, end_date__gte=date)
+    # )
+    # )
+    # print(results,"results")
+
     if date and program_semester_id:
-        if Program_Semester.objects.filter(id=program_semester_id).exists():
-            if Student_program_semester.objects.filter(semester_id=program_semester_id).exists():
-                if Student_program_semester.objects.filter(semester_id=program_semester_id,start_date__isnull=False, end_date__isnull=False).exists():
-                    student_program_semester = Student_program_semester.objects.filter(
-                        semester_id=program_semester_id,
-                        start_date__lte=date,
-                        end_date__gte=date         
-                    )
-                    serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
-                    response_data = {
-                        "statusCode":6000,
-                        "data":{
-                            "title":"Success",
-                            "data":serializer.data
-                        }
-                    }
-                else:
-                    student_program_semester = Student_program_semester.objects.filter(
-                        semester_id=program_semester_id,
-                        start_date__lte=date   
-                    )
-                    serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
-                    response_data = {
-                        "statusCode":6000,
-                        "data":{
-                            "title":"Success",
-                            "data":serializer.data
-                        }
-                    }
-            else:
-                response_data = {
-                    "statusCode":6001,
-                    "data":{
-                        "title":"Failed",
-                        "data":"student program semester instance NotFound"
-                    }
-                }
-        else:
-            response_data = {
-            "statusCode":6001,
+        results = Student_program_semester.objects.filter(
+        Q(semester_id=program_semester_id) & (
+            Q(start_date__isnull=False, end_date__isnull=True) |
+            Q(start_date__isnull=False, end_date__isnull=False, start_date__lte=date, end_date__gte=date)
+        )
+        )
+        serializer = StudentProgramSemesterSerializer(results, many=True)
+        response_data = {
+            "statusCode":6000,
             "data":{
-                "title":"Failed",
-                "data":"program semester NotFound"
+                "title":"Success",
+                "data":serializer.data
             }
         }
-            
     else:
         if Student_program_semester.objects.all():
             student_program_semester = Student_program_semester.objects.all()  
@@ -889,7 +865,77 @@ def student_program_semester_details(request):
                     "title":"Failed",
                     "data":"NotFound"
                 }
-            }
-
+            }    
     return Response(response_data,status=status.HTTP_200_OK)
+
+    
+    # if date and program_semester_id:
+    #     if Program_Semester.objects.filter(id=program_semester_id).exists():
+    #         if Student_program_semester.objects.filter(semester_id=program_semester_id).exists():
+    #             if Student_program_semester.objects.filter(semester_id=program_semester_id,start_date__isnull=False, end_date__isnull=False).exists():
+    #                 student_program_semester = Student_program_semester.objects.filter(
+    #                     semester_id=program_semester_id,
+    #                     start_date__lte=date,
+    #                     end_date__gte=date         
+    #                 )
+    #                 serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
+    #                 response_data = {
+    #                     "statusCode":6000,
+    #                     "data":{
+    #                         "title":"Success",
+    #                         "data":serializer.data
+    #                     }
+    #                 }
+    #             else:
+    #                 student_program_semester = Student_program_semester.objects.filter(
+    #                     semester_id=program_semester_id,
+    #                     start_date__lte=date   
+    #                 )
+    #                 serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
+    #                 response_data = {
+    #                     "statusCode":6000,
+    #                     "data":{
+    #                         "title":"Success",
+    #                         "data":serializer.data
+    #                     }
+    #                 }
+    #         else:
+    #             response_data = {
+    #                 "statusCode":6001,
+    #                 "data":{
+    #                     "title":"Failed",
+    #                     "data":"student program semester instance NotFound"
+    #                 }
+    #             }
+    #     else:
+    #         response_data = {
+    #         "statusCode":6001,
+    #         "data":{
+    #             "title":"Failed",
+    #             "data":"program semester NotFound"
+    #         }
+    #     }
+            
+    # else:
+    #     if Student_program_semester.objects.all():
+    #         student_program_semester = Student_program_semester.objects.all()  
+    #         serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
+            
+    #         response_data = {
+    #             "statusCode":6000,
+    #             "data":{
+    #                 "title":"Success",
+    #                 "data":serializer.data
+    #             }
+    #         }
+    #     else:
+    #         response_data = {
+    #             "statusCode":6001,
+    #             "data":{
+    #                 "title":"Failed",
+    #                 "data":"NotFound"
+    #             }
+    #         }
+
+    # return Response(response_data,status=status.HTTP_200_OK)
 
