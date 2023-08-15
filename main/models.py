@@ -277,3 +277,33 @@ class Recruitment_Participated_Students(models.Model):
     def __str__(self):
         return f"{self.student}:{self.scheduled_recruitment}"
     
+
+class Recruitment_Student_Updations(models.Model):
+    selection_choices = (
+        ('Aptitude', 'Aptitude'),
+        ('Group Discussion', 'Group Discussion'),
+        ('Exam', 'Exam'),
+        ('HR Interview', 'HR Interview'),
+        ('Technical Interview', 'Technical Interview'),
+    )
+    is_selected_choices=(
+        ('Qualified','Qualified'),
+        ('Disqualified','Disqualified'),
+    )
+    status_choices =(
+        ('ongoing','ongoing'),
+        ('completed','completed')
+    )
+    recruitment_participated_student=models.ForeignKey(Recruitment_Participated_Students,on_delete=models.CASCADE, null=False)
+    date = models.DateField(null=True)
+    type_of_selection=models.CharField(max_length=30, choices=selection_choices, null=False)
+    is_selected=models.CharField(max_length=30, choices=is_selected_choices,null=True)
+    status = models.CharField(max_length=30, choices=status_choices, default='ongoing') #if exam is pass set ongoing to complete until final process complete
+
+    def __str__(self):
+        return f"{self.recruitment_participated_student},{self.type_of_selection}"
+    
+    def save(self, *args, **kwargs):
+        if self.is_selected == 'Disqualified':
+            self.status = 'completed'
+        super().save(*args, **kwargs)
