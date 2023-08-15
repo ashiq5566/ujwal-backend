@@ -860,3 +860,28 @@ def student_program_semester_details(request):
             }    
     return Response(response_data,status=status.HTTP_200_OK)
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def recruitment_applied_students_by_recruitment_schedule(request, pk):
+    if Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk).exists():
+        students =Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk)
+        serializer = RecruitmentParticipatedStudentsSchedulesSerializer(students, many=True)
+
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"Participated student list Not Found"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
