@@ -111,6 +111,10 @@ class StudentProgramSemesterSerializer(serializers.ModelSerializer):
         model = Student_program_semester
         fields = '__all__'
         
+class RecruitmentParticipatedStudentsSchedulesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recruitment_Participated_Students
+        fields = '__all__'
     
     
 

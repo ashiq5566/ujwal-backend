@@ -36,7 +36,8 @@ urlpatterns = [
     re_path(r"^recruitment/add_schedule/$", add_recruitment_schedule),
     re_path(r"^recruitment/schedules/$", recruitment_schedule),
     re_path(r"^recruitment/schedules/(?P<pk>\d+)/$", recruitment_schedule_detail), 
-    re_path(r"^recruitment_participents/$", recruitment_participents_details),  
+    re_path(r"^recruitment_participents/$", recruitment_participents_details), 
+    re_path(r"^recruitment_participated_students_by_recruitment_schedule/(?P<pk>\d+)/$", recruitment_applied_students_by_recruitment_schedule),  
     
     # attendance
     re_path(r"^training/add_attendance/(?P<pk>\d+)/$", attendance),
