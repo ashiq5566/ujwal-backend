@@ -774,6 +774,7 @@ def attendance(request, pk):
                 training_p = TrainingParticipant.objects.all()
                 
                 absent_students = request.data['absent_student']
+                present_student = request.data['present_student']
                 date1 = request.data['date']
                 absent_studs = list(Student.objects.filter(id__in=absent_students).values_list('id', flat=True))
                 for each in participants_id_list:
@@ -782,8 +783,8 @@ def attendance(request, pk):
                     a = TrainingParticipant.objects.filter(id=each).values('program_semester')
                     b = Student_program_semester.objects.filter(semester__in=a).values('student')
                     c = Student.objects.filter(id__in=b).values_list('id', flat=True)
-                    absent = [id for id in absent_studs if id in c]
-                    present = [id for id in c if id not in absent]
+                    absent = [id for id in absent_students if id in c]
+                    present = [id for id in c if id in present_student]
                     attendence.absent_student.set(absent)
                     attendence.present_students.set(present)
                 
