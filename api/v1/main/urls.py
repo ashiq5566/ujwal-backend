@@ -44,4 +44,5 @@ urlpatterns = [
 
     #student program semester
     re_path(r"^student_program_semester_details/$", student_program_semester_details),
+    re_path(r"^student_program_semester_by_program_semester/(?P<pk>\d+)/$", student_program_semester_by_program_semester),
 ]

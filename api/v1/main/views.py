@@ -955,3 +955,29 @@ def recruitment_applied_students_by_recruitment_schedule(request, pk):
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def student_program_semester_by_program_semester(request, pk):
+    if Program_Semester.objects.filter(id=pk).exists():
+        students_program_semester =Student_program_semester.objects.filter(semester_id=pk)
+        print(students_program_semester,pk,"pk")
+        serializer = StudentProgramSemesterSerializer(students_program_semester, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"Program semester Not Found"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
