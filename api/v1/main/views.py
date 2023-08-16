@@ -774,6 +774,7 @@ def attendance(request, pk):
                 training_p = TrainingParticipant.objects.all()
                 
                 absent_students = request.data['absent_student']
+                present_student = request.data['present_student']
                 date1 = request.data['date']
                 absent_studs = list(Student.objects.filter(id__in=absent_students).values_list('id', flat=True))
                 for each in participants_id_list:
@@ -782,8 +783,8 @@ def attendance(request, pk):
                     a = TrainingParticipant.objects.filter(id=each).values('program_semester')
                     b = Student_program_semester.objects.filter(semester__in=a).values('student')
                     c = Student.objects.filter(id__in=b).values_list('id', flat=True)
-                    absent = [id for id in absent_studs if id in c]
-                    present = [id for id in c if id not in absent]
+                    absent = [id for id in absent_students if id in c]
+                    present = [id for id in c if id in present_student]
                     attendence.absent_student.set(absent)
                     attendence.present_students.set(present)
                 
@@ -860,77 +861,6 @@ def student_program_semester_details(request):
             }    
     return Response(response_data,status=status.HTTP_200_OK)
 
-    
-    # if date and program_semester_id:
-    #     if Program_Semester.objects.filter(id=program_semester_id).exists():
-    #         if Student_program_semester.objects.filter(semester_id=program_semester_id).exists():
-    #             if Student_program_semester.objects.filter(semester_id=program_semester_id,start_date__isnull=False, end_date__isnull=False).exists():
-    #                 student_program_semester = Student_program_semester.objects.filter(
-    #                     semester_id=program_semester_id,
-    #                     start_date__lte=date,
-    #                     end_date__gte=date         
-    #                 )
-    #                 serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
-    #                 response_data = {
-    #                     "statusCode":6000,
-    #                     "data":{
-    #                         "title":"Success",
-    #                         "data":serializer.data
-    #                     }
-    #                 }
-    #             else:
-    #                 student_program_semester = Student_program_semester.objects.filter(
-    #                     semester_id=program_semester_id,
-    #                     start_date__lte=date   
-    #                 )
-    #                 serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
-    #                 response_data = {
-    #                     "statusCode":6000,
-    #                     "data":{
-    #                         "title":"Success",
-    #                         "data":serializer.data
-    #                     }
-    #                 }
-    #         else:
-    #             response_data = {
-    #                 "statusCode":6001,
-    #                 "data":{
-    #                     "title":"Failed",
-    #                     "data":"student program semester instance NotFound"
-    #                 }
-    #             }
-    #     else:
-    #         response_data = {
-    #         "statusCode":6001,
-    #         "data":{
-    #             "title":"Failed",
-    #             "data":"program semester NotFound"
-    #         }
-    #     }
-            
-    # else:
-    #     if Student_program_semester.objects.all():
-    #         student_program_semester = Student_program_semester.objects.all()  
-    #         serializer = StudentProgramSemesterSerializer(student_program_semester, many=True)
-            
-    #         response_data = {
-    #             "statusCode":6000,
-    #             "data":{
-    #                 "title":"Success",
-    #                 "data":serializer.data
-    #             }
-    #         }
-    #     else:
-    #         response_data = {
-    #             "statusCode":6001,
-    #             "data":{
-    #                 "title":"Failed",
-    #                 "data":"NotFound"
-    #             }
-    #         }
-
-    # return Response(response_data,status=status.HTTP_200_OK)
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny,])
@@ -938,7 +868,7 @@ def recruitment_applied_students_by_recruitment_schedule(request, pk):
     if Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk).exists():
         students =Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk)
         serializer = RecruitmentParticipatedStudentsSchedulesSerializer(students, many=True)
-        
+
         response_data = {
             "statusCode":6000,
             "data":{
@@ -955,6 +885,7 @@ def recruitment_applied_students_by_recruitment_schedule(request, pk):
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
+
 
 
 @api_view(['GET'])
