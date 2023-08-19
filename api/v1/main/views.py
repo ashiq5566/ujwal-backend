@@ -912,3 +912,30 @@ def student_program_semester_by_program_semester(request, pk):
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def add_recruitment_Participated_Students(request):
+    serializer = RecruitmentParticipatedStudentsSchedulesSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        serializer.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Recruitment participatindg student added successfully."
+            }
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    response_data = {
+        "statusCode": 6001,
+        "data": {
+            "title": "Validation Error",
+            "message": "Recruitment participatindg student adding failed.",
+            "errors": serializer.errors
+        }
+    }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
