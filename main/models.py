@@ -242,6 +242,7 @@ class Schedule_Recruitment(models.Model):
     STATUS_CHOICES = (
         ('completed', 'Completed'),
         ('ongoing', 'Ongoing'),
+        ('cancelled', 'Cancelled'),
     )
     recruiter = models.ForeignKey(Recruiters,on_delete=models.CASCADE, null=False)
     venue = models.CharField(max_length=50, null=True)
