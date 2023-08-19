@@ -124,4 +124,12 @@ class CheckAttendanceMarkedSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
 
-        
+class CheckAttendanceMarkedUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CheckAttendanceMarked
+        fields = ['attendance_marked']
+
+    # Optionally, you can add extra validation logic if needed
+    def validate_attendance_marked(self, value):
+        # Add your validation logic here, if required
+        return value

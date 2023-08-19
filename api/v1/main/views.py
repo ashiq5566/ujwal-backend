@@ -964,3 +964,23 @@ def check_Attendance_Marked_details_from_allot_trainer(request, pk):
             }
         }
     return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def update_attendance_marked(request):
+    try:
+        allot_trainer_id = request.data.get("allot_trainer")
+        date_str = request.data.get("date")
+        attendance_marked = request.data.get("attendance_marked")
+
+        instance = CheckAttendanceMarked.objects.get(allot_trainer_id=allot_trainer_id, date=date_str)
+    except CheckAttendanceMarked.DoesNotExist:
+        return Response({"detail": "Instance not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = CheckAttendanceMarkedUpdateSerializer(instance, data={"attendance_marked": attendance_marked})
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"detail": "Instance updated successfully"}, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
