@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group
 from django.db import models
 from api.v1.accounts.functions import encrypt, decrypt
 from accounts.models import User
+from datetime import timedelta ,datetime
 
 
 DOCUMENT_TYPE_CHOICES = [
@@ -226,16 +227,44 @@ class AllotTrainer(models.Model):
                 self.allotment_id = f'TA{last_id + 1}'
             else:
                 self.allotment_id = 'TA1'
+
         super().save(*args, **kwargs)
-   
-      
+
+        # Automatically create instances in AllotTrainerAttendance for each day within the start and end dates
+        if self.start_date and self.end_date:
+            print(self.start_date, self.end_date)
+            
+            startDate=datetime.strptime(self.start_date, '%Y-%m-%d').date()
+            endDate=datetime.strptime(self.end_date, '%Y-%m-%d').date()
+            current_date = startDate
+            while current_date <= endDate:
+                # Create attendance record for each date
+                CheckAttendanceMarked.objects.create(
+                    allot_trainer=self,
+                    date=current_date,
+                    attendance_marked=False  # You can change this default value as needed
+                )
+                print(current_date,"current_date1")
+                current_date += timedelta(days=1)
+                print(current_date,"current_date2")
+
+
 class TrainingParticipant(models.Model):
     allot_trainer = models.ForeignKey(AllotTrainer, on_delete=models.CASCADE)
     program_semester = models.ForeignKey(Program_Semester,on_delete=models.CASCADE)
     
 
     def __str__(self):
-        return f"{self.allot_trainer} - {self.program_semester}"     
+        return f"{self.allot_trainer} - {self.program_semester}"   
+
+class CheckAttendanceMarked(models.Model):
+    allot_trainer = models.ForeignKey(AllotTrainer, on_delete=models.CASCADE)
+    date = models.DateField(null=False)
+    attendance_marked = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"AllotTrainer: {self.allot_trainer}, Date: {self.date}, Attendance Marked: {self.attendance_marked}"
+  
 
 
 class Schedule_Recruitment(models.Model):

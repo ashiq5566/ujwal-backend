@@ -118,6 +118,10 @@ class RecruitmentParticipatedStudentsSchedulesSerializer(serializers.ModelSerial
         model = Recruitment_Participated_Students
         fields = '__all__'
     
+class CheckAttendanceMarkedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CheckAttendanceMarked
+        fields = '__all__'
     
 
         

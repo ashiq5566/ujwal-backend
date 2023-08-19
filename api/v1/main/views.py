@@ -939,3 +939,28 @@ def add_recruitment_Participated_Students(request):
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def check_Attendance_Marked_details_from_allot_trainer(request, pk):
+    checkAttendanceMarked = CheckAttendanceMarked.objects.filter(allot_trainer_id=pk)
+    
+    if checkAttendanceMarked.exists():
+        serializer = CheckAttendanceMarkedSerializer(checkAttendanceMarked, many=True)
+        
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "data": serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "data": "Attendance marked details not found"
+            }
+        }
+    return Response(response_data, status=status.HTTP_200_OK)
