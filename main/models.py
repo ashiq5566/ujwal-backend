@@ -236,23 +236,6 @@ class AllotTrainer(models.Model):
 
         super().save(*args, **kwargs)
 
-        # Automatically create instances in AllotTrainerAttendance for each day within the start and end dates
-        if self.start_date and self.end_date:
-            print(self.start_date, self.end_date)
-            start_date_str = str(self.start_date)
-            end_date_str = str(self.end_date)
-            
-            startDate=datetime.strptime(start_date_str, '%Y-%m-%d').date()
-            endDate=datetime.strptime(end_date_str, '%Y-%m-%d').date()
-            current_date = startDate
-            while current_date <= endDate:
-                # Create attendance record for each date
-                CheckAttendanceMarked.objects.create(
-                    allot_trainer=self,
-                    date=current_date,
-                    attendance_marked=False  # You can change this default value as needed
-                )
-                current_date += timedelta(days=1)
 
 
 class TrainingParticipant(models.Model):
@@ -262,14 +245,6 @@ class TrainingParticipant(models.Model):
 
     def __str__(self):
         return f"{self.allot_trainer} - {self.program_semester}"   
-
-class CheckAttendanceMarked(models.Model):
-    allot_trainer = models.ForeignKey(AllotTrainer, on_delete=models.CASCADE)
-    date = models.DateField(null=False)
-    attendance_marked = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"AllotTrainer: {self.allot_trainer}, Date: {self.date}, Attendance Marked: {self.attendance_marked}"
   
 
 
