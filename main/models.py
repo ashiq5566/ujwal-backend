@@ -210,12 +210,18 @@ class FocusingArea(models.Model):
     
        
 class AllotTrainer(models.Model):
+    STATUS_CHOICES = (
+        ('completed', 'Completed'),
+        ('ongoing', 'Ongoing'),
+        ('cancelled', 'Cancelled'),
+    )
     allotment_id = models.CharField(max_length=10, unique=True, null=False)
     trainer = models.ForeignKey(Trainers, on_delete=models.CASCADE)
     start_date = models.DateField(null=False)
     end_date = models.DateField(null=False)
     venue = models.CharField(max_length=100)
     focusing_area = models.ManyToManyField(FocusingArea)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES,default='ongoing')
 
     def __str__(self):
         return f"{self.trainer}"
@@ -233,9 +239,11 @@ class AllotTrainer(models.Model):
         # Automatically create instances in AllotTrainerAttendance for each day within the start and end dates
         if self.start_date and self.end_date:
             print(self.start_date, self.end_date)
+            start_date_str = str(self.start_date)
+            end_date_str = str(self.end_date)
             
-            startDate=datetime.strptime(self.start_date, '%Y-%m-%d').date()
-            endDate=datetime.strptime(self.end_date, '%Y-%m-%d').date()
+            startDate=datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            endDate=datetime.strptime(end_date_str, '%Y-%m-%d').date()
             current_date = startDate
             while current_date <= endDate:
                 # Create attendance record for each date
@@ -244,9 +252,7 @@ class AllotTrainer(models.Model):
                     date=current_date,
                     attendance_marked=False  # You can change this default value as needed
                 )
-                print(current_date,"current_date1")
                 current_date += timedelta(days=1)
-                print(current_date,"current_date2")
 
 
 class TrainingParticipant(models.Model):
