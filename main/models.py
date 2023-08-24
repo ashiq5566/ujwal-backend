@@ -127,12 +127,12 @@ class Student(models.Model):
     admission_year = models.IntegerField(null=False)
     roll_number = models.CharField(max_length=10, null=True,blank=True)
     parent_name = models.CharField(max_length=100)
-    parent_phone_number = models.CharField(max_length=15,unique=True)
+    parent_phone_number = models.CharField(max_length=15,unique=False)
     parent_email = models.EmailField()
     program = models.ForeignKey(Programs, on_delete=models.CASCADE)
     username = models.CharField(max_length=50, null=True,blank=True)
     password = models.CharField(blank=True, null=True)
-    image = models.ImageField(upload_to='students/', null=True, blank=True)
+    # image = models.ImageField(upload_to='students/', null=True, blank=True)
     
 
     def __str__(self):
@@ -151,7 +151,7 @@ class Student(models.Model):
             username = self.username
             password = self.password
 
-            user = User.objects.create_user(username=username, password=password, role="student", email=self.email)
+            user = User.objects.create_user(username=username, password=password, role="student", email=self.email,is_active=False)
             self.password = encrypt(password)
             
             s_group, created = Group.objects.get_or_create(
@@ -196,7 +196,7 @@ class Student_program_semester(models.Model):
     semester = models.ForeignKey("main.Program_Semester",on_delete=models.CASCADE)
     start_date = models.DateField(null=True,blank=True) 
     end_date = models.DateField(null=True,blank=True)     
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES,default='upcoming')
 
     def __str__(self):
         return f"{self.student},{self.semester},{self.status}"

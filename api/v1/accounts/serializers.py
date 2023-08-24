@@ -30,7 +30,7 @@ class StudentSerializer(serializers.Serializer):
     program_id = serializers.IntegerField()
     username = serializers.CharField()
     password = serializers.CharField()
-    image = serializers.ImageField()
+    # image = serializers.ImageField()
     
 class StudentListSerializer(serializers.ModelSerializer):
     class Meta:

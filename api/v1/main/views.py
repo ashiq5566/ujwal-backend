@@ -718,104 +718,144 @@ def recruitment_participents_details(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 
+# @api_view(['POST'])
+# @permission_classes([AllowAny,])
+# def attendance1(request, pk):
+#     serializer = AttendanceSerializer(data=request.data)
+    
+#     if serializer.is_valid():
+        
+#         if AllotTrainer.objects.filter(id=pk).exists():
+#             schedules = AllotTrainer.objects.filter(id=pk)
+#             if TrainingParticipant.objects.filter(allot_trainer=pk).exists():
+#                 participaing_depts = TrainingParticipant.objects.filter(allot_trainer=pk).values('program_semester')
+#                 participants = participaing_depts.values_list('program_semester', flat=True)
+                
+#                 sd = schedules.values('start_date')
+#                 ed = schedules.values('end_date')
+#                 start_date = sd[0]['start_date']
+#                 end_date = ed[0]['end_date']
+                
+#                 date_list = []
+#                 current_date = start_date
+#                 while current_date <= end_date:
+#                     date_list.append(current_date)
+#                     current_date += timedelta(days=1)
+                    
+#                 student_sems_list = []
+#                 for each in participants:
+#                     if Program_Semester.objects.get(id=each):
+#                         pgm_sem = Program_Semester.objects.get(id=each)
+#                         if Student_program_semester.objects.filter(semester=pgm_sem,status="ongoing").exists():
+#                             student_list = Student_program_semester.objects.filter(semester=pgm_sem,status="ongoing").values('id')
+#                             student_sems = list(student_list.values_list('id', flat=True))
+#                             student_sems_list.extend(student_sems)
+                            
+#                         else:
+#                             response_data = {
+#                                 "statusCode": 6001,
+#                                 "title": "Failed",
+#                                 "message": "Student List not Found"
+#                             }
+                            
+#                     else:
+#                         response_data = {
+#                             "statusCode": 6001,
+#                             "title": "Failed",
+#                             "message": "Program semester not Found"
+#                         }
+                
+#                 students = Student_program_semester.objects.filter(id__in=student_sems_list).values('student_id')
+#                 students_list = list(students.values_list('student_id', flat=True))
+#                 student_s = Student.objects.filter(id__in=students_list)
+#                 all_students = [str(student.id) for student in student_s]# Get a list of all student IDs
+#                 participant_id = TrainingParticipant.objects.filter(allot_trainer=pk).values('id')
+#                 participants_id_list = participant_id.values_list('id', flat=True)
+#                 training_p = TrainingParticipant.objects.all()
+                
+#                 absent_students = request.data['absent_student']
+#                 present_student = request.data['present_student']
+#                 date1 = request.data['date']
+#                 absent_studs = list(Student.objects.filter(id__in=absent_students).values_list('id', flat=True))
+#                 for each in participants_id_list:
+#                     attendence = Attendence(training_participant=training_p.get(id=each),date=date1)
+#                     print(attendence,"attendence")
+#                     attendence.save()
+#                     a = TrainingParticipant.objects.filter(id=each).values('program_semester')
+#                     b = Student_program_semester.objects.filter(semester__in=a).values('student')
+#                     c = Student.objects.filter(id__in=b).values_list('id', flat=True)
+#                     absent = [id for id in absent_students if id in c]
+#                     present = [id for id in c if id in present_student]
+#                     attendence.absent_student.set(absent)
+#                     attendence.present_students.set(present)
+                
+#                 response_data = {
+#                     "statusCode": 6000,
+#                     "title": "Success",
+#                     "message": "Attendence Added SuccessFully"
+#                 }
+#             else:
+#                 response_data = {
+#                     "statusCode": 6001,
+#                     "title": "Failed",
+#                     "message": "TrainingParticipant not Found"
+#                 }
+                
+#         else:
+#             response_data = {
+#                 "statusCode": 6001,
+#                 "title": "Failed",
+#                 "message": "Schedule not Found"
+#             }
+        
+#     else:
+#         response_data = {
+#         "statusCode": 6001,
+#         "title": "Validation Error",
+#         "message": serializer._errors
+#     }    
+        
+    
+#     return Response(response_data,status=status.HTTP_200_OK)
+
 @api_view(['POST'])
 @permission_classes([AllowAny,])
 def attendance(request, pk):
     serializer = AttendanceSerializer(data=request.data)
     
     if serializer.is_valid():
-        
-        if AllotTrainer.objects.filter(id=pk).exists():
-            schedules = AllotTrainer.objects.filter(id=pk)
-            if TrainingParticipant.objects.filter(allot_trainer=pk).exists():
-                participaing_depts = TrainingParticipant.objects.filter(allot_trainer=pk).values('program_semester')
-                participants = participaing_depts.values_list('program_semester', flat=True)
-                
-                sd = schedules.values('start_date')
-                ed = schedules.values('end_date')
-                start_date = sd[0]['start_date']
-                end_date = ed[0]['end_date']
-                
-                date_list = []
-                current_date = start_date
-                while current_date <= end_date:
-                    date_list.append(current_date)
-                    current_date += timedelta(days=1)
-                    
-                student_sems_list = []
-                for each in participants:
-                    if Program_Semester.objects.get(id=each):
-                        pgm_sem = Program_Semester.objects.get(id=each)
-                        if Student_program_semester.objects.filter(semester=pgm_sem,status="ongoing").exists():
-                            student_list = Student_program_semester.objects.filter(semester=pgm_sem,status="ongoing").values('id')
-                            student_sems = list(student_list.values_list('id', flat=True))
-                            student_sems_list.extend(student_sems)
-                            
-                        else:
-                            response_data = {
-                                "statusCode": 6001,
-                                "title": "Failed",
-                                "message": "Student List not Found"
-                            }
-                            
-                    else:
-                        response_data = {
-                            "statusCode": 6001,
-                            "title": "Failed",
-                            "message": "Program semester not Found"
-                        }
-                
-                students = Student_program_semester.objects.filter(id__in=student_sems_list).values('student_id')
-                students_list = list(students.values_list('student_id', flat=True))
-                student_s = Student.objects.filter(id__in=students_list)
-                all_students = [str(student.id) for student in student_s]# Get a list of all student IDs
-                participant_id = TrainingParticipant.objects.filter(allot_trainer=pk).values('id')
-                participants_id_list = participant_id.values_list('id', flat=True)
-                training_p = TrainingParticipant.objects.all()
-                
-                absent_students = request.data['absent_student']
-                present_student = request.data['present_student']
-                date1 = request.data['date']
-                absent_studs = list(Student.objects.filter(id__in=absent_students).values_list('id', flat=True))
-                for each in participants_id_list:
-                    attendence = Attendence(training_participant=training_p.get(id=each),date=date1)
-                    attendence.save()
-                    a = TrainingParticipant.objects.filter(id=each).values('program_semester')
-                    b = Student_program_semester.objects.filter(semester__in=a).values('student')
-                    c = Student.objects.filter(id__in=b).values_list('id', flat=True)
-                    absent = [id for id in absent_students if id in c]
-                    present = [id for id in c if id in present_student]
-                    attendence.absent_student.set(absent)
-                    attendence.present_students.set(present)
-                
-                response_data = {
+        if TrainingParticipant.objects.get(id=pk):
+            training_participant=TrainingParticipant.objects.get(id=pk)
+            present_student_ids = request.data['present_student']
+            absent_student_ids = request.data['absent_student']
+            present_students = Student.objects.filter(id__in=present_student_ids)
+            absent_students = Student.objects.filter(id__in=absent_student_ids)
+            responce_date = request.data['date']
+            attendance_instance = Attendence.objects.create(
+                training_participant=training_participant,
+                date=responce_date
+                )
+            attendance_instance.present_students.set(present_students)
+            attendance_instance.absent_student.set(absent_students)
+            response_data = {
                     "statusCode": 6000,
                     "title": "Success",
                     "message": "Attendence Added SuccessFully"
                 }
-            else:
-                response_data = {
-                    "statusCode": 6001,
-                    "title": "Failed",
-                    "message": "TrainingParticipant not Found"
-                }
-                
         else:
             response_data = {
-                "statusCode": 6001,
-                "title": "Failed",
-                "message": "Schedule not Found"
-            }
-        
+                            "statusCode": 6001,
+                            "title": "Failed",
+                            "message": "Attendence marking failed"
+                        }
     else:
         response_data = {
         "statusCode": 6001,
         "title": "Validation Error",
         "message": serializer._errors
-    }    
-        
-    
-    return Response(response_data,status=status.HTTP_200_OK)
+    }  
+    return Response(response_data,status=status.HTTP_200_OK) 
+
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -940,3 +980,44 @@ def add_recruitment_Participated_Students(request):
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def attendenceMarkedOrNot(request):
+    
+    date = request.GET.get('date')
+    training_Participent = request.GET.get('trainingParticipent_id')
+    print(date,training_Participent,"result")
+
+    if date and training_Participent:
+        result=Attendence.objects.filter(training_participant=training_Participent,date=date).exists()
+        print(Attendence.objects.filter(training_participant=training_Participent,date=date))
+        if(result):
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":{
+                        "attendenceMarked":True
+                    }
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":{
+                        "attendenceMarked":False
+                    }
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Error",
+                "message": "Date and trainer id not found",
+                "error": []
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)

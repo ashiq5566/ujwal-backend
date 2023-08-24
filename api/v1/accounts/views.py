@@ -232,6 +232,8 @@ def user_details(request, pk):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def student_register(request):
+    # uploaded_image = request.FILES.get('image')
+    # print(uploaded_image)
     serializer = StudentSerializer(data=request.data)
     
     if serializer.is_valid():
@@ -252,57 +254,56 @@ def student_register(request):
         program_id = request.data['program_id']
         username = request.data['username']
         password = request.data['password']
-        image = request.data['image']
+        # image = request.data['image']
         
         if not Student.objects.filter(admission_number=admission_number).exists():
-            if not Student.objects.filter(roll_number=roll_number).exists():
-                if Programs.objects.filter(id=program_id).exists():
-                    program = Programs.objects.get(id=program_id)
-                    
-                    dob = datetime.strptime(date_of_birth, '%d-%m-%Y').strftime('%Y-%m-%d')
-                    student = Student.objects.create(
-                        admission_number=admission_number,
-                        roll_number=roll_number,
-                        first_name=first_name,
-                        last_name=last_name,
-                        date_of_birth=dob,
-                        address=address,
-                        gender=gender,
-                        phone=phone,
-                        email=email,
-                        marital_status=marital_status,
-                        admission_year=admission_year,
-                        parent_name=parent_name,
-                        parent_phone_number=parent_phone_number,
-                        parent_email=parent_email,
-                        program=program,
-                        username=username,
-                        password=password,
-                        image=image    
-                    )                    
-                    response_data = {
-                        "statusCode":6000,
-                        "data":{
-                            "title":"Success",
-                            "message":"Registered SuccessFully"
-                        }
-                    }
-                else:
-                    response_data = {
-                    "statusCode":6001,
+            if Programs.objects.filter(id=program_id).exists():
+                program = Programs.objects.get(id=program_id)
+                
+                dob = datetime.strptime(date_of_birth, '%d-%m-%Y').strftime('%Y-%m-%d')
+                student = Student.objects.create(
+                    admission_number=admission_number,
+                    roll_number=roll_number,
+                    first_name=first_name,
+                    last_name=last_name,
+                    date_of_birth=dob,
+                    address=address,
+                    gender=gender,
+                    phone=phone,
+                    email=email,
+                    marital_status=marital_status,
+                    admission_year=admission_year,
+                    parent_name=parent_name,
+                    parent_phone_number=parent_phone_number,
+                    parent_email=parent_email,
+                    program=program,
+                    username=username,
+                    password=password,
+                    # image=image    
+                ) 
+                no_of_semester=Programs.objects.get(id=program_id).number_of_semester
+                for i in range(1,no_of_semester+1):
+                    print(i)
+                    sem_starting='Semester '+str(i)
+                    print(sem_starting)
+                    sem=Semesters.objects.get(semester=sem_starting)
+                    program_sem=Program_Semester.objects.get(program_id=program_id,semester=sem)
+                    Student_program_semester.objects.create(student=student,semester=program_sem)                
+                response_data = {
+                    "statusCode":6000,
                     "data":{
-                        "title":"Failed",
-                        "data":"Program not Exists"
+                        "title":"Success",
+                        "message":"Registered SuccessFully"
                     }
-                }  
+                }
             else:
                 response_data = {
                 "statusCode":6001,
                 "data":{
                     "title":"Failed",
-                    "data":"This Roll number already Exists"
+                    "data":"Program not Exists"
                 }
-            }     
+            }      
         else:
             response_data = {
             "statusCode":6001,
