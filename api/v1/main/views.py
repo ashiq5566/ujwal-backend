@@ -986,7 +986,7 @@ def recruitment_Student_UpdationDetails_by_Participated_Student(request, pk):
 
 @api_view(['GET'])
 @permission_classes([AllowAny,])
-def recruitment_Student_UpdationDetails_by_List_Student(request):
+def recruitment_Student_UpdationDetails_by_List_of_Student(request):
     # Get the list of IDs from the query parameter, e.g., /your-endpoint/?ids=6,7,8,9
     ids_list = request.GET.get('ids')
     ids_list = [int(id) for id in ids_list.strip('[]').split(',') if id]
@@ -1023,3 +1023,29 @@ def recruitment_Student_UpdationDetails_by_List_Student(request):
                 }
             }
     return Response(response_data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def add_selection_update_for_student(request):
+    serializer = RecruitmentSelectionUpdatesSchedulesSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        serializer.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Selection update added successfully."
+            }
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    response_data = {
+        "statusCode": 6001,
+        "data": {
+            "title": "Validation Error",
+            "message": "Selection update adding failed.",
+            "errors": serializer.errors
+        }
+    }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
