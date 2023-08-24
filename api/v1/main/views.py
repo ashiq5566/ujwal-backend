@@ -1021,3 +1021,39 @@ def attendenceMarkedOrNot(request):
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def ongoing_program_semester_promote_details(request):
+    if Student_program_semester.objects.filter().exists():
+        ongoing_semester_ids = list(set([i.semester.id for i in Student_program_semester.objects.filter(status='ongoing')]))
+        
+        upcoming_new_sem_ids=[]
+        for i in Student_program_semester.objects.filter(status='upcoming'):
+            for j in Program_Semester.objects.filter(id=i.semester.id):
+                sem_1=Semesters.objects.get(semester="Semester 1")
+                if j.semester.id==sem_1.id:
+                    upcoming_new_sem_ids += [i.semester.id]
+        upcoming_new_sem_ids=list(set(upcoming_new_sem_ids))
+
+
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":{
+                    "onGoingProgramSemesters":ongoing_semester_ids,
+                    "upcomingBatchFirstProgramSemesters":upcoming_new_sem_ids
+                }
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Error",
+                "message": "No Program semester Exists",
+                "error": []
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
