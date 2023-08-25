@@ -1014,6 +1014,7 @@ def recruitment_Student_UpdationDetails_by_List_of_Student(request):
                     "data": serializer.data
                 }
             }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         else:
             response_data = {
                 "statusCode": 6001,
@@ -1049,3 +1050,39 @@ def add_selection_update_for_student(request):
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def get_participatedStudents_for_placement_by_schedule(request,pk):
+    if Schedule_Recruitment.objects.filter(id=pk).exists():
+        schedule=Schedule_Recruitment.objects.get(id=pk)
+        if(Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule).exists()):
+            students=Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule)
+            serializer = ParticipatedStudentsByRecruitmentSchedulesSerializer(students,many=True)
+            response_data = {
+                    "statusCode": 6000,
+                    "data": {
+                        "title": "Success",
+                        "data": serializer.data
+                    }
+                }
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            response_data = {
+                    "statusCode": 6000,
+                    "data": {
+                        "title": "Success",
+                        "data": []
+                    }
+                }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+    response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "data": "Recruitment Schedule not found"
+            }
+        }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+        

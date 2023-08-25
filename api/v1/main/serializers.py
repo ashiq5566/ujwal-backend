@@ -122,4 +122,9 @@ class RecruitmentSelectionUpdatesSchedulesSerializer(serializers.ModelSerializer
     class Meta:
         model = Recruitment_Student_Updations
         fields = '__all__'
-    
+
+class ParticipatedStudentsByRecruitmentSchedulesSerializer(serializers.ModelSerializer):
+    participated_id = serializers.IntegerField(source='id')
+    class Meta:
+        model = Recruitment_Participated_Students
+        fields = ['participated_id','student']

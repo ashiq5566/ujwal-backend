@@ -320,3 +320,10 @@ class Recruitment_Student_Updations(models.Model):
         if self.is_selected == 'Disqualified':
             self.status = 'completed'
         super().save(*args, **kwargs)
+
+class Placed_students(models.Model):
+    recruitment_participated_student=models.ForeignKey(Recruitment_Participated_Students,on_delete=models.CASCADE, null=False)
+    placed_date=models.DateField()
+
+    def __str__(self):
+        return f"{self.recruitment_participated_student.student}:Date{self.placed_date}"
