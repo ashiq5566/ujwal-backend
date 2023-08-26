@@ -14,7 +14,7 @@ from .serializers import *
 from api.v1.accounts.functions import authenticate
 from accounts.models import User
 from main.models import *
-
+from django.db.models import Subquery
 from django.db.models import Q
 
 
@@ -1057,7 +1057,8 @@ def get_participatedStudents_for_placement_by_schedule(request,pk):
     if Schedule_Recruitment.objects.filter(id=pk).exists():
         schedule=Schedule_Recruitment.objects.get(id=pk)
         if(Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule).exists()):
-            students=Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule)
+            students = Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule) \
+                    .exclude(id__in=Subquery(Placed_students.objects.values('recruitment_participated_student_id')))
             serializer = ParticipatedStudentsByRecruitmentSchedulesSerializer(students,many=True)
             response_data = {
                     "statusCode": 6000,
