@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
 
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 
 from .serializers import *
 from api.v1.accounts.functions import authenticate
@@ -16,6 +16,7 @@ from accounts.models import User
 from main.models import *
 from django.db.models import Subquery
 from django.db.models import Q
+from datetime import datetime, timedelta
 
 
 @api_view(['POST'])
@@ -1087,3 +1088,106 @@ def get_participatedStudents_for_placement_by_schedule(request,pk):
         }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def add_a_placement(request):
+    serializer = AddAPlacementSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        serializer.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Placement added successfully."
+            }
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    response_data = {
+        "statusCode": 6001,
+        "data": {
+            "title": "Validation Error",
+            "message": "Selection update adding failed.",
+            "errors": serializer.errors
+        }
+    }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+@permission_classes([AllowAny,])
+def promote_current_batch(request, pk):
+    program =Program_Semester.objects.get(id=pk).program
+    semester = Program_Semester.objects.get(id=pk).semester
+    semNumber=Semesters.objects.get(id=semester.id).semester
+    if Semesters.objects.filter(semester='Semester '+str(int(semNumber[9:])+1)).exists():
+        nextSem=Semesters.objects.get(semester='Semester '+str(int(semNumber[9:])+1))
+        if Program_Semester.objects.filter(program_id=program.id,semester_id=nextSem.id).exists():
+            nextSem_id=Program_Semester.objects.get(program_id=program.id,semester_id=nextSem.id)
+            ongoing_students = Student_program_semester.objects.filter(semester=pk, status="ongoing")
+            print(Student_program_semester.objects.filter(semester=pk, status="ongoing").values_list('student_id', flat=True),"ongoing_students")
+            if  Student_program_semester.objects.filter(semester=nextSem_id.id,status="ongoing").count()>0:
+                response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":"Already there exists a Program semester"
+                    }
+                }
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            
+            # print(Student_program_semester.objects.filter(semester=nextSem_id.id,status="upcoming",student_id__in=ongoing_students),"sadfsdf")
+            Student_program_semester.objects.filter(
+                                semester=nextSem_id.id,
+                                status="upcoming",
+                                student__in=ongoing_students.values_list('student', flat=True)
+                                ).update(status="ongoing", start_date=datetime.now().date() + timedelta(days=1))
+            Student_program_semester.objects.filter(semester=pk, status="ongoing").update(status="completed",end_date=datetime.now())
+            # print(upcoming_students,"upcoming_students")
+            # Student_program_semester.objects.filter(semester=nextSem_id,status="upcoming",student__in=Subquery(ongoing_students)).update(status="ongoing", start_date=datetime.now().date() + timedelta(days=1))
+        else:
+            Student_program_semester.objects.filter(semester=pk,status="ongoing").update(status="completed",end_date=datetime.now())
+    else:
+        Student_program_semester.objects.filter(semester=pk,status="ongoing").update(status="completed",end_date=datetime.now())
+
+    response_data = {
+        "statusCode":6000,
+        "data":{
+            "title":"Success",
+            "message":"Program semester promoted succesfully"
+        }
+    }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['PUT'])
+@permission_classes([AllowAny,])
+def promote_new_batch(request, pk):
+    program =Program_Semester.objects.get(id=pk).program
+    semester = Program_Semester.objects.get(id=pk).semester
+    if(Student_program_semester.objects.filter(semester=pk, status="upcoming").exists()):
+        if Student_program_semester.objects.filter(semester=pk, status="ongoing").count()>0:
+            response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "message":"Already there exists a Program semester"
+                }
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            students = Student_program_semester.objects.filter(semester=pk, status="upcoming")
+            for student in students:
+                print(student.student)
+                student_username=Student.objects.get(id=student.student.id).username
+                User.objects.filter(username=student_username).update(is_active=True)
+            Student_program_semester.objects.filter(semester=pk, status="upcoming").update(status="ongoing",start_date=datetime.now())
+
+
+    response_data = {
+        "statusCode":6000,
+        "data":{
+            "title":"Success",
+            "message":"Program semester promoted succesfully"
+        }
+    }
+    return Response(response_data,status=status.HTTP_200_OK)

@@ -128,3 +128,8 @@ class ParticipatedStudentsByRecruitmentSchedulesSerializer(serializers.ModelSeri
     class Meta:
         model = Recruitment_Participated_Students
         fields = ['participated_id','student']
+
+class AddAPlacementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Placed_students
+        fields = '__all__'

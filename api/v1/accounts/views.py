@@ -288,7 +288,7 @@ def student_register(request):
                     print(sem_starting)
                     sem=Semesters.objects.get(semester=sem_starting)
                     program_sem=Program_Semester.objects.get(program_id=program_id,semester=sem)
-                    Student_program_semester.objects.create(student=student,semester=program_sem)                
+                    Student_program_semester.objects.create(student=student,semester=program_sem,status="upcoming")                
                 response_data = {
                     "statusCode":6000,
                     "data":{
