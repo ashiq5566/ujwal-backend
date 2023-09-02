@@ -1015,7 +1015,7 @@ def recruitment_Student_UpdationDetails_by_List_of_Student(request):
                     "data": serializer.data
                 }
             }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             response_data = {
                 "statusCode": 6001,
