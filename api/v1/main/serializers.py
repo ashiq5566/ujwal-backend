@@ -133,3 +133,8 @@ class AddAPlacementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Placed_students
         fields = '__all__'
+
+class AttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attendence
+        fields = '__all__'

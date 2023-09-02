@@ -1223,3 +1223,42 @@ def get_placedStudents_by_year(request):
             }
         }
     return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def getAttendence(request):
+    
+    date = request.GET.get('date')
+    training_Participent = request.GET.get('trainingParticipent_id')
+
+    if date and training_Participent:
+        if(Attendence.objects.filter(training_participant=training_Participent,date=date).exists()):
+            attendence =Attendence.objects.filter(training_participant=training_Participent,date=date)
+            serializer = AttendanceSerializer(attendence, many=True)
+
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
+            }
+        else:
+            response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "data": "Attendence Not available"
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Error",
+                "message": "Date and trainer id not found",
+                "error": []
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
