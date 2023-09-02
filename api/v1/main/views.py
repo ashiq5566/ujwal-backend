@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
-
-from datetime import timedelta, datetime, timezone
+from django.db.models import Max, F
+from datetime import timedelta, datetime, timezone,date
 
 from .serializers import *
 from api.v1.accounts.functions import authenticate
@@ -1191,3 +1191,35 @@ def promote_new_batch(request, pk):
         }
     }
     return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def get_placedStudents_by_year(request):
+    today = date.today()
+    if today.month < 6:  # If current month is before June, the academic year starts from the previous year
+        academic_year_start = date(today.year - 1, 6, 1)
+        academic_year_end = date(today.year, 5, 31)
+    else:  # Otherwise, it starts from the current year
+        academic_year_start = date(today.year, 6, 1)
+        academic_year_end = date(today.year + 1, 5, 31)
+
+    # Query to get the latest academic year's recruitment_participated_student details
+    latest_academic_year_details = Placed_students.objects.filter(
+        placed_date__gte=academic_year_start,
+        placed_date__lte=academic_year_end
+    ).annotate(
+        max_placed_date=Max('recruitment_participated_student__placed_students__placed_date')
+    ).filter(
+        placed_date=F('max_placed_date')
+    ).select_related('recruitment_participated_student')
+    print(latest_academic_year_details,"latest_academic_year_details")
+        
+    response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "data": "Recruitment Schedule not found"
+            }
+        }
+    return Response(response_data, status=status.HTTP_200_OK)
