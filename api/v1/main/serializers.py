@@ -135,6 +135,7 @@ class PlacedStudentsSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='recruitment_participated_student.student.first_name')
     last_name = serializers.CharField(source='recruitment_participated_student.student.last_name')
     gender = serializers.CharField(source='recruitment_participated_student.student.gender')
+    roll_number = serializers.CharField(source='recruitment_participated_student.student.roll_number')
     recruiter_company_name = serializers.CharField(source='recruitment_participated_student.scheduled_recruitment.recruiter.company_name')
     recruiter_designation = serializers.CharField(source='recruitment_participated_student.scheduled_recruitment.designation')
     program_name = serializers.CharField(source='recruitment_participated_student.student.program.program_name')
@@ -142,7 +143,7 @@ class PlacedStudentsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Placed_students
-        fields = ['admission_number', 'first_name', 'last_name', 'gender',
+        fields = ['admission_number', 'first_name', 'last_name', 'gender','roll_number',
                   'recruiter_company_name', 'recruiter_designation', 'program_name', 'department_name', 'placed_date']
 
 
