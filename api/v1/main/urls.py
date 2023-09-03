@@ -59,7 +59,7 @@ urlpatterns = [
     #placement
     re_path(r"^get_participatedStudents_for_placement_by_schedule/(?P<pk>\d+)/$", get_participatedStudents_for_placement_by_schedule),
     re_path(r"^add_a_placement/$", add_a_placement),
-    re_path(r"^get_placedStudents_by_year/$", get_placedStudents_by_year),
+    re_path(r"^get_placedStudents_by_batch/$", get_placedStudents_by_batch),
 
 
     #promote program

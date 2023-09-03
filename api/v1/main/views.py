@@ -1091,7 +1091,7 @@ def get_participatedStudents_for_placement_by_schedule(request,pk):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def add_a_placement(request):
-    serializer = AddAPlacementSerializer(data=request.data)
+    serializer = PlacedStudentsSerializer(data=request.data)
     
     if serializer.is_valid():
         serializer.save()
@@ -1193,36 +1193,36 @@ def promote_new_batch(request, pk):
     return Response(response_data,status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny,])
-def get_placedStudents_by_year(request):
-    today = date.today()
-    if today.month < 6:  # If current month is before June, the academic year starts from the previous year
-        academic_year_start = date(today.year - 1, 6, 1)
-        academic_year_end = date(today.year, 5, 31)
-    else:  # Otherwise, it starts from the current year
-        academic_year_start = date(today.year, 6, 1)
-        academic_year_end = date(today.year + 1, 5, 31)
+# @api_view(['GET'])
+# @permission_classes([AllowAny,])
+# def get_placedStudents_by_year(request):
+#     today = date.today()
+#     if today.month < 6:  # If current month is before June, the academic year starts from the previous year
+#         academic_year_start = date(today.year - 1, 6, 1)
+#         academic_year_end = date(today.year, 5, 31)
+#     else:  # Otherwise, it starts from the current year
+#         academic_year_start = date(today.year, 6, 1)
+#         academic_year_end = date(today.year + 1, 5, 31)
 
-    # Query to get the latest academic year's recruitment_participated_student details
-    latest_academic_year_details = Placed_students.objects.filter(
-        placed_date__gte=academic_year_start,
-        placed_date__lte=academic_year_end
-    ).annotate(
-        max_placed_date=Max('recruitment_participated_student__placed_students__placed_date')
-    ).filter(
-        placed_date=F('max_placed_date')
-    ).select_related('recruitment_participated_student')
-    print(latest_academic_year_details,"latest_academic_year_details")
+#     # Query to get the latest academic year's recruitment_participated_student details
+#     latest_academic_year_details = Placed_students.objects.filter(
+#         placed_date__gte=academic_year_start,
+#         placed_date__lte=academic_year_end
+#     ).annotate(
+#         max_placed_date=Max('recruitment_participated_student__placed_students__placed_date')
+#     ).filter(
+#         placed_date=F('max_placed_date')
+#     ).select_related('recruitment_participated_student')
+#     print(latest_academic_year_details,"latest_academic_year_details")
         
-    response_data = {
-            "statusCode": 6001,
-            "data": {
-                "title": "Failed",
-                "data": "Recruitment Schedule not found"
-            }
-        }
-    return Response(response_data, status=status.HTTP_200_OK)
+#     response_data = {
+#             "statusCode": 6001,
+#             "data": {
+#                 "title": "Failed",
+#                 "data": "Recruitment Schedule not found"
+#             }
+#         }
+#     return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -1287,3 +1287,30 @@ def get_academic_years(request):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny,])
+def get_placedStudents_by_batch(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    print("works")
+    if start_date and end_date:
+        placed_students = Placed_students.objects.filter(placed_date__range=(start_date, end_date)).order_by('-placed_date')
+        serializer = PlacedStudentsSerializer(placed_students, many=True)
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "data": "Batch"
+            }
+        }
+    return Response(response_data, status=status.HTTP_200_OK)

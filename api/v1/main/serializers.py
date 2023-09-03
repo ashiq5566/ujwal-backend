@@ -129,10 +129,22 @@ class ParticipatedStudentsByRecruitmentSchedulesSerializer(serializers.ModelSeri
         model = Recruitment_Participated_Students
         fields = ['participated_id','student']
 
-class AddAPlacementSerializer(serializers.ModelSerializer):
+
+class PlacedStudentsSerializer(serializers.ModelSerializer):
+    admission_number = serializers.CharField(source='recruitment_participated_student.student.admission_number')
+    first_name = serializers.CharField(source='recruitment_participated_student.student.first_name')
+    last_name = serializers.CharField(source='recruitment_participated_student.student.last_name')
+    gender = serializers.CharField(source='recruitment_participated_student.student.gender')
+    recruiter_company_name = serializers.CharField(source='recruitment_participated_student.scheduled_recruitment.recruiter.company_name')
+    recruiter_designation = serializers.CharField(source='recruitment_participated_student.scheduled_recruitment.designation')
+    program_name = serializers.CharField(source='recruitment_participated_student.student.program.program_name')
+    department_name = serializers.CharField(source='recruitment_participated_student.student.program.department.department_name')
+    
     class Meta:
         model = Placed_students
-        fields = '__all__'
+        fields = ['admission_number', 'first_name', 'last_name', 'gender',
+                  'recruiter_company_name', 'recruiter_designation', 'program_name', 'department_name', 'placed_date']
+
 
 class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:
