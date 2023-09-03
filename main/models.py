@@ -327,3 +327,10 @@ class Placed_students(models.Model):
 
     def __str__(self):
         return f"{self.recruitment_participated_student.student}:Date{self.placed_date}"
+    
+class Academic_year(models.Model):
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def __str__(self):
+        return f"{self.start_date.year}-{self.end_date.year}"

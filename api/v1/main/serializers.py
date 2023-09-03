@@ -138,3 +138,8 @@ class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attendence
         fields = '__all__'
+
+class AcademicYearSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Academic_year
+        fields = '__all__'
