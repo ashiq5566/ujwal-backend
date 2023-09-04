@@ -1266,6 +1266,23 @@ def getAttendence(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_academic_years(request):
+    current_date = date.today()
+    academic_year_exists = Academic_year.objects.filter(start_date__lte=current_date, end_date__gte=current_date).exists()
+    if not academic_year_exists:
+        
+        january_1st = date(date.today().year, 1, 1)
+        may_31st = date(date.today().year, 5, 31)
+
+        if january_1st <= current_date <= may_31st:
+            # start_date = date(current_date.year - 1, 6, 1)
+            # end_date = date(current_date.year, 5, 31)
+            Academic_year.objects.create(start_date=date(current_date.year - 1, 6, 1), end_date=date(current_date.year, 5, 31))
+
+        else:
+            Academic_year.objects.create(start_date=date(current_date.year , 6, 1), end_date=date(current_date.year+1, 5, 31))
+            # start_date = date(current_date.year , 6, 1)
+            # end_date = date(current_date.year+1, 5, 31)
+
     if Academic_year.objects.all():
         academic_years = Academic_year.objects.all().order_by('-start_date')
         serializer = AcademicYearSerializer(academic_years, many=True)
