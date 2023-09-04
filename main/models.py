@@ -262,6 +262,7 @@ class Schedule_Recruitment(models.Model):
     apply_link = models.URLField(null=True, blank=True)
     apply_last_date=models.DateField(null=True)
     number_of_hirings = models.PositiveIntegerField(null=True)
+    description= models.CharField(null=True)
 
     def __str__(self):
         return f"{self.recruiter}-{self.designation}({self.date})"
