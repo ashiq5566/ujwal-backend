@@ -76,7 +76,8 @@ def department_list(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "data":[],
+                "message":"NotFound"
             }
         }
 
@@ -105,7 +106,8 @@ def add_trainer(request):
         "data": {
             "title": "Validation Error",
             "message": "Department creation failed.",
-            "errors": serializer.errors
+            "errors": serializer.errors,
+            "data":[]
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -129,7 +131,8 @@ def trainers_list(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "data":[],
+                "message":"NotFound"
             }
         }
 
@@ -157,7 +160,8 @@ def add_recruiter(request):
         "data": {
             "title": "Validation Error",
             "message": "Recruiter creation failed.",
-            "errors": serializer.errors
+            "errors": serializer.errors,
+            "data":[]
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -181,7 +185,8 @@ def recruiters_list(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "data":[],
+                "message":"NotFound"
             }
         }
 
@@ -221,7 +226,8 @@ def add_program(request):
         "data": {
             "title": "Validation Error",
             "message": "Program creation failed.",
-            "errors": serializer.errors
+            "errors": serializer.errors,
+            "data":[]
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -245,7 +251,8 @@ def program_list(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "data":[],
+                "message":"NotFound"
             }
         }
 
@@ -287,7 +294,8 @@ def update_program(request, program_id):
         "data": {
             "title": "Validation Error",
             "message": "Program update failed.",
-            "errors": serializer.errors
+            "errors": serializer.errors,
+            "data":[]
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -312,7 +320,8 @@ def focusing_areas(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "message":"NotFound",
+                "data":[]
             }
         }
 
@@ -339,7 +348,8 @@ def programs_by_department(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "message":"NotFound",
+                "data":[]
             }
         }
 
@@ -364,7 +374,8 @@ def semesters(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "message":"NotFound",
+                "data":[]
             }
         }
 
@@ -390,7 +401,8 @@ def program_semester_by_program(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "message":"NotFound",
+                "data":[]
             }
         }
 
@@ -416,7 +428,8 @@ def program_semesters(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "message":"NotFound",
+                "data":[]
             }
         }
 
@@ -472,7 +485,8 @@ def add_training_schedule(request):
                         'statusCode' : 6001,
                         'data' : {
                             'title': 'failed',
-                            'message' : "Participants Not Found"
+                            'message' : "Participants Not Found",
+                            "data":[]
                         }
                     }
             else:
@@ -480,7 +494,8 @@ def add_training_schedule(request):
                     'statusCode' : 6001,
                     'data' : {
                         'title': 'failed',
-                        'message' : "Trainer Not Found"
+                        'message' : "Trainer Not Found",
+                        "data":[]
                     }
                 } 
         else:
@@ -488,14 +503,16 @@ def add_training_schedule(request):
                 'statusCode' : 6001,
                 'data' : {
                     'title': 'failed',
-                    'message' : "Focusing Area Not Found"
+                    'message' : "Focusing Area Not Found",
+                    "data":[]
                 }
             }
     else:
          response_data = {
             "statusCode": 6001,
             "title": "Validation Error",
-            "message": serializer._errors
+            "message": serializer._errors,
+            "data":[]
         }
     return Response(response_data,status=status.HTTP_200_OK)
 
@@ -520,7 +537,8 @@ def training_schedule(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"Schedule Not Found"
+                "message":"Schedule Not Found",
+                "data":[]
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
@@ -544,7 +562,8 @@ def training_schedule_detail(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"Schedule Not Found"
+                "message":"Schedule Not Found",
+                "data":[]
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
@@ -593,7 +612,8 @@ def add_recruitment_schedule(request):
                 'statusCode' : 6001,
                 'data' : {
                     'title': 'failed',
-                    'message' : "Participants Not Found"
+                    'message' : "Participants Not Found",
+                    "data":[]
                 }
             }
         else:
@@ -601,39 +621,55 @@ def add_recruitment_schedule(request):
                 'statusCode' : 6001,
                 'data' : {
                     'title': 'failed',
-                    'message' : "Recruiter Not Found"
+                    'message' : "Recruiter Not Found",
+                    "data":[]
                 }
             }
     else:
          response_data = {
             "statusCode": 6001,
             "title": "Validation Error",
-            "message": serializer._errors
+            "message": serializer._errors,
+            "data":[]
         }
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny,])
 def recruitment_schedule(request):
-    if Schedule_Recruitment.objects.all():
-        schedule = Schedule_Recruitment.objects.all()   
-        serializer = RecruitmentSchedulesSerializer(schedule, many=True)
-        
-        response_data = {
-            "statusCode":6000,
-            "data":{
-                "title":"Success",
-                "data":serializer.data
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    if start_date and end_date:
+        if Schedule_Recruitment.objects.filter(date__range=(start_date, end_date)).exists():
+            schedule =  Schedule_Recruitment.objects.filter(date__range=(start_date, end_date))
+            serializer = RecruitmentSchedulesSerializer(schedule, many=True)
+            
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
             }
-        }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":"Schedule Not Found",
+                    "data":[]
+                }
+            }
     else:
         response_data = {
-            "statusCode":6001,
-            "data":{
-                "title":"Failed",
-                "data":"Schedule Not Found"
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":[],
+                    "message":"Invalied batch"
+                }
             }
-        }
+
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -655,7 +691,8 @@ def recruitment_schedule_detail(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"Schedule Not Found"
+                "message":"Schedule Not Found",
+                "data":[]
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
@@ -680,7 +717,8 @@ def training_participents_details(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "message":"NotFound",
+                "data":[]
             }
         }
 
@@ -706,7 +744,8 @@ def recruitment_participents_details(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "message":"NotFound",
+                "data":[]
             }
         }
 
@@ -734,20 +773,28 @@ def attendance(request, pk):
             attendance_instance.absent_student.set(absent_students)
             response_data = {
                     "statusCode": 6000,
-                    "title": "Success",
-                    "message": "Attendence Added SuccessFully"
+                    "data":{
+                        "title": "Success",
+                        "message": "Attendence Added SuccessFully"
+                    }
                 }
         else:
             response_data = {
                             "statusCode": 6001,
-                            "title": "Failed",
-                            "message": "Attendence marking failed"
+                            "data":{
+                                "title": "Failed",
+                                "message": "Attendence marking failed",
+                                "data":[]
+                            }
                         }
     else:
         response_data = {
         "statusCode": 6001,
-        "title": "Validation Error",
-        "message": serializer._errors
+        "data":{
+            "title": "Validation Error",
+            "message": serializer._errors,
+            "data":[]
+        }
     }  
     return Response(response_data,status=status.HTTP_200_OK) 
 
@@ -791,7 +838,8 @@ def student_program_semester_details(request):
                 "statusCode":6001,
                 "data":{
                     "title":"Failed",
-                    "data":"NotFound"
+                    "message":"NotFound",
+                    "data":[]
                 }
             }    
     return Response(response_data,status=status.HTTP_200_OK)
@@ -816,7 +864,8 @@ def recruitment_applied_students_by_recruitment_schedule(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"Participated student list Not Found"
+                "message":"Participated student list Not Found",
+                "data":[]
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
@@ -842,7 +891,8 @@ def student_program_semester_by_program_semester(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"Program semester Not Found"
+                "message":"Program semester Not Found",
+                "data":[]
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
@@ -869,7 +919,8 @@ def add_recruitment_Participated_Students(request):
         "data": {
             "title": "Validation Error",
             "message": "Recruitment participatindg student adding failed.",
-            "errors": serializer.errors
+            "errors": serializer.errors,
+            "data":[]
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -909,7 +960,7 @@ def attendenceMarkedOrNot(request):
             "data":{
                 "title":"Error",
                 "message": "Date and trainer id not found",
-                "error": []
+                "data": []
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
@@ -945,7 +996,7 @@ def ongoing_program_semester_promote_details(request):
             "data":{
                 "title":"Error",
                 "message": "No Program semester Exists",
-                "error": []
+                "data": []
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
@@ -970,7 +1021,8 @@ def recruitment_Student_UpdationDetails_by_Participated_Student(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"Student Not Found"
+                "message":"Student Not Found",
+                "data":[]
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
@@ -988,7 +1040,8 @@ def recruitment_Student_UpdationDetails_by_List_of_Student(request):
             "statusCode": 6001,
             "data": {
                 "title": "Failed",
-                "data": "No student IDs provided"
+                "message": "No student IDs provided",
+                "data":[]
             }
         }
     else:   
@@ -1009,7 +1062,8 @@ def recruitment_Student_UpdationDetails_by_List_of_Student(request):
                 "statusCode": 6001,
                 "data": {
                     "title": "Failed",
-                    "data": "Students Not Found"
+                    "message": "Students Not Found",
+                    "data":[]
                 }
             }
     return Response(response_data, status=status.HTTP_200_OK)
@@ -1035,7 +1089,8 @@ def add_selection_update_for_student(request):
         "data": {
             "title": "Validation Error",
             "message": "Selection update adding failed.",
-            "errors": serializer.errors
+            "errors": serializer.errors,
+            "data":[]
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -1071,7 +1126,8 @@ def get_participatedStudents_for_placement_by_schedule(request,pk):
             "statusCode": 6001,
             "data": {
                 "title": "Failed",
-                "data": "Recruitment Schedule not found"
+                "message": "Recruitment Schedule not found",
+                "data":[]
             }
         }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -1097,7 +1153,8 @@ def add_a_placement(request):
         "data": {
             "title": "Validation Error",
             "message": "Selection update adding failed.",
-            "errors": serializer.errors
+            "errors": serializer.errors,
+            "data":[]
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -1118,7 +1175,8 @@ def promote_current_batch(request, pk):
                 "statusCode":6001,
                 "data":{
                     "title":"Failed",
-                    "message":"Already there exists a Program semester"
+                    "message":"Already there exists a Program semester",
+                    "data":[]
                     }
                 }
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -1157,7 +1215,8 @@ def promote_new_batch(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "message":"Already there exists a Program semester"
+                "message":"Already there exists a Program semester",
+                "data":[]
                 }
             }
             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
@@ -1205,7 +1264,8 @@ def promote_new_batch(request, pk):
 #             "statusCode": 6001,
 #             "data": {
 #                 "title": "Failed",
-#                 "data": "Recruitment Schedule not found"
+#                 "message": "Recruitment Schedule not found",
+#                 "data":[]
 #             }
 #         }
 #     return Response(response_data, status=status.HTTP_200_OK)
@@ -1235,7 +1295,8 @@ def getAttendence(request):
             "statusCode": 6001,
             "data": {
                 "title": "Failed",
-                "data": "Attendence Not available"
+                "message": "Attendence Not available",
+                "data":[]
             }
         }
     else:
@@ -1244,7 +1305,7 @@ def getAttendence(request):
             "data":{
                 "title":"Error",
                 "message": "Date and trainer id not found",
-                "error": []
+                "data":[]
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
@@ -1285,7 +1346,8 @@ def get_academic_years(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "message":"NotFound",
+                "data":[]
             }
         }
 
@@ -1362,8 +1424,9 @@ def get_placedStudents_by_batch(request):
             "statusCode": 6001,
             "data": {
                 "title": "Failed",
-                "data": "Batch"
+                "message": "Not found",
+                "data":[]
             }
         }
-    return Response(response_data, status=status.HTTP_200_OK)
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
