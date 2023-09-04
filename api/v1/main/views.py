@@ -1181,14 +1181,12 @@ def promote_current_batch(request, pk):
                 }
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
             
-            # print(Student_program_semester.objects.filter(semester=nextSem_id.id,status="upcoming",student_id__in=ongoing_students),"sadfsdf")
             Student_program_semester.objects.filter(
                                 semester=nextSem_id.id,
                                 status="upcoming",
                                 student__in=ongoing_students.values_list('student', flat=True)
                                 ).update(status="ongoing", start_date=datetime.now().date() + timedelta(days=1))
             Student_program_semester.objects.filter(semester=pk, status="ongoing").update(status="completed",end_date=datetime.now())
-            # print(upcoming_students,"upcoming_students")
             # Student_program_semester.objects.filter(semester=nextSem_id,status="upcoming",student__in=Subquery(ongoing_students)).update(status="ongoing", start_date=datetime.now().date() + timedelta(days=1))
         else:
             Student_program_semester.objects.filter(semester=pk,status="ongoing").update(status="completed",end_date=datetime.now())
@@ -1258,7 +1256,6 @@ def promote_new_batch(request, pk):
 #     ).filter(
 #         placed_date=F('max_placed_date')
 #     ).select_related('recruitment_participated_student')
-#     print(latest_academic_year_details,"latest_academic_year_details")
         
 #     response_data = {
 #             "statusCode": 6001,

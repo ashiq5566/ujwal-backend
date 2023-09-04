@@ -75,7 +75,6 @@ class Recruiters(models.Model):
     def company_save(self):
         if not self.recruiter_id:
             last_company = Recruiters.objects.order_by('-recruiter_id').first()
-            print(last_company,"Last company")
             if last_company:
                 code = int(last_company.recruiter_id[1:]) + 1
                 self.recruiter_id = f'C{code:02}'

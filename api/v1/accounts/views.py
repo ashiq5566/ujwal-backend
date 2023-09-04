@@ -233,7 +233,6 @@ def user_details(request, pk):
 @permission_classes([AllowAny])
 def student_register(request):
     # uploaded_image = request.FILES.get('image')
-    # print(uploaded_image)
     serializer = StudentSerializer(data=request.data)
     
     if serializer.is_valid():
@@ -283,9 +282,7 @@ def student_register(request):
                 ) 
                 no_of_semester=Programs.objects.get(id=program_id).number_of_semester
                 for i in range(1,no_of_semester+1):
-                    print(i)
                     sem_starting='Semester '+str(i)
-                    print(sem_starting)
                     sem=Semesters.objects.get(semester=sem_starting)
                     program_sem=Program_Semester.objects.get(program_id=program_id,semester=sem)
                     Student_program_semester.objects.create(student=student,semester=program_sem,status="upcoming")                
@@ -328,7 +325,6 @@ def student_register(request):
 @permission_classes([AllowAny])
 def students(request):
     ids_param = request.query_params.get("ids")
-    print(ids_param,"ids_param")
     
     if ids_param:
         ids_list = [int(id) for id in ids_param.strip("[]").split(",")]
