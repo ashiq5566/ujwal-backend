@@ -298,7 +298,6 @@ def update_program(request, program_id):
 def focusing_areas(request):
     if FocusingArea.objects.all():
         focusingArea = FocusingArea.objects.all()  
-        print(focusingArea)
         serializer = FocusinAreaGetSerializer(focusingArea, many=True)
         
         response_data = {
@@ -326,7 +325,6 @@ def programs_by_department(request, pk):
     if Departments.objects.get(id=pk):
         department = Departments.objects.get(id=pk)
         program=Programs.objects.filter(department=department)
-        print("sdsd",program)
         serializer = ProgramsGetSerializer(program, many=True)
         
         response_data = {
@@ -428,10 +426,8 @@ def program_semesters(request):
 @api_view(['POST'])
 @permission_classes([AllowAny,])
 def add_training_schedule(request):
-    print(request.data,"request.data")
     serializer = TrainingScheduleSerializer(data=request.data)
     if serializer.is_valid():
-        print("validationg serializer")
         trainer_id = request.data['trainer_id']
         start_date_str = request.data['start_date_str']
         end_date_str = request.data['end_date_str']
@@ -558,11 +554,9 @@ def training_schedule_detail(request, pk):
 @api_view(['POST'])
 @permission_classes([AllowAny,])
 def add_recruitment_schedule(request):
-    print(request.data,"request.data")
     serializer = RecruitmentScheduleSerializer(data=request.data)
     
     if serializer.is_valid():
-        print("validationg serializer")
         recruiter_id = request.data['recruiter_id']
         date_str = request.data['date']  
         venue = request.data['venue']
@@ -722,7 +716,7 @@ def recruitment_participents_details(request):
 @api_view(['POST'])
 @permission_classes([AllowAny,])
 def attendance(request, pk):
-    serializer = AttendanceSerializer(data=request.data)
+    serializer = AttendancePostSerializer(data=request.data)
     
     if serializer.is_valid():
         if TrainingParticipant.objects.get(id=pk):
@@ -834,7 +828,6 @@ def recruitment_applied_students_by_recruitment_schedule(request, pk):
 def student_program_semester_by_program_semester(request, pk):
     if Program_Semester.objects.filter(id=pk).exists():
         students_program_semester =Student_program_semester.objects.filter(semester_id=pk)
-        print(students_program_semester,pk,"pk")
         serializer = StudentProgramSemesterSerializer(students_program_semester, many=True)
         
         response_data = {
@@ -887,11 +880,9 @@ def attendenceMarkedOrNot(request):
     
     date = request.GET.get('date')
     training_Participent = request.GET.get('trainingParticipent_id')
-    print(date,training_Participent,"result")
 
     if date and training_Participent:
         result=Attendence.objects.filter(training_participant=training_Participent,date=date).exists()
-        print(Attendence.objects.filter(training_participant=training_Participent,date=date))
         if(result):
             response_data = {
                 "statusCode":6000,
@@ -991,7 +982,6 @@ def recruitment_Student_UpdationDetails_by_List_of_Student(request):
     # Get the list of IDs from the query parameter, e.g., /your-endpoint/?ids=6,7,8,9
     ids_list = request.GET.get('ids')
     ids_list = [int(id) for id in ids_list.strip('[]').split(',') if id]
-    print(ids_list,"ids_list")
     
     if not ids_list:
         response_data = {
@@ -1002,9 +992,7 @@ def recruitment_Student_UpdationDetails_by_List_of_Student(request):
             }
         }
     else:   
-        print("terst")
         selections =  Recruitment_Student_Updations.objects.filter(recruitment_participated_student__id__in=ids_list)
-        print("terssss")
         if selections.exists():
             serializer = RecruitmentSelectionUpdatesSchedulesSerializer(selections, many=True)
 
@@ -1125,7 +1113,6 @@ def promote_current_batch(request, pk):
         if Program_Semester.objects.filter(program_id=program.id,semester_id=nextSem.id).exists():
             nextSem_id=Program_Semester.objects.get(program_id=program.id,semester_id=nextSem.id)
             ongoing_students = Student_program_semester.objects.filter(semester=pk, status="ongoing")
-            print(Student_program_semester.objects.filter(semester=pk, status="ongoing").values_list('student_id', flat=True),"ongoing_students")
             if  Student_program_semester.objects.filter(semester=nextSem_id.id,status="ongoing").count()>0:
                 response_data = {
                 "statusCode":6001,
@@ -1177,7 +1164,6 @@ def promote_new_batch(request, pk):
         else:
             students = Student_program_semester.objects.filter(semester=pk, status="upcoming")
             for student in students:
-                print(student.student)
                 student_username=Student.objects.get(id=student.student.id).username
                 User.objects.filter(username=student_username).update(is_active=True)
             Student_program_semester.objects.filter(semester=pk, status="upcoming").update(status="ongoing",start_date=datetime.now())
@@ -1269,7 +1255,7 @@ def get_academic_years(request):
     current_date = date.today()
     academic_year_exists = Academic_year.objects.filter(start_date__lte=current_date, end_date__gte=current_date).exists()
     if not academic_year_exists:
-        
+
         january_1st = date(date.today().year, 1, 1)
         may_31st = date(date.today().year, 5, 31)
 
@@ -1380,3 +1366,4 @@ def get_placedStudents_by_batch(request):
             }
         }
     return Response(response_data, status=status.HTTP_200_OK)
+
