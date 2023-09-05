@@ -53,12 +53,14 @@ def login(request):
                             "id":user.id,
                             "username":user.username,
                             "role":user.role,
-                            "email":user.email
+                            "email":user.email,
 
                         },
                         'response' : response.json(),
                     }
                 }
+                if user.department:
+                    response_data['data']['data']['department'] = user.department.id
             else:
                 response_data = {
                     'statusCode' : 6001,
