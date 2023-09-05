@@ -582,18 +582,28 @@ def add_recruitment_schedule(request):
         designation = request.data['designation']
         participants_ids = request.data['participants_ids']
         apply_link = request.data['apply_link']
+        number_of_hirings = request.data['number_of_hirings']
+        apply_last_date_str = request.data['apply_last_date']
+        description = request.data['description']
+
+
         
         if Recruiters.objects.filter(id=recruiter_id).exists():
             recruiter = Recruiters.objects.get(id=recruiter_id)
             if Program_Semester.objects.filter(id__in=participants_ids).exists():
                 participants = Program_Semester.objects.filter(id__in=participants_ids)
                 date = datetime.strptime(date_str, '%d-%m-%Y').strftime('%Y-%m-%d')
+                apply_last_date = datetime.strptime(apply_last_date_str, '%d-%m-%Y').strftime('%Y-%m-%d')
+
                 
                 allot_recruiter = Schedule_Recruitment(recruiter=recruiter,
                     date=date,
                     venue=venue,
                     designation=designation,
-                    apply_link=apply_link
+                    apply_link=apply_link,
+                    number_of_hirings=number_of_hirings,
+                    apply_last_date=apply_last_date,
+                    description=description
                 )
                 allot_recruiter.save()
                 

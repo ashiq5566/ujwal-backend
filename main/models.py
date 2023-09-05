@@ -254,11 +254,11 @@ class Schedule_Recruitment(models.Model):
         ('cancelled', 'Cancelled'),
     )
     recruiter = models.ForeignKey(Recruiters,on_delete=models.CASCADE, null=False)
-    venue = models.CharField(max_length=50, null=True)
+    venue = models.CharField(max_length=50, null=True,default="")
     designation=models.CharField(max_length=50)
     date=models.DateField(null=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES,default='ongoing')
-    apply_link = models.URLField(null=True, blank=True)
+    apply_link = models.URLField(null=True)
     apply_last_date=models.DateField(null=True)
     number_of_hirings = models.PositiveIntegerField(null=True)
     description= models.CharField(null=True)

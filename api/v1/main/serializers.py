@@ -85,6 +85,9 @@ class RecruitmentScheduleSerializer(serializers.Serializer):
     designation = serializers.CharField()
     participants_ids = serializers.ListField(child=serializers.IntegerField())
     apply_link = serializers.URLField()
+    number_of_hirings = serializers.IntegerField()
+    apply_last_date = serializers.CharField() 
+    description =  serializers.CharField() 
     
 class RecruitmentSchedulesSerializer(serializers.ModelSerializer):
     class Meta:
