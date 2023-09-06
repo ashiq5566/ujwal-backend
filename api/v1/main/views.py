@@ -96,7 +96,7 @@ def add_trainer(request):
             "statusCode": 6000,
             "data": {
                 "title": "Success",
-                "message": "Department created successfully."
+                "message": "Trainer created successfully."
             }
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
@@ -105,7 +105,7 @@ def add_trainer(request):
         "statusCode": 6001,
         "data": {
             "title": "Validation Error",
-            "message": "Department creation failed.",
+            "message": "Trainer creation failed.",
             "errors": serializer.errors,
             "data":[]
         }
@@ -520,28 +520,41 @@ def add_training_schedule(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny,])
-def training_schedule(request):
-    if AllotTrainer.objects.all():
-        schedule = AllotTrainer.objects.all()   
-        serializer = TrainingSchedulesSerializer(schedule, many=True)
-        
-        response_data = {
-            "statusCode":6000,
-            "data":{
-                "title":"Success",
-                "data":serializer.data
+def training_schedule(request): 
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    if start_date and end_date:
+        if AllotTrainer.objects.filter(start_date__range=(start_date, end_date)).exists():
+            schedule = AllotTrainer.objects.filter(start_date__range=(start_date, end_date)) 
+            serializer = TrainingSchedulesSerializer(schedule, many=True)
+            
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
             }
-        }
+            return Response(response_data,status=status.HTTP_200_OK)
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":"Schedule Not Found",
+                    "data":[]
+                }
+            }
     else:
         response_data = {
-            "statusCode":6001,
-            "data":{
-                "title":"Failed",
-                "message":"Schedule Not Found",
-                "data":[]
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":[],
+                    "message":"Invalied batch"
+                }
             }
-        }
-    return Response(response_data,status=status.HTTP_200_OK)
+    return Response(response_data,status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @permission_classes([AllowAny,])
