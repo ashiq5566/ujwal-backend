@@ -266,7 +266,7 @@ def update_program(request, program_id):
         program_instance = Programs.objects.get(id=program_id)
     except Programs.DoesNotExist:
         response_data = {
-            "statusCode": 6002,
+            "statusCode": 6001,
             "data": {
                 "title": "Not Found",
                 "message": "Program not found."
@@ -525,7 +525,7 @@ def training_schedule(request):
     end_date = request.GET.get('end_date')
     if start_date and end_date:
         if AllotTrainer.objects.filter(start_date__range=(start_date, end_date)).exists():
-            schedule = AllotTrainer.objects.filter(start_date__range=(start_date, end_date)) 
+            schedule = AllotTrainer.objects.filter(start_date__range=(start_date, end_date)).order_by('-start_date')
             serializer = TrainingSchedulesSerializer(schedule, many=True)
             
             response_data = {
@@ -664,7 +664,7 @@ def recruitment_schedule(request):
     end_date = request.GET.get('end_date')
     if start_date and end_date:
         if Schedule_Recruitment.objects.filter(date__range=(start_date, end_date)).exists():
-            schedule =  Schedule_Recruitment.objects.filter(date__range=(start_date, end_date))
+            schedule =  Schedule_Recruitment.objects.filter(date__range=(start_date, end_date)).order_by('-date')
             serializer = RecruitmentSchedulesSerializer(schedule, many=True)
             
             response_data = {
@@ -1445,6 +1445,115 @@ def get_placedStudents_by_batch(request):
             "data": {
                 "title": "Failed",
                 "message": "Not found",
+                "data":[]
+            }
+        }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+@permission_classes([AllowAny,])
+def complete_recruitment_schedule_status(request,pk):
+    if Schedule_Recruitment.objects.get(id=pk):
+        schedule=Schedule_Recruitment.objects.get(id=pk)
+        schedule.status="completed"
+        schedule.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Schedule updated Succesfully",
+                "data":[]
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    else:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "message": "Schedule not exists",
+                "data":[]
+            }
+        }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+@permission_classes([AllowAny,])
+def cancel_recruitment_schedule_status(request,pk):
+    if Schedule_Recruitment.objects.get(id=pk):
+        schedule=Schedule_Recruitment.objects.get(id=pk)
+        schedule.status="cancelled"
+        schedule.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Schedule updated Succesfully",
+                "data":[]
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    else:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "message": "Schedule not exists",
+                "data":[]
+            }
+        }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([AllowAny,])
+def complete_training_schedule_status(request,pk):
+    if AllotTrainer.objects.get(id=pk):
+        schedule=AllotTrainer.objects.get(id=pk)
+        schedule.status="completed"
+        schedule.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Schedule updated Succesfully",
+                "data":[]
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    else:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "message": "Schedule not exists",
+                "data":[]
+            }
+        }
+    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+@permission_classes([AllowAny,])
+def cancel_training_schedule_status(request,pk):
+    if AllotTrainer.objects.get(id=pk):
+        schedule=AllotTrainer.objects.get(id=pk)
+        schedule.status="cancelled"
+        schedule.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Schedule updated Succesfully",
+                "data":[]
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    else:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "message": "Schedule not exists",
                 "data":[]
             }
         }

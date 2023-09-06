@@ -224,7 +224,8 @@ def user_details(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "message":"NotFound",
+                "data":[]
             }
         }
 
@@ -347,7 +348,8 @@ def students(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"student not found"
+                "message":"student not found",
+                "data":[]
             }
         }
     else:
@@ -366,7 +368,8 @@ def students(request):
                 "statusCode":6001,
                 "data":{
                     "title":"Failed",
-                    "data":"student not found"
+                    "message":"student not found",
+                    "data":[]
                 }
             }
     
@@ -394,7 +397,8 @@ def student_details(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"student not found"
+                "message":"student not found",
+                "data":[]
             }
         }
 
@@ -433,7 +437,8 @@ def student_document_upload(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"This student not Exists"
+                "message":"This student not Exists",
+                "data":[]
             }
         }
     else: 
@@ -468,7 +473,8 @@ def student_documents(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"NotFound"
+                "message":"NotFound",
+                "data":[]
             }
         }
 
@@ -494,7 +500,8 @@ def student_document_details(request, pk):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"student not found"
+                "message":"student not found",
+                "data":[]
             }
         }
 

@@ -31,6 +31,8 @@ urlpatterns = [
     re_path(r"^training/schedules/(?P<pk>\d+)/$", training_schedule_detail),
     re_path(r"^focusing_areas/$", focusing_areas),
     re_path(r"^training_participents/$", training_participents_details),
+    re_path(r"^cancel_training_schedule/(?P<pk>\d+)/$", cancel_training_schedule_status),
+    re_path(r"^complete_training_schedule/(?P<pk>\d+)/$", complete_training_schedule_status),
     
     #recruitment
     re_path(r"^recruitment/add_schedule/$", add_recruitment_schedule),
@@ -42,6 +44,8 @@ urlpatterns = [
     re_path(r"^recruitment_Student_UpdationDetails_by_Participated_Student/(?P<pk>\d+)/$", recruitment_Student_UpdationDetails_by_Participated_Student),  
     re_path(r"^recruitment_Student_UpdationDetails_by_List_of_Student/$", recruitment_Student_UpdationDetails_by_List_of_Student),
     re_path(r"^add_selection_update_for_student/$", add_selection_update_for_student),
+    re_path(r"^cancel_recruitment_schedule/(?P<pk>\d+)/$", cancel_recruitment_schedule_status),
+    re_path(r"^complete_recruitment_schedule/(?P<pk>\d+)/$", complete_recruitment_schedule_status),
 
     
     # attendance
