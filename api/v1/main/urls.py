@@ -6,6 +6,7 @@ from .views import  *
 urlpatterns = [
     #departement
     re_path(r"^departments/$", department_list),
+    re_path(r"^department/(?P<pk>\d+)/$", get_department_instance),
     re_path(r"^create_department/$", create_department),
     
     #trainer

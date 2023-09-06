@@ -83,6 +83,32 @@ def department_list(request):
 
     return Response(response_data,status=status.HTTP_200_OK)
 
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_department_instance(request,pk):
+    if Departments.objects.filter(id=pk).exists():
+        department = Departments.objects.filter(id=pk)
+        serializer = DepartmentsGetSerializer(department, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
