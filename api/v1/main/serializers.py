@@ -125,6 +125,7 @@ class RecruitmentParticipentsSerializer(serializers.ModelSerializer):
         serialized_program_semesters = []  # List to store serialized Program_Semester data
         for program_semester in program_semesters:
             serialized_program_semester = {
+                'program_semester': program_semester.id,  # You can customize the fields you want to include
                 'program': program_semester.program.id,  # You can customize the fields you want to include
                 'program_name': program_semester.program.program_name,  # You can customize the fields you want to include
                 'semester': program_semester.semester.id,
@@ -145,6 +146,14 @@ class StudentProgramSemesterSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class RecruitmentParticipatedStudentsSchedulesSerializer(serializers.ModelSerializer):
+    department_name = serializers.CharField(source='student.program.program_name')
+    program_name = serializers.CharField(source='student.program.department.department_name')
+    admission_number = serializers.CharField(source='student.admission_number')
+    first_name = serializers.CharField(source='student.first_name')
+    last_name = serializers.CharField(source='student.last_name')
+    gender = serializers.CharField(source='student.gender')
+    roll_number = serializers.CharField(source='student.roll_number')
+    designation = serializers.CharField(source='scheduled_recruitment.designation')
     class Meta:
         model = Recruitment_Participated_Students
         fields = '__all__'
