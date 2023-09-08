@@ -89,10 +89,20 @@ class RecruitmentScheduleSerializer(serializers.Serializer):
     apply_last_date = serializers.CharField() 
     description =  serializers.CharField() 
     
+
 class RecruitmentSchedulesSerializer(serializers.ModelSerializer):
+    participents_details = serializers.SerializerMethodField()
+    recruiter_name =serializers.CharField(source='recruiter.company_name')
+
     class Meta:
         model = Schedule_Recruitment
         fields = '__all__'
+
+    def get_participents_details(self, obj):
+        schedule_id = obj.id
+        filtered_data = Recruitment_Participating_Branches.objects.filter(scheduled_recruitment_id=schedule_id)
+        serialized_data = RecruitmentParticipentsSerializer(filtered_data, many=True).data
+        return serialized_data
 
 class TrainingParticipentsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -103,7 +113,25 @@ class RecruitmentParticipentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recruitment_Participating_Branches
         fields = '__all__'
-        
+
+class RecruitmentParticipentsSerializer(serializers.ModelSerializer):
+    program_semester = serializers.SerializerMethodField()
+    class Meta:
+        model = Recruitment_Participating_Branches
+        fields = ['scheduled_recruitment','program_semester']
+
+    def get_program_semester(self, obj):
+        program_semesters = obj.program_semester.all()  # Assuming you want to retrieve all related Program_Semester instances
+        serialized_program_semesters = []  # List to store serialized Program_Semester data
+        for program_semester in program_semesters:
+            serialized_program_semester = {
+                'program': program_semester.program.id,  # You can customize the fields you want to include
+                'program_name': program_semester.program.program_name,  # You can customize the fields you want to include
+                'semester': program_semester.semester.id,
+                'semester_name': program_semester.semester.semester,
+            }
+            serialized_program_semesters.append(serialized_program_semester)
+        return serialized_program_semesters       
         
 class AttendancePostSerializer(serializers.Serializer):
     date = serializers.CharField()

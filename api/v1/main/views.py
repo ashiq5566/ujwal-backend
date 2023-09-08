@@ -688,7 +688,33 @@ def add_recruitment_schedule(request):
 def recruitment_schedule(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
-    if start_date and end_date:
+    department_id = request.GET.get('department_id')
+    if start_date and end_date and department_id:
+        recruitment_branches = Recruitment_Participating_Branches.objects.filter(
+                                    scheduled_recruitment__date__range=(start_date, end_date),program_semester__program__department__id=department_id
+                                )
+        scheduled_recruitment_ids = recruitment_branches.values_list('scheduled_recruitment__id', flat=True)
+        if Schedule_Recruitment.objects.filter(date__range=(start_date, end_date)).exists():
+            schedule =  Schedule_Recruitment.objects.filter(id__in=scheduled_recruitment_ids).order_by('-date')
+            serializer = RecruitmentSchedulesSerializer(schedule, many=True)
+            
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":"Schedule Not Found",
+                    "data":[]
+                }
+            }
+    elif start_date and end_date:
         if Schedule_Recruitment.objects.filter(date__range=(start_date, end_date)).exists():
             schedule =  Schedule_Recruitment.objects.filter(date__range=(start_date, end_date)).order_by('-date')
             serializer = RecruitmentSchedulesSerializer(schedule, many=True)
