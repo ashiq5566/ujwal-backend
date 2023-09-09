@@ -549,16 +549,113 @@ def add_training_schedule(request):
 def training_schedule(request): 
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
-    if start_date and end_date:
+    department_id = request.GET.get('department_id')
+    if start_date and end_date and department_id:
         if AllotTrainer.objects.filter(start_date__range=(start_date, end_date)).exists():
             schedule = AllotTrainer.objects.filter(start_date__range=(start_date, end_date)).order_by('-start_date')
-            serializer = TrainingSchedulesSerializer(schedule, many=True)
+            allot_trainers_with_participants = schedule.prefetch_related(
+                'trainingparticipant_set__program_semester'
+            )
+            data=[]
+            for allot_trainer in allot_trainers_with_participants:
+                focusing_areas = [area.area_name for area in allot_trainer.focusing_area.all()]
+                instance={
+                    'id':allot_trainer.id,
+                    "trainer_name":allot_trainer.trainer.trainer_name,
+                    "focusing_area":focusing_areas,
+                    "training_company":allot_trainer.trainer.training_company,
+                    "training_company":allot_trainer.trainer.training_company,
+                    "venue":allot_trainer.venue,
+                    "start_date":allot_trainer.start_date.isoformat(),
+                    "end_date":allot_trainer.end_date.isoformat(),
+                    "status":allot_trainer.status
+                    }
+                pgmSems=[]
+                departmentCheck=False
+                for training_participant in allot_trainer.trainingparticipant_set.all():
+                    # print(training_participant.program_semester.program.department.id,"sfd",department_id,"department_id")
+                    # print(f"Training Participant Department ID: {repr(training_participant.program_semester.program.department.id)}")
+                    department_id = int(department_id)
+                    if training_participant.program_semester.program.department.id == department_id:
+                        departmentCheck=True
+                        print("cheking")
+                    print(departmentCheck,"departmentCheck")
+                    pgmSem={
+                        "program_semester":training_participant.program_semester.id,
+                        "department":training_participant.program_semester.program.department.id,
+                        "department_name":training_participant.program_semester.program.department.department_name,
+                        "program":training_participant.program_semester.program.id,
+                        "program_name":training_participant.program_semester.program.program_name,
+                        "semester":training_participant.program_semester.semester.id,
+                        "semester_name":training_participant.program_semester.semester.semester
+                    }
+                    
+                    pgmSems.append(pgmSem)
+                instance["program_semesters"]=pgmSems
+                if departmentCheck:
+                    data.append(instance)
+
+            json_data = json.dumps(data, indent=4)
             
             response_data = {
                 "statusCode":6000,
                 "data":{
                     "title":"Success",
-                    "data":serializer.data
+                    "data":json_data
+                }
+            }
+            return Response(response_data,status=status.HTTP_200_OK)
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":"Schedule Not Found",
+                    "data":[]
+                }
+            }
+    elif start_date and end_date:
+        if AllotTrainer.objects.filter(start_date__range=(start_date, end_date)).exists():
+            schedule = AllotTrainer.objects.filter(start_date__range=(start_date, end_date)).order_by('-start_date')
+            allot_trainers_with_participants = schedule.prefetch_related(
+                'trainingparticipant_set__program_semester'
+            )
+            data=[]
+            for allot_trainer in allot_trainers_with_participants:
+                focusing_areas = [area.area_name for area in allot_trainer.focusing_area.all()]
+                instance={
+                    'id':allot_trainer.id,
+                    "trainer_name":allot_trainer.trainer.trainer_name,
+                    "focusing_area":focusing_areas,
+                    "training_company":allot_trainer.trainer.training_company,
+                    "training_company":allot_trainer.trainer.training_company,
+                    "venue":allot_trainer.venue,
+                    "start_date":allot_trainer.start_date.isoformat(),
+                    "end_date":allot_trainer.end_date.isoformat(),
+                    "status":allot_trainer.status
+                    }
+                pgmSems=[]
+                for training_participant in allot_trainer.trainingparticipant_set.all():
+                    pgmSem={
+                        "program_semester":training_participant.program_semester.id,
+                        "department":training_participant.program_semester.program.department.id,
+                        "department_name":training_participant.program_semester.program.department.department_name,
+                        "program":training_participant.program_semester.program.id,
+                        "program_name":training_participant.program_semester.program.program_name,
+                        "semester":training_participant.program_semester.semester.id,
+                        "semester_name":training_participant.program_semester.semester.semester
+                    }
+                    pgmSems.append(pgmSem)
+                instance["program_semesters"]=pgmSems
+                data.append(instance)
+
+            json_data = json.dumps(data, indent=4)
+            
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":json_data
                 }
             }
             return Response(response_data,status=status.HTTP_200_OK)
@@ -580,7 +677,7 @@ def training_schedule(request):
                     "message":"Invalied batch"
                 }
             }
-    return Response(response_data,status=status.HTTP_400_BAD_REQUEST)
+    return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny,])
@@ -924,7 +1021,6 @@ def student_program_semester_details(request):
 @permission_classes([AllowAny,])
 def recruitment_applied_students_by_recruitment_schedule(request, pk):
     department_id = request.GET.get('department_id')
-    print(department_id,"department_id")
     if department_id:
         if Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk,student__program__department__id=department_id).exists():
             students =Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk,student__program__department__id=department_id)
