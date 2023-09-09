@@ -923,7 +923,31 @@ def student_program_semester_details(request):
 @api_view(['GET'])
 @permission_classes([AllowAny,])
 def recruitment_applied_students_by_recruitment_schedule(request, pk):
-    if Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk).exists():
+    department_id = request.GET.get('department_id')
+    print(department_id,"department_id")
+    if department_id:
+        if Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk,student__program__department__id=department_id).exists():
+            students =Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk,student__program__department__id=department_id)
+            serializer = RecruitmentParticipatedStudentsSchedulesSerializer(students, many=True)
+
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
+            }
+        else:
+            response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "message":"Participated student list Not Found",
+                "data":[]
+                }
+            }
+
+    elif Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk).exists():
         students =Recruitment_Participated_Students.objects.filter(scheduled_recruitment_id=pk)
         serializer = RecruitmentParticipatedStudentsSchedulesSerializer(students, many=True)
 

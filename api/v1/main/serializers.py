@@ -126,6 +126,7 @@ class RecruitmentParticipentsSerializer(serializers.ModelSerializer):
         for program_semester in program_semesters:
             serialized_program_semester = {
                 'program_semester': program_semester.id,  # You can customize the fields you want to include
+                'department': program_semester.program.department.id,  # You can customize the fields you want to include
                 'program': program_semester.program.id,  # You can customize the fields you want to include
                 'program_name': program_semester.program.program_name,  # You can customize the fields you want to include
                 'semester': program_semester.semester.id,
