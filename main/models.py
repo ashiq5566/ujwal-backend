@@ -338,10 +338,12 @@ class Academic_year(models.Model):
         return f"{self.start_date.year}-{self.end_date.year}"
 
 class Skills(models.Model):
-    skill_name = models.CharField(null=False)
+    skill_name = models.CharField(null=False,unique=True)
     def __str__(self):
         return f"{self.skill_name}"
 
 class Student_skills(models.Model):
     student = models.ForeignKey(Student,on_delete=models.CASCADE,null=False)
     skill = models.ForeignKey(Skills,on_delete=models.CASCADE,null=False)
+    def __str__(self):
+        return f"{self.student}-{self.skill}"

@@ -17,6 +17,7 @@ from main.models import *
 from django.db.models import Subquery
 from django.db.models import Q
 from datetime import datetime, timedelta
+from django.shortcuts import get_object_or_404
 
 
 @api_view(['POST'])
@@ -1822,3 +1823,74 @@ def cancel_training_schedule_status(request,pk):
         }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def getSkillSetByStudent(request,pk):
+    if Student_skills.objects.filter(student__id=pk).exists():
+        skill = Student_skills.objects.filter(student__id=pk)
+        data = []  
+        for i in skill:
+            print(i,"sfdsdf")
+            data.append(i.skill.skill_name)
+        
+        data=json.dumps(data, indent=4)
+
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def add_skillset(request):
+    # Get the skill and student IDs from the request data
+    skill_id = request.data.get('skill')
+    student_id = request.data.get('student')
+
+    # Get the skill instance or create it if not found
+    skill, created = Skills.objects.get_or_create(skill_name=skill_id)
+
+    if not created:
+        skill.save()
+
+    # Get the student instance or return a 404 if not found
+    student = get_object_or_404(Student, id=student_id)
+
+    # Check if the skillset already exists for this student
+    if Student_skills.objects.filter(student=student, skill=skill).exists():
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "failed",
+                "message": "Skillset already exists",
+                "data": []
+            }
+        }
+        return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+    # Create a new Student_skills instance
+    student_skill = Student_skills.objects.create(student=student, skill=skill).save()
+
+    response_data = {
+        "statusCode": 6000,
+        "data": {
+            "title": "Success",
+            "message": "Skillset added successfully.",
+            "data": []
+        }
+    }
+    return Response(response_data, status=status.HTTP_201_CREATED)

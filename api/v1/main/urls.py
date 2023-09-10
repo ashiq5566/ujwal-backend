@@ -73,4 +73,9 @@ urlpatterns = [
 
     #academic year
     re_path(r"get_academic_years/$", get_academic_years),
+
+    #skill
+    re_path(r"getSkillSetByStudent/(?P<pk>\d+)/$", getSkillSetByStudent),
+    re_path(r"add_skillset/$", add_skillset),
+    
 ]
