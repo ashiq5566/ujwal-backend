@@ -61,6 +61,11 @@ def login(request):
                 }
                 if user.department:
                     response_data['data']['data']['department'] = user.department.id
+                if user.role == 'student' and Student.objects.filter(admission_number=user.username).exists():
+                    student = Student.objects.get(admission_number=user.username)
+                    response_data['data']['data']['student']=student.id
+                    response_data['data']['data']['program']=student.program.program_name
+                    response_data['data']['data']['name']=student.first_name + ' ' + student.last_name 
             else:
                 response_data = {
                     'statusCode' : 6001,
