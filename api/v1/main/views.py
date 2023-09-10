@@ -1163,8 +1163,10 @@ def attendenceMarkedOrNot(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def ongoing_program_semester_promote_details(request):
-    if Student_program_semester.objects.filter().exists():
+    department_id = request.GET.get('department_id')
+    if department_id:
         ongoing_semester_ids = list(set([i.semester.id for i in Student_program_semester.objects.filter(status='ongoing')]))
+        print(ongoing_semester_ids,"ongoing_semester_ids")
         
         upcoming_new_sem_ids=[]
         for i in Student_program_semester.objects.filter(status='upcoming'):
@@ -1172,16 +1174,92 @@ def ongoing_program_semester_promote_details(request):
                 sem_1=Semesters.objects.get(semester="Semester 1")
                 if j.semester.id==sem_1.id:
                     upcoming_new_sem_ids += [i.semester.id]
+                    print()
         upcoming_new_sem_ids=list(set(upcoming_new_sem_ids))
+        upcoming_details=[]
+        department_id = int(department_id)
+        for unpsId in upcoming_new_sem_ids:
+            instance_upcoming = Program_Semester.objects.get(id=unpsId)
+            if instance_upcoming.program.department.id==department_id:
+                instance_upcoming_data={
+                    "id":unpsId,
+                    "program":instance_upcoming.program.id,
+                    "program_name":instance_upcoming.program.program_name,
+                    "semester":instance_upcoming.semester.id,
+                    "semester_name":instance_upcoming.semester.semester
+                }
+                upcoming_details.append(instance_upcoming_data)
+        json_upcoming_data=json.dumps(upcoming_details, indent=4)
 
+        ongoing_details=[]
+        for ogpsId in ongoing_semester_ids:
+            instance_ongoing = Program_Semester.objects.get(id=ogpsId)
+            if instance_ongoing.program.department.id==department_id:
+                instance_ongoing_data={
+                    "id":ogpsId,
+                    "program":instance_ongoing.program.id,
+                    "program_name":instance_ongoing.program.program_name,
+                    "semester":instance_ongoing.semester.id,
+                    "semester_name":instance_ongoing.semester.semester
+                }
+                ongoing_details.append(instance_ongoing_data)
+        json_ongoing_data=json.dumps(ongoing_details, indent=4)
 
         response_data = {
             "statusCode":6000,
             "data":{
                 "title":"Success",
                 "data":{
-                    "onGoingProgramSemesters":ongoing_semester_ids,
-                    "upcomingBatchFirstProgramSemesters":upcoming_new_sem_ids
+                    "onGoingProgramSemesters": json_ongoing_data,
+                    "upcomingBatchFirstProgramSemesters":json_upcoming_data
+                }
+            }
+        }
+    elif Student_program_semester.objects.filter().exists():
+        ongoing_semester_ids = list(set([i.semester.id for i in Student_program_semester.objects.filter(status='ongoing')]))
+        print(ongoing_semester_ids,"ongoing_semester_ids")
+        
+        upcoming_new_sem_ids=[]
+        for i in Student_program_semester.objects.filter(status='upcoming'):
+            for j in Program_Semester.objects.filter(id=i.semester.id):
+                sem_1=Semesters.objects.get(semester="Semester 1")
+                if j.semester.id==sem_1.id:
+                    upcoming_new_sem_ids += [i.semester.id]
+                    print()
+        upcoming_new_sem_ids=list(set(upcoming_new_sem_ids))
+        upcoming_details=[]
+        for unpsId in upcoming_new_sem_ids:
+            instance_ongoing = Program_Semester.objects.get(id=unpsId)
+            instance_ongoing_data={
+                "id":unpsId,
+                "program":instance_ongoing.program.id,
+                "program_name":instance_ongoing.program.program_name,
+                "semester":instance_ongoing.semester.id,
+                "semester_name":instance_ongoing.semester.semester
+            }
+            upcoming_details.append(instance_ongoing_data)
+        json_upcoming_data=json.dumps(upcoming_details, indent=4)
+
+        ongoing_details=[]
+        for ogpsId in ongoing_semester_ids:
+            instance_ongoing = Program_Semester.objects.get(id=ogpsId)
+            instance_ongoing_data={
+                "id":ogpsId,
+                "program":instance_ongoing.program.id,
+                "program_name":instance_ongoing.program.program_name,
+                "semester":instance_ongoing.semester.id,
+                "semester_name":instance_ongoing.semester.semester
+            }
+            ongoing_details.append(instance_ongoing_data)
+        json_ongoing_data=json.dumps(ongoing_details, indent=4)
+
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":{
+                    "onGoingProgramSemesters": json_ongoing_data,
+                    "upcomingBatchFirstProgramSemesters":json_upcoming_data
                 }
             }
         }
