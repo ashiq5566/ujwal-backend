@@ -873,7 +873,20 @@ def recruitment_schedule_detail(request, pk):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def training_participents_details(request):
-    if TrainingParticipant.objects.all():
+    allot_tariner_id = request.GET.get('allot_tariner_id')
+    if allot_tariner_id:
+        allot_tariner_id = int(allot_tariner_id)
+        training_participant = TrainingParticipant.objects.filter(allot_trainer__id=allot_tariner_id) ;  
+        serializer = TrainingParticipentsSerializer(training_participant, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    elif TrainingParticipant.objects.filter(allot_trainer__id=pk):
         training_participant = TrainingParticipant.objects.all()  
         serializer = TrainingParticipentsSerializer(training_participant, many=True)
         
