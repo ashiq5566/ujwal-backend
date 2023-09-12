@@ -59,10 +59,15 @@ class SemestersGetSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProgramSemesterGetSerializer(serializers.ModelSerializer):
+    program_name =serializers.SerializerMethodField()
+    semester_name =serializers.SerializerMethodField()
     class Meta:
         model = Program_Semester
         fields = '__all__'
-
+    def get_program_name(self, obj):
+        return obj.program.program_name
+    def get_semester_name(self, obj):
+        return obj.semester.semester
 
 class TrainingScheduleSerializer(serializers.Serializer):
     trainer_id = serializers.IntegerField()
@@ -159,6 +164,10 @@ class RecruitmentParticipatedStudentsSchedulesSerializer(serializers.ModelSerial
         model = Recruitment_Participated_Students
         fields = '__all__'
     
+class PostRecruitmentParticipatedStudentsSchedulesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recruitment_Participated_Students
+        fields = '__all__'
 class RecruitmentSelectionUpdatesSchedulesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recruitment_Student_Updations
@@ -170,6 +179,10 @@ class ParticipatedStudentsByRecruitmentSchedulesSerializer(serializers.ModelSeri
         model = Recruitment_Participated_Students
         fields = ['participated_id','student']
 
+class PlacedPOSTStudentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Placed_students
+        fields = '__all__'
 
 class PlacedStudentsSerializer(serializers.ModelSerializer):
     admission_number = serializers.CharField(source='recruitment_participated_student.student.admission_number')

@@ -887,7 +887,7 @@ def training_participents_details(request):
                 "data":serializer.data
             }
         }
-    elif TrainingParticipant.objects.filter(allot_trainer__id=pk):
+    elif TrainingParticipant.objects.all():
         training_participant = TrainingParticipant.objects.all()  
         serializer = TrainingParticipentsSerializer(training_participant, many=True)
         
@@ -1110,7 +1110,7 @@ def student_program_semester_by_program_semester(request, pk):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def add_recruitment_Participated_Students(request):
-    serializer = RecruitmentParticipatedStudentsSchedulesSerializer(data=request.data)
+    serializer = PostRecruitmentParticipatedStudentsSchedulesSerializer(data=request.data)
     
     if serializer.is_valid():
         serializer.save()
@@ -1422,7 +1422,7 @@ def get_participatedStudents_for_placement_by_schedule(request,pk):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def add_a_placement(request):
-    serializer = PlacedStudentsSerializer(data=request.data)
+    serializer = PlacedPOSTStudentsSerializer(data=request.data)
     
     if serializer.is_valid():
         serializer.save()
@@ -1894,3 +1894,74 @@ def add_skillset(request):
         }
     }
     return Response(response_data, status=status.HTTP_201_CREATED)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_placement_details_by_student(request,pk):
+    print(pk,"sdfgdsf")
+    student_id = int(pk)
+    if Student_program_semester.objects.filter(student__id=student_id).exists():
+        student_data=Student_program_semester.objects.filter(student__id=student_id)
+        program_sems = []
+        responce_date=[]
+        for data in student_data:
+            ps_instance ={
+                "program_semester": data.semester,
+                "start_date" : data.start_date,
+                "end_date" : data.end_date,
+                "status" : data.status,
+            }
+            program_sems.append(ps_instance)
+        for program_sem in program_sems:
+            if Recruitment_Participating_Branches.objects.filter(program_semester=program_sem['program_semester']).exists():
+                part_batchs=(Recruitment_Participating_Branches.objects.filter(program_semester=program_sem['program_semester']))
+                for part_batch in part_batchs:
+                    
+                    if program_sem['start_date'] and (program_sem['status']=='ongoing' or program_sem['status']=='completed' ) :
+                        # print(part_batch.scheduled_recruitment,"part_batch.scheduled_recruitment")
+                        if program_sem['end_date']:
+                            if program_sem['start_date'] <= part_batch.scheduled_recruitment.date <= program_sem['end_date']:
+                                inst_res_data={
+                                    "scheduled_recruitment":part_batch.scheduled_recruitment.id,
+                                    "recruiter":part_batch.scheduled_recruitment.recruiter.id,
+                                    "recruiter_name":part_batch.scheduled_recruitment.recruiter.company_name,
+                                    "designation":part_batch.scheduled_recruitment.designation,
+                                    "apply_link":part_batch.scheduled_recruitment.apply_link,
+                                    "apply_last_date":part_batch.scheduled_recruitment.apply_last_date.isoformat(),
+                                    "description":part_batch.scheduled_recruitment.description,
+                                    "venue":part_batch.scheduled_recruitment.venue,
+                                }
+                                responce_date.append(inst_res_data)
+                        elif program_sem['start_date'] <= part_batch.scheduled_recruitment.date:
+                            inst_res_data={
+                                "scheduled_recruitment":part_batch.scheduled_recruitment.id,
+                                "recruiter":part_batch.scheduled_recruitment.recruiter.id,
+                                "recruiter_name":part_batch.scheduled_recruitment.recruiter.company_name,
+                                "designation":part_batch.scheduled_recruitment.designation,
+                                "apply_link":part_batch.scheduled_recruitment.apply_link,
+                                "apply_last_date":part_batch.scheduled_recruitment.apply_last_date.isoformat(),
+                                "description":part_batch.scheduled_recruitment.description,
+                                "venue":part_batch.scheduled_recruitment.venue,
+                            }
+                            responce_date.append(inst_res_data)
+            responce_date_sent=json.dumps(sorted(responce_date, key=lambda x: x['apply_last_date'], reverse=True), indent=4)  
+
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":responce_date_sent,
+                }
+            }             
+                                
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)

@@ -44,28 +44,36 @@ def login(request):
                     'password': password,
                 }
                 response = requests.post(request_url, headers=headers, data=json.dumps(data))
-                
-                response_data = {
-                    'statusCode' : 6000,
-                    'data' : {
-                        'title': 'Success',
-                                "data":{
-                            "id":user.id,
-                            "username":user.username,
-                            "role":user.role,
-                            "email":user.email,
+                if(user.is_active):
+                    response_data = {
+                        'statusCode' : 6000,
+                        'data' : {
+                            'title': 'Success',
+                                    "data":{
+                                "id":user.id,
+                                "username":user.username,
+                                "role":user.role,
+                                "email":user.email,
 
-                        },
-                        'response' : response.json(),
+                            },
+                            'response' : response.json(),
+                        }
                     }
-                }
-                if user.department:
-                    response_data['data']['data']['department'] = user.department.id
-                if user.role == 'student' and Student.objects.filter(admission_number=user.username).exists():
-                    student = Student.objects.get(admission_number=user.username)
-                    response_data['data']['data']['student']=student.id
-                    response_data['data']['data']['program']=student.program.program_name
-                    response_data['data']['data']['name']=student.first_name + ' ' + student.last_name 
+                    if user.department:
+                        response_data['data']['data']['department'] = user.department.id
+                    if user.role == 'student' and Student.objects.filter(admission_number=user.username).exists():
+                        student = Student.objects.get(admission_number=user.username)
+                        response_data['data']['data']['student']=student.id
+                        response_data['data']['data']['program']=student.program.program_name
+                        response_data['data']['data']['name']=student.first_name + ' ' + student.last_name 
+                else:
+                    response_data = {
+                        "statusCode": 6001,
+                        "data":{
+                            "title": "Validation Error",
+                            "message": "Invalied Credentials" #User inactive
+                        }
+                    }
             else:
                 response_data = {
                     'statusCode' : 6001,
@@ -79,7 +87,7 @@ def login(request):
                 'statusCode' : 6001,
                 'data' : {
                     'title': 'failed',
-                    'message' : "User not exists"
+                    'message' : "Invalied Credentials" #User not exists
                 }
             }
     else:

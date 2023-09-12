@@ -78,4 +78,6 @@ urlpatterns = [
     re_path(r"getSkillSetByStudent/(?P<pk>\d+)/$", getSkillSetByStudent),
     re_path(r"add_skillset/$", add_skillset),
     
+    #student
+    re_path(r"get_placement_details_by_student/(?P<pk>\d+)/$", get_placement_details_by_student),
 ]
