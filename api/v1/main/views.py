@@ -1927,7 +1927,7 @@ def get_placement_details_by_student(request,pk):
                                     "recruiter_name":part_batch.scheduled_recruitment.recruiter.company_name,
                                     "designation":part_batch.scheduled_recruitment.designation,
                                     "apply_link":part_batch.scheduled_recruitment.apply_link,
-                                    "apply_last_date":part_batch.scheduled_recruitment.apply_last_date.isoformat(),
+                                    "apply_last_date":part_batch.scheduled_recruitment.apply_last_date.isoformat() if part_batch.scheduled_recruitment.apply_last_date else None,
                                     "description":part_batch.scheduled_recruitment.description,
                                     "venue":part_batch.scheduled_recruitment.venue,
                                 }
@@ -1939,7 +1939,7 @@ def get_placement_details_by_student(request,pk):
                                 "recruiter_name":part_batch.scheduled_recruitment.recruiter.company_name,
                                 "designation":part_batch.scheduled_recruitment.designation,
                                 "apply_link":part_batch.scheduled_recruitment.apply_link,
-                                "apply_last_date":part_batch.scheduled_recruitment.apply_last_date.isoformat(),
+                                "apply_last_date":part_batch.scheduled_recruitment.apply_last_date.isoformat() if part_batch.scheduled_recruitment.apply_last_date else None,
                                 "description":part_batch.scheduled_recruitment.description,
                                 "venue":part_batch.scheduled_recruitment.venue,
                             }
@@ -1956,6 +1956,57 @@ def get_placement_details_by_student(request,pk):
                                 
     else:
         response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_applied_placements_by_student(request,pk):
+    student_id = int(pk)
+    if Recruitment_Participated_Students.objects.filter(student__id=student_id).exists():
+        appliedPlacements=Recruitment_Participated_Students.objects.filter(student__id=student_id)
+        print(appliedPlacements)
+        data=[]
+        for appliedPlacement in appliedPlacements:
+            print(appliedPlacement)
+            studentUpdationItems= Recruitment_Student_Updations.objects.filter(recruitment_participated_student=appliedPlacement)
+            updationAll=[]
+            for studentUpdationItem in studentUpdationItems:
+                updationInstance={
+                    "updation_date":studentUpdationItem.date.isoformat()  if studentUpdationItem.date else None,
+                    "type_of_selection":studentUpdationItem.type_of_selection,
+                    "selected_status":studentUpdationItem.is_selected,
+                    "completed_status" :studentUpdationItem.status
+                }
+                updationAll.append(updationInstance)
+            instance = {
+                "id" : appliedPlacement.id,
+                "applied_date" :  appliedPlacement.applied_date.isoformat() if appliedPlacement.applied_date else None,
+                "scheduled_recruitment_id" : appliedPlacement.scheduled_recruitment.id,
+                "scheduled_recruitment_name" : appliedPlacement.scheduled_recruitment.recruiter.company_name,
+                "designation" : appliedPlacement.scheduled_recruitment.designation,
+                "status" : appliedPlacement.scheduled_recruitment.status,
+                "student_process_details":updationAll
+            }
+            data.append(instance)
+        responce_date_sent=json.dumps(data,indent=4)
+        response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":responce_date_sent,
+                }
+            }   
+        return Response(response_data,status=status.HTTP_200_OK)   
+
+    response_data = {
             "statusCode":6001,
             "data":{
                 "title":"Failed",
