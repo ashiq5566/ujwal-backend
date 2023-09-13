@@ -567,8 +567,8 @@ def training_schedule(request):
                     "training_company":allot_trainer.trainer.training_company,
                     "training_company":allot_trainer.trainer.training_company,
                     "venue":allot_trainer.venue,
-                    "start_date":allot_trainer.start_date.isoformat(),
-                    "end_date":allot_trainer.end_date.isoformat(),
+                    "start_date":allot_trainer.start_date.isoformat() if allot_trainer.start_date else None ,
+                    "end_date":allot_trainer.end_date.isoformat() if allot_trainer.end_date else None,
                     "status":allot_trainer.status
                     }
                 pgmSems=[]
@@ -631,8 +631,8 @@ def training_schedule(request):
                     "training_company":allot_trainer.trainer.training_company,
                     "training_company":allot_trainer.trainer.training_company,
                     "venue":allot_trainer.venue,
-                    "start_date":allot_trainer.start_date.isoformat(),
-                    "end_date":allot_trainer.end_date.isoformat(),
+                    "start_date":allot_trainer.start_date.isoformat() if allot_trainer.start_date else None,
+                    "end_date":allot_trainer.end_date.isoformat() if allot_trainer.end_date else None,
                     "status":allot_trainer.status
                     }
                 pgmSems=[]
@@ -1972,10 +1972,8 @@ def get_applied_placements_by_student(request,pk):
     student_id = int(pk)
     if Recruitment_Participated_Students.objects.filter(student__id=student_id).exists():
         appliedPlacements=Recruitment_Participated_Students.objects.filter(student__id=student_id)
-        print(appliedPlacements)
         data=[]
         for appliedPlacement in appliedPlacements:
-            print(appliedPlacement)
             studentUpdationItems= Recruitment_Student_Updations.objects.filter(recruitment_participated_student=appliedPlacement)
             updationAll=[]
             for studentUpdationItem in studentUpdationItems:
