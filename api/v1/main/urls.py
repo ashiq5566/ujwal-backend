@@ -81,5 +81,6 @@ urlpatterns = [
     #student login
     re_path(r"get_placement_details_by_student/(?P<pk>\d+)/$", get_placement_details_by_student),
     re_path(r"get_applied_placements_by_student/(?P<pk>\d+)/$", get_applied_placements_by_student),
+    re_path(r"get_placed_result_by_student/(?P<pk>\d+)/$", get_placed_result_by_student),
 
 ]

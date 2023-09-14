@@ -1898,7 +1898,6 @@ def add_skillset(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_placement_details_by_student(request,pk):
-    print(pk,"sdfgdsf")
     student_id = int(pk)
     if Student_program_semester.objects.filter(student__id=student_id).exists():
         student_data=Student_program_semester.objects.filter(student__id=student_id)
@@ -2014,3 +2013,39 @@ def get_applied_placements_by_student(request,pk):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_placed_result_by_student(request,pk):
+    student_id = int(pk)
+    if Placed_students.objects.filter(recruitment_participated_student__student__id=student_id).exists():
+        student_placements= Placed_students.objects.filter(recruitment_participated_student__student__id=student_id)
+        data=[]
+        for student_placement in student_placements:
+            instance={
+                "student":student_placement.recruitment_participated_student.student.id,
+                "recruiter":student_placement.recruitment_participated_student.scheduled_recruitment.recruiter.company_name,
+                "designation":student_placement.recruitment_participated_student.scheduled_recruitment.designation,
+                "placed_date":student_placement.placed_date.isoformat() if student_placement.placed_date else None
+            }
+            data.append(instance)
+        responce_date_sent=json.dumps(data,indent=4)
+        response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":responce_date_sent,
+                }
+            }   
+        return Response(response_data,status=status.HTTP_200_OK)  
+    response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+    
