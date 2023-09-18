@@ -262,8 +262,8 @@ def add_program(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def program_list(request):
-    if Programs.objects.all():
-        programs = Programs.objects.all()  
+    if Programs.objects.filter(is_active=True).exists():
+        programs = Programs.objects.filter(is_active=True)
         serializer = ProgramsGetSerializer(programs, many=True)
         
         response_data = {

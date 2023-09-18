@@ -162,14 +162,19 @@ class Student(models.Model):
         
         super().save(*args, **kwargs)
 
-class StudentDocument(models.Model):
+class StudentAcademicDetails(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    document_type = models.CharField(max_length=50, choices=DOCUMENT_TYPE_CHOICES)
-    document_file = models.FileField(upload_to='student_documents/',null=True,blank=True)
-    mark = models.CharField(null=True,blank=True)
+    SSLC_Mark = models.CharField(max_length=50)
+    SSLC_Document = models.FileField(upload_to='student_documents/sslc/')
+    Plus_Two_Mark = models.CharField(max_length=50)
+    Plus_Two_Document = models.FileField(upload_to='student_documents/plusTwo/')
+    Degree_Mark = models.CharField(max_length=50,null=True,blank=True)
+    Degree_Document = models.FileField(upload_to='student_documents/degree/',null=True,blank=True)
+    Engineering_Mark = models.CharField(max_length=50,null=True,blank=True)
+    Engineering_Document = models.FileField(upload_to='student_documents/engineering/',null=True,blank=True)
 
     def __str__(self):
-        return f"{self.get_document_type_display()}"
+        return f"{self.student}"
 
 class Semesters(models.Model):
     semester = models.CharField(max_length=50, null=False)
@@ -350,7 +355,7 @@ class Student_skills(models.Model):
     
 class Student_Additional_Documents(models.Model):
     student = models.ForeignKey(Student,on_delete=models.CASCADE,null=False)
-    document = models.ImageField(upload_to='documents/', null=False)
+    document = models.ImageField(upload_to='student_documents/additional/', null=False)
     document_name =models.CharField(null=False)
     def __str__(self):
         return f"{self.student}-{self.document_name}"
