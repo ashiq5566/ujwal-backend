@@ -574,13 +574,9 @@ def training_schedule(request):
                 pgmSems=[]
                 departmentCheck=False
                 for training_participant in allot_trainer.trainingparticipant_set.all():
-                    # print(training_participant.program_semester.program.department.id,"sfd",department_id,"department_id")
-                    # print(f"Training Participant Department ID: {repr(training_participant.program_semester.program.department.id)}")
                     department_id = int(department_id)
                     if training_participant.program_semester.program.department.id == department_id:
                         departmentCheck=True
-                        print("cheking")
-                    print(departmentCheck,"departmentCheck")
                     pgmSem={
                         "program_semester":training_participant.program_semester.id,
                         "department":training_participant.program_semester.program.department.id,
@@ -1180,7 +1176,6 @@ def ongoing_program_semester_promote_details(request):
     department_id = request.GET.get('department_id')
     if department_id:
         ongoing_semester_ids = list(set([i.semester.id for i in Student_program_semester.objects.filter(status='ongoing')]))
-        print(ongoing_semester_ids,"ongoing_semester_ids")
         
         upcoming_new_sem_ids=[]
         for i in Student_program_semester.objects.filter(status='upcoming'):
@@ -1188,7 +1183,6 @@ def ongoing_program_semester_promote_details(request):
                 sem_1=Semesters.objects.get(semester="Semester 1")
                 if j.semester.id==sem_1.id:
                     upcoming_new_sem_ids += [i.semester.id]
-                    print()
         upcoming_new_sem_ids=list(set(upcoming_new_sem_ids))
         upcoming_details=[]
         department_id = int(department_id)
@@ -1231,7 +1225,6 @@ def ongoing_program_semester_promote_details(request):
         }
     elif Student_program_semester.objects.filter().exists():
         ongoing_semester_ids = list(set([i.semester.id for i in Student_program_semester.objects.filter(status='ongoing')]))
-        print(ongoing_semester_ids,"ongoing_semester_ids")
         
         upcoming_new_sem_ids=[]
         for i in Student_program_semester.objects.filter(status='upcoming'):
@@ -1239,7 +1232,6 @@ def ongoing_program_semester_promote_details(request):
                 sem_1=Semesters.objects.get(semester="Semester 1")
                 if j.semester.id==sem_1.id:
                     upcoming_new_sem_ids += [i.semester.id]
-                    print()
         upcoming_new_sem_ids=list(set(upcoming_new_sem_ids))
         upcoming_details=[]
         for unpsId in upcoming_new_sem_ids:
@@ -1830,7 +1822,6 @@ def getSkillSetByStudent(request,pk):
         skill = Student_skills.objects.filter(student__id=pk)
         data = []  
         for i in skill:
-            print(i,"sfdsdf")
             data.append(i.skill.skill_name)
         
         data=json.dumps(data, indent=4)
@@ -1917,7 +1908,6 @@ def get_placement_details_by_student(request,pk):
                 for part_batch in part_batchs:
                     
                     if program_sem['start_date'] and (program_sem['status']=='ongoing' or program_sem['status']=='completed' ) :
-                        # print(part_batch.scheduled_recruitment,"part_batch.scheduled_recruitment")
                         if program_sem['end_date']:
                             if program_sem['start_date'] <= part_batch.scheduled_recruitment.date <= program_sem['end_date']:
                                 inst_res_data={
@@ -2049,3 +2039,63 @@ def get_placed_result_by_student(request,pk):
 
     return Response(response_data,status=status.HTTP_200_OK)
     
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def upload_additional_document(request):
+    if request.method == 'POST' and request.FILES.get('document'):
+        student_id = request.data.get('student_id')
+        student = Student.objects.get(pk=student_id)
+        
+        document = Student_Additional_Documents(
+            student=student,
+            document=request.FILES['document'],
+            document_name=request.data.get('document_name')
+        )
+        document.save()
+        
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Document added successfully.",
+                "data": []
+            }
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def students_additional_documents(request,student_id):
+    if Student_Additional_Documents.objects.filter(student_id=student_id).exists():
+        docs = Student_Additional_Documents.objects.filter(student_id=student_id)
+        serializer = StudentAdditionalDocumentsSerializer(docs, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)

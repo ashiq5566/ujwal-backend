@@ -210,3 +210,8 @@ class AcademicYearSerializer(serializers.ModelSerializer):
     class Meta:
         model = Academic_year
         fields = '__all__'
+
+class StudentAdditionalDocumentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student_Additional_Documents
+        fields = '__all__'

@@ -10,7 +10,7 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['first_name','last_name','email','department','user_active','username','role']
     
 class StudentSerializer(serializers.Serializer):
     admission_number = serializers.IntegerField()
@@ -44,3 +44,7 @@ class StudentDocumentsSerializer(serializers.Serializer):
     mark = serializers.CharField()
 
         
+class DepartmentsGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Departments
+        fields = ['department_name']

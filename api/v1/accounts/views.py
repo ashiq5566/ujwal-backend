@@ -195,27 +195,38 @@ def user_register(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def user_list(request):
-    if User.objects.all():
-        user = User.objects.all()  
-        serializer = UserSerializer(user, many=True)
-        
+    users = User.objects.filter(user_active=True).exclude(role__in=['student', 'Admin'])
+
+    user_data = []
+
+    for user in users:
+        user_info = UserSerializer(user).data
+
+        # Check if the user has a department associated with them
+        if user.department:
+            department_info = DepartmentsGetSerializer(user.department).data
+            user_info['department'] = department_info
+
+        user_data.append(user_info)
+
+    if user_data:
         response_data = {
-            "statusCode":6000,
-            "data":{
-                "title":"Success",
-                "data":serializer.data
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "data": user_data
             }
         }
     else:
         response_data = {
-            "statusCode":6001,
-            "data":{
-                "title":"Failed",
-                "data":"NotFound"
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "data": "NotFound"
             }
         }
 
-    return Response(response_data,status=status.HTTP_200_OK)
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])

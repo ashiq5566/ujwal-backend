@@ -347,3 +347,10 @@ class Student_skills(models.Model):
     skill = models.ForeignKey(Skills,on_delete=models.CASCADE,null=False)
     def __str__(self):
         return f"{self.student}-{self.skill}"
+    
+class Student_Additional_Documents(models.Model):
+    student = models.ForeignKey(Student,on_delete=models.CASCADE,null=False)
+    document = models.ImageField(upload_to='documents/', null=False)
+    document_name =models.CharField(null=False)
+    def __str__(self):
+        return f"{self.student}-{self.document_name}"
