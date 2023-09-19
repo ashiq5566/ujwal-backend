@@ -215,3 +215,8 @@ class StudentAdditionalDocumentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student_Additional_Documents
         fields = '__all__'
+
+class StudentResumeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student_Resume
+        fields = '__all__'

@@ -2099,3 +2099,64 @@ def students_additional_documents(request,student_id):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def upload_resume(request):
+    if request.method == 'POST' and request.FILES.get('resume'):
+        student_id = request.data.get('student_id')
+        student = Student.objects.get(pk=student_id)
+        
+        existing_record, created = Student_Resume.objects.update_or_create(
+            student=student,
+            defaults={
+                'resume': request.FILES['resume'],
+            }
+        )
+        
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Resume updated successfully.",
+                "data": []
+            }
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def student_resume(request,student_id):
+    if Student_Resume.objects.filter(student_id=student_id).exists():
+        docs = Student_Resume.objects.filter(student_id=student_id)
+        serializer = StudentResumeSerializer(docs, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)

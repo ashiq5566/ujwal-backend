@@ -359,3 +359,10 @@ class Student_Additional_Documents(models.Model):
     document_name =models.CharField(null=False)
     def __str__(self):
         return f"{self.student}-{self.document_name}"
+    
+class Student_Resume(models.Model):
+    student = models.ForeignKey(Student,on_delete=models.CASCADE,null=False,unique=True)
+    resume = models.ImageField(upload_to='student_documents/resume/', null=False)
+    def __str__(self):
+        return f"{self.student}"
+    
