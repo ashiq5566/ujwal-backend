@@ -1114,7 +1114,7 @@ def add_recruitment_Participated_Students(request):
             "statusCode": 6000,
             "data": {
                 "title": "Success",
-                "message": "Recruitment participatindg student added successfully."
+                "message": "Recruitment participating student added successfully."
             }
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
@@ -2016,7 +2016,8 @@ def get_placed_result_by_student(request,pk):
                 "student":student_placement.recruitment_participated_student.student.id,
                 "recruiter":student_placement.recruitment_participated_student.scheduled_recruitment.recruiter.company_name,
                 "designation":student_placement.recruitment_participated_student.scheduled_recruitment.designation,
-                "placed_date":student_placement.placed_date.isoformat() if student_placement.placed_date else None
+                "placed_date":student_placement.placed_date.isoformat() if student_placement.placed_date else None,
+                "offer_latter":student_placement.offer_latter.url if student_placement.offer_latter else None
             }
             data.append(instance)
         responce_date_sent=json.dumps(data,indent=4)
