@@ -317,6 +317,7 @@ class Recruitment_Student_Updations(models.Model):
     recruitment_participated_student=models.ForeignKey(Recruitment_Participated_Students,on_delete=models.CASCADE, null=False)
     date = models.DateField(null=True)
     type_of_selection=models.CharField(max_length=30, choices=selection_choices, null=False)
+    others=models.CharField(max_length=60, null=False,blank=True)
     is_selected=models.CharField(max_length=30, choices=is_selected_choices,null=True)
     status = models.CharField(max_length=30, choices=status_choices, default='ongoing') #if exam is pass set ongoing to complete until final process complete
 

@@ -2013,6 +2013,7 @@ def get_placed_result_by_student(request,pk):
         data=[]
         for student_placement in student_placements:
             instance={
+                "id":student_placement.id,
                 "student":student_placement.recruitment_participated_student.student.id,
                 "recruiter":student_placement.recruitment_participated_student.scheduled_recruitment.recruiter.company_name,
                 "designation":student_placement.recruitment_participated_student.scheduled_recruitment.designation,
@@ -2160,4 +2161,33 @@ def student_resume(request,student_id):
             }
         }
 
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["PUT"])
+@permission_classes([AllowAny])
+def update_offer_latter(request):
+    placed_student_id = request.data.get('placed_student_id')
+    new_offer_latter = request.FILES.get('offer_latter')
+    if Placed_students.objects.filter(pk=placed_student_id).exists() and request.FILES.get('offer_latter'):
+        placed_student = Placed_students.objects.get(pk=placed_student_id)
+        placed_student.offer_latter = new_offer_latter
+        placed_student.save()
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":[],
+                "message":"Offer latter updated succesfully."
+            }
+        }
+        
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"No student found."
+            }
+        }
     return Response(response_data,status=status.HTTP_200_OK)
