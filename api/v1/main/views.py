@@ -2,6 +2,7 @@
 import requests
 import json
 from django.contrib.auth.models import Group
+from django.db.models import Count
 
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -2190,4 +2191,69 @@ def update_offer_latter(request):
                 "message":"No student found."
             }
         }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def dashboard_reports(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+    
+    if Placed_students.objects.filter().exists():
+        placedStudents=Placed_students.objects.filter(recruitment_participated_student__applied_date__range=(start_date, end_date))
+        programs=Programs.objects.filter(is_active=True)
+        pgmPlcedList={}
+        for pgm in programs:
+            pgmPlcedList[pgm.program_name]=0
+        for pgm in programs:
+            for placStud in placedStudents:
+                if(placStud.recruitment_participated_student.student.program.id==pgm.id):
+                    pgmPlcedList[pgm.program_name]=pgmPlcedList[pgm.program_name]+1
+
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+        # Initialize a dictionary to store the results
+        fiveYearReport = {}
+
+        # Iterate over the previous five years
+        for i in range(5):
+            academic_year = start_date.year+1
+            previous_academic_year = academic_year-1 
+            year_range = f"{academic_year}-{previous_academic_year}"
+            
+            # Count placed students within the academic year range
+            placed_count = (
+                Placed_students.objects
+                .filter(placed_date__gte=start_date, placed_date__lt=end_date)
+                .aggregate(count=Count('id'))
+            )['count'] or 0
+
+            fiveYearReport[year_range] = placed_count
+
+            # Update start_date and end_date for the next iteration
+            start_date -= timedelta(days=365)
+            end_date -= timedelta(days=365)
+
+        placedInPrograms=json.dumps(pgmPlcedList,indent=4)
+        fiveYearReports=json.dumps(fiveYearReport,indent=4)
+    recruiters=Recruiters.objects.filter(is_active=True)
+    trainers=Trainers.objects.filter(is_active=True)
+    response_data = {
+        "statusCode":6000,
+        "data":{
+            "title":"Success",
+            "message":"NotFound",
+            "data":{
+                "placedInPrograms":placedInPrograms,
+                "totalPlaced":len(placedStudents),
+                "recruiters":len(recruiters),
+                "trainers":len(trainers),
+                "fiveYearReports":fiveYearReports
+                }
+        }
+    }
+
     return Response(response_data,status=status.HTTP_200_OK)
