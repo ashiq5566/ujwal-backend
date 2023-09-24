@@ -264,7 +264,7 @@ def add_program(request):
 def program_list(request):
     if Programs.objects.filter(is_active=True).exists():
         programs = Programs.objects.filter(is_active=True)
-        serializer = ProgramsGetSerializer(programs, many=True)
+        serializer = ProgramsGetWithDepartmentSerializer(programs, many=True)
         
         response_data = {
             "statusCode":6000,

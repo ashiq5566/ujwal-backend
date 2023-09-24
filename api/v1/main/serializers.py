@@ -45,6 +45,17 @@ class ProgramsGetSerializer(serializers.ModelSerializer):
         model = Programs
         fields = '__all__'
         
+class ProgramsGetWithDepartmentSerializer(serializers.ModelSerializer):
+    department_details = serializers.SerializerMethodField()
+    class Meta:
+        model = Programs
+        fields = '__all__'
+
+    def get_department_details(self, obj):
+        dep_id = obj.department.id
+        filtered_data = Departments.objects.get(pk=dep_id)
+        serialized_data = DepartmentsGetSerializer(filtered_data, many=False).data
+        return serialized_data
         
 
 class FocusinAreaGetSerializer(serializers.ModelSerializer):
