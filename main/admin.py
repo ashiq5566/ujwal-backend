@@ -32,6 +32,7 @@ class ProgramsAdmin(admin.ModelAdmin):
     'program_id',
     'program_name',
     'department',
+    'type',
     'number_of_semester',
     'is_active',)
     

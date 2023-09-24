@@ -40,9 +40,15 @@ class Departments(models.Model):
             
             
 class Programs(models.Model):
+    TYPE_CHOICES = (
+        ('UG', 'UG'),
+        ('PG M-Tech', 'PG M-Tech'),
+        ('PG', 'PG'),
+    )
     program_id = models.CharField(max_length=10, unique=True, null=False)
     program_name = models.CharField(max_length=50, null=False)
     department = models.ForeignKey(Departments, on_delete=models.CASCADE, null=False)
+    type=models.CharField(max_length=50,null=True,blank=True,choices=TYPE_CHOICES)
     number_of_semester = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
 
@@ -163,14 +169,14 @@ class Student(models.Model):
         super().save(*args, **kwargs)
 
 class StudentAcademicDetails(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    SSLC_Mark = models.CharField(max_length=50)
+    student = models.OneToOneField(Student, on_delete=models.CASCADE)
+    SSLC_Mark = models.FloatField(max_length=50)
     SSLC_Document = models.FileField(upload_to='student_documents/sslc/')
-    Plus_Two_Mark = models.CharField(max_length=50)
+    Plus_Two_Mark = models.FloatField(max_length=50)
     Plus_Two_Document = models.FileField(upload_to='student_documents/plusTwo/')
-    Degree_Mark = models.CharField(max_length=50,null=True,blank=True)
+    Degree_Mark = models.FloatField(max_length=50,null=True,blank=True)
     Degree_Document = models.FileField(upload_to='student_documents/degree/',null=True,blank=True)
-    Engineering_Mark = models.CharField(max_length=50,null=True,blank=True)
+    Engineering_Mark = models.FloatField(max_length=50,null=True,blank=True)
     Engineering_Document = models.FileField(upload_to='student_documents/engineering/',null=True,blank=True)
 
     def __str__(self):
