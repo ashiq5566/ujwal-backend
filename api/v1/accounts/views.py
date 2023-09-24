@@ -530,3 +530,95 @@ def student_document_details(request, pk):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def student_register_with_documents(request):
+    # uploaded_image = request.FILES.get('image')
+    serializer = StudentSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        admission_number = request.data['admission_number']
+        roll_number = request.data['roll_number']
+        first_name = request.data['first_name']
+        last_name = request.data['last_name']
+        date_of_birth = request.data['date_of_birth']
+        address = request.data['address']
+        gender = request.data['gender']
+        phone = request.data['phone']
+        email = request.data['email']
+        marital_status = request.data['marital_status']
+        admission_year = request.data['admission_year']
+        parent_name = request.data['parent_name']
+        parent_phone_number = request.data['parent_phone_number']
+        parent_email = request.data['parent_email']
+        program_id = request.data['program_id']
+        username = request.data['username']
+        password = request.data['password']
+        # image = request.data['image'] //addd more fields 
+        
+        if not Student.objects.filter(admission_number=admission_number).exists():
+            if Programs.objects.filter(id=program_id).exists():
+                program = Programs.objects.get(id=program_id)
+                
+                dob = datetime.strptime(date_of_birth, '%d-%m-%Y').strftime('%Y-%m-%d')
+                student = Student.objects.create(
+                    admission_number=admission_number,
+                    roll_number=roll_number,
+                    first_name=first_name,
+                    last_name=last_name,
+                    date_of_birth=dob,
+                    address=address,
+                    gender=gender,
+                    phone=phone,
+                    email=email,
+                    marital_status=marital_status,
+                    admission_year=admission_year,
+                    parent_name=parent_name,
+                    parent_phone_number=parent_phone_number,
+                    parent_email=parent_email,
+                    program=program,
+                    username=username,
+                    password=password,
+                    # image=image    
+                ) 
+                no_of_semester=Programs.objects.get(id=program_id).number_of_semester
+                for i in range(1,no_of_semester+1):
+                    sem_starting='Semester '+str(i)
+                    sem=Semesters.objects.get(semester=sem_starting)
+                    program_sem=Program_Semester.objects.get(program_id=program_id,semester=sem)
+                    Student_program_semester.objects.create(student=student,semester=program_sem,status="upcoming")                
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "message":"Registered SuccessFully"
+                    }
+                }
+            else:
+                response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":"Program not Exists"
+                }
+            }      
+        else:
+            response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":"This Admission number already Exists"
+            }
+        }
+    else: 
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Validation Error",
+                "message": "Registration failed.",
+                "errors": serializer.errors
+            }
+        }       
+    return Response(response_data,status=status.HTTP_200_OK)
