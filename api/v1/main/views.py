@@ -1637,30 +1637,6 @@ def get_placedStudents_by_batch(request):
     end_date = request.GET.get('end_date')
     department_id = request.GET.get('department_id')
     program_id = request.GET.get('program_id')
-    if start_date and end_date and program_id:
-        if Programs.objects.filter(id=program_id).exists():
-            program = Programs.objects.get(id=program_id)
-            placed_students = Placed_students.objects.filter(placed_date__range=(start_date, end_date),recruitment_participated_student__student__program=program).order_by('-placed_date')
-            serializer = PlacedStudentsSerializer(placed_students, many=True)
-            response_data = {
-                "statusCode":6000,
-                "data":{
-                    "title":"Success",
-                    "data":serializer.data
-                }
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-        else:
-            response_data = {
-                "statusCode":6001,
-                "data":{
-                    "title":"failed",
-                    "data":[],
-                    "message":"program not found",
-
-                }
-            }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
     if start_date and end_date and department_id:
         if Departments.objects.filter(id=department_id).exists():
             department = Departments.objects.get(id=department_id)
@@ -1685,6 +1661,31 @@ def get_placedStudents_by_batch(request):
                 }
             }
             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+    if start_date and end_date and program_id:
+        if Programs.objects.filter(id=program_id).exists():
+            program = Programs.objects.get(id=program_id)
+            placed_students = Placed_students.objects.filter(placed_date__range=(start_date, end_date),recruitment_participated_student__student__program=program).order_by('-placed_date')
+            serializer = PlacedStudentsSerializer(placed_students, many=True)
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"failed",
+                    "data":[],
+                    "message":"program not found",
+
+                }
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+    
     if start_date and end_date:
         placed_students = Placed_students.objects.filter(placed_date__range=(start_date, end_date)).order_by('-placed_date')
         serializer = PlacedStudentsSerializer(placed_students, many=True)

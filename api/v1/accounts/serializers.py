@@ -10,7 +10,7 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name','last_name','email','department','user_active','username','role']
+        fields = ['first_name','last_name','email','department','user_active','username','role','password']
     
 class StudentSerializer(serializers.Serializer):
     admission_number = serializers.IntegerField()
