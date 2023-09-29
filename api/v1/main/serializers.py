@@ -231,3 +231,8 @@ class StudentResumeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student_Resume
         fields = '__all__'
+        
+class StudentReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = '__all__'

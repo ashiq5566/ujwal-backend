@@ -13,7 +13,6 @@ class User(AbstractUser):
         ('Student_cordinator','Student cordinator'),
         ('student','Student'),
     )
-
     role = models.CharField(max_length=50, choices=Role_choices, blank=True, null=True)
     department = models.ForeignKey("main.Departments", on_delete=models.CASCADE, blank=True, null=True)
     user_active=models.BooleanField(default=True)

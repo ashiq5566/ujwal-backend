@@ -90,5 +90,6 @@ urlpatterns = [
 
     #reports
     re_path(r"dashboard_reports/$", dashboard_reports),
+    re_path(r"students_report/$", students_report),
 
 ]
