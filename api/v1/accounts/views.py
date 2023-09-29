@@ -102,8 +102,6 @@ def login(request):
     return Response(response_data, status=status.HTTP_200_OK)
 
 
-
-
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def user_register(request):
@@ -257,7 +255,7 @@ def user_details(request, pk):
 
 
 @api_view(["POST"])
-@permission_classes([AllowAny])
+@permission_classes(["student"])
 def student_register(request):
     # uploaded_image = request.FILES.get('image')
     serializer = StudentSerializer(data=request.data)
@@ -312,7 +310,8 @@ def student_register(request):
                     sem_starting='Semester '+str(i)
                     sem=Semesters.objects.get(semester=sem_starting)
                     program_sem=Program_Semester.objects.get(program_id=program_id,semester=sem)
-                    Student_program_semester.objects.create(student=student,semester=program_sem,status="upcoming")                
+                    Student_program_semester.objects.create(student=student,semester=program_sem,status="upcoming")       
+                             
                 response_data = {
                     "statusCode":6000,
                     "data":{
@@ -401,9 +400,8 @@ def students(request):
     return Response(response_data, status=status.HTTP_200_OK)
 
 
-
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes(["student"])
 def student_details(request, pk):
     if Student.objects.filter(id=pk).exists():
         student = Student.objects.get(id=pk)
@@ -430,7 +428,7 @@ def student_details(request, pk):
 
     
 @api_view(["POST"])
-@permission_classes([AllowAny])
+@permission_classes(["student"])
 def student_document_upload(request):
     serializer = StudentDocumentsSerializer(data=request.data)
     
@@ -477,9 +475,8 @@ def student_document_upload(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 
-
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes(["student"])
 def student_documents(request):
     if StudentDocument.objects.all():
         documents = StudentDocument.objects.all()
@@ -506,7 +503,7 @@ def student_documents(request):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes(["student"])
 def student_document_details(request, pk):
     if StudentDocument.objects.filter(id=pk).exists():
         document = StudentDocument.objects.get(id=pk)
@@ -533,7 +530,7 @@ def student_document_details(request, pk):
 
 
 @api_view(["POST"])
-@permission_classes([AllowAny])
+@permission_classes(["student"])
 def student_register_with_documents(request):
     # uploaded_image = request.FILES.get('image')
     serializer = StudentSerializer(data=request.data)
