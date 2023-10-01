@@ -19,9 +19,10 @@ from django.db.models import Subquery
 from django.db.models import Q
 from datetime import datetime, timedelta
 from django.shortcuts import get_object_or_404
+from api.v1.main.decorators import group_required
 
 @api_view(['POST'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def create_department(request):
     serializer = DepartmentPostSerializer(data=request.data)
     
@@ -59,7 +60,7 @@ def create_department(request):
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def department_list(request):
     if Departments.objects.all():
         departments = Departments.objects.all()  
@@ -85,7 +86,7 @@ def department_list(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def get_department_instance(request,pk):
     if Departments.objects.filter(id=pk).exists():
         department = Departments.objects.filter(id=pk)
@@ -112,7 +113,7 @@ def get_department_instance(request,pk):
 
 
 @api_view(['POST'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def add_trainer(request):
     serializer = TrainerPostSerializer(data=request.data)
     
@@ -140,7 +141,7 @@ def add_trainer(request):
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def trainers_list(request):
     if Trainers.objects.all():
         trainers = Trainers.objects.all()  
@@ -167,7 +168,7 @@ def trainers_list(request):
 
 
 @api_view(['POST'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def add_recruiter(request):
     serializer = RecruiterPostSerializer(data=request.data)
     
@@ -194,7 +195,7 @@ def add_recruiter(request):
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def recruiters_list(request):
     if Recruiters.objects.all():
         recruiter = Recruiters.objects.all()  
@@ -220,7 +221,7 @@ def recruiters_list(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def add_program(request):
     serializer = ProgramPostSerializer(data=request.data)
     
@@ -260,7 +261,7 @@ def add_program(request):
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def program_list(request):
     if Programs.objects.filter(is_active=True).exists():
         programs = Programs.objects.filter(is_active=True)
@@ -287,7 +288,7 @@ def program_list(request):
 
 
 @api_view(['PUT'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def update_program(request, program_id):
     try:
         program_instance = Programs.objects.get(id=program_id)
@@ -329,7 +330,7 @@ def update_program(request, program_id):
 
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def focusing_areas(request):
     if FocusingArea.objects.all():
         focusingArea = FocusingArea.objects.all()  
@@ -356,7 +357,7 @@ def focusing_areas(request):
 
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def programs_by_department(request, pk):
     if Departments.objects.get(id=pk):
         department = Departments.objects.get(id=pk)
@@ -383,7 +384,7 @@ def programs_by_department(request, pk):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def semesters(request):
     if Semesters.objects.all():
         semesters = Semesters.objects.all()  
@@ -409,7 +410,7 @@ def semesters(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def program_semester_by_program(request, pk):
     if Programs.objects.get(id=pk):
         program = Programs.objects.get(id=pk)
@@ -437,7 +438,7 @@ def program_semester_by_program(request, pk):
 
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def program_semesters(request):
     if Program_Semester.objects.all():
         program_Semester = Program_Semester.objects.all()  
@@ -868,7 +869,7 @@ def recruitment_schedule_detail(request, pk):
 
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def training_participents_details(request):
     allot_tariner_id = request.GET.get('allot_tariner_id')
     if allot_tariner_id:
@@ -908,7 +909,7 @@ def training_participents_details(request):
 
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def recruitment_participents_details(request):
     if Recruitment_Participating_Branches.objects.all():
         recruitment_participant = Recruitment_Participating_Branches.objects.all()  
@@ -982,7 +983,7 @@ def attendance(request, pk):
 
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def student_program_semester_details(request):
     
     date = request.GET.get('date')
@@ -1104,7 +1105,7 @@ def student_program_semester_by_program_semester(request, pk):
 
 
 @api_view(['POST'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def add_recruitment_Participated_Students(request):
     serializer = PostRecruitmentParticipatedStudentsSchedulesSerializer(data=request.data)
     
@@ -1131,7 +1132,7 @@ def add_recruitment_Participated_Students(request):
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def attendenceMarkedOrNot(request):
     
     date = request.GET.get('date')
@@ -1171,7 +1172,7 @@ def attendenceMarkedOrNot(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def ongoing_program_semester_promote_details(request):
     department_id = request.GET.get('department_id')
     if department_id:
@@ -1348,7 +1349,7 @@ def recruitment_Student_UpdationDetails_by_List_of_Student(request):
     return Response(response_data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def add_selection_update_for_student(request):
     serializer = RecruitmentSelectionUpdatesSchedulesSerializer(data=request.data)
     
@@ -1412,7 +1413,7 @@ def get_participatedStudents_for_placement_by_schedule(request,pk):
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
         
 @api_view(['POST'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def add_a_placement(request):
     serializer = PlacedPOSTStudentsSerializer(data=request.data)
     
@@ -1548,7 +1549,7 @@ def promote_new_batch(request, pk):
 
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def getAttendence(request):
     
     date = request.GET.get('date')
@@ -1587,7 +1588,7 @@ def getAttendence(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def get_academic_years(request):
     current_date = date.today()
     academic_year_exists = Academic_year.objects.filter(start_date__lte=current_date, end_date__gte=current_date).exists()
@@ -1817,7 +1818,7 @@ def cancel_training_schedule_status(request,pk):
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def getSkillSetByStudent(request,pk):
     if Student_skills.objects.filter(student__id=pk).exists():
         skill = Student_skills.objects.filter(student__id=pk)
@@ -1847,7 +1848,7 @@ def getSkillSetByStudent(request,pk):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def add_skillset(request):
     # Get the skill and student IDs from the request data
     skill_id = request.data.get('skill')
@@ -1888,7 +1889,7 @@ def add_skillset(request):
     return Response(response_data, status=status.HTTP_201_CREATED)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def get_placement_details_by_student(request,pk):
     student_id = int(pk)
     if Student_program_semester.objects.filter(student__id=student_id).exists():
@@ -1957,7 +1958,7 @@ def get_placement_details_by_student(request,pk):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def get_applied_placements_by_student(request,pk):
     student_id = int(pk)
     if Recruitment_Participated_Students.objects.filter(student__id=student_id).exists():
@@ -2006,7 +2007,7 @@ def get_applied_placements_by_student(request,pk):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def get_placed_result_by_student(request,pk):
     student_id = int(pk)
     if Placed_students.objects.filter(recruitment_participated_student__student__id=student_id).exists():
@@ -2043,7 +2044,7 @@ def get_placed_result_by_student(request,pk):
     return Response(response_data,status=status.HTTP_200_OK)
     
 @api_view(['POST'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def upload_additional_document(request):
     if request.method == 'POST' and request.FILES.get('document'):
         student_id = request.data.get('student_id')
@@ -2078,7 +2079,7 @@ def upload_additional_document(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def students_additional_documents(request,student_id):
     if Student_Additional_Documents.objects.filter(student_id=student_id).exists():
         docs = Student_Additional_Documents.objects.filter(student_id=student_id)
@@ -2104,7 +2105,7 @@ def students_additional_documents(request,student_id):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def upload_resume(request):
     if request.method == 'POST' and request.FILES.get('resume'):
         student_id = request.data.get('student_id')
@@ -2139,7 +2140,7 @@ def upload_resume(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def student_resume(request,student_id):
     if Student_Resume.objects.filter(student_id=student_id).exists():
         docs = Student_Resume.objects.filter(student_id=student_id)
@@ -2165,7 +2166,7 @@ def student_resume(request,student_id):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["PUT"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def update_offer_latter(request):
     placed_student_id = request.data.get('placed_student_id')
     new_offer_latter = request.FILES.get('offer_latter')
@@ -2194,7 +2195,7 @@ def update_offer_latter(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@permission_classes(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def dashboard_reports(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')

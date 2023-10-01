@@ -16,6 +16,7 @@ from .serializers import *
 from api.v1.accounts.functions import authenticate
 from accounts.models import User
 from main.models import *
+from api.v1.main.decorators import group_required
 
 
 @api_view(["POST"])
@@ -255,7 +256,7 @@ def user_details(request, pk):
 
 
 @api_view(["POST"])
-@permission_classes(["student"])
+@group_required(["student"])
 def student_register(request):
     # uploaded_image = request.FILES.get('image')
     serializer = StudentSerializer(data=request.data)
@@ -401,7 +402,7 @@ def students(request):
 
 
 @api_view(["GET"])
-@permission_classes(["student"])
+@group_required(["student"])
 def student_details(request, pk):
     if Student.objects.filter(id=pk).exists():
         student = Student.objects.get(id=pk)
@@ -428,7 +429,7 @@ def student_details(request, pk):
 
     
 @api_view(["POST"])
-@permission_classes(["student"])
+@group_required(["student"])
 def student_document_upload(request):
     serializer = StudentDocumentsSerializer(data=request.data)
     
@@ -476,7 +477,7 @@ def student_document_upload(request):
 
 
 @api_view(["GET"])
-@permission_classes(["student"])
+@group_required(["student"])
 def student_documents(request):
     if StudentDocument.objects.all():
         documents = StudentDocument.objects.all()
@@ -503,7 +504,7 @@ def student_documents(request):
 
 
 @api_view(["GET"])
-@permission_classes(["student"])
+@group_required(["student"])
 def student_document_details(request, pk):
     if StudentDocument.objects.filter(id=pk).exists():
         document = StudentDocument.objects.get(id=pk)
@@ -530,7 +531,7 @@ def student_document_details(request, pk):
 
 
 @api_view(["POST"])
-@permission_classes(["student"])
+@group_required(["student"])
 def student_register_with_documents(request):
     # uploaded_image = request.FILES.get('image')
     serializer = StudentSerializer(data=request.data)
