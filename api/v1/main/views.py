@@ -1818,7 +1818,7 @@ def cancel_training_schedule_status(request,pk):
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def getSkillSetByStudent(request,pk):
     if Student_skills.objects.filter(student__id=pk).exists():
         skill = Student_skills.objects.filter(student__id=pk)
@@ -1848,7 +1848,7 @@ def getSkillSetByStudent(request,pk):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def add_skillset(request):
     # Get the skill and student IDs from the request data
     skill_id = request.data.get('skill')
@@ -1889,7 +1889,7 @@ def add_skillset(request):
     return Response(response_data, status=status.HTTP_201_CREATED)
 
 @api_view(["GET"])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def get_placement_details_by_student(request,pk):
     student_id = int(pk)
     if Student_program_semester.objects.filter(student__id=student_id).exists():
@@ -1958,7 +1958,7 @@ def get_placement_details_by_student(request,pk):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def get_applied_placements_by_student(request,pk):
     student_id = int(pk)
     if Recruitment_Participated_Students.objects.filter(student__id=student_id).exists():
@@ -2007,7 +2007,7 @@ def get_applied_placements_by_student(request,pk):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def get_placed_result_by_student(request,pk):
     student_id = int(pk)
     if Placed_students.objects.filter(recruitment_participated_student__student__id=student_id).exists():
@@ -2044,7 +2044,7 @@ def get_placed_result_by_student(request,pk):
     return Response(response_data,status=status.HTTP_200_OK)
     
 @api_view(['POST'])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def upload_additional_document(request):
     if request.method == 'POST' and request.FILES.get('document'):
         student_id = request.data.get('student_id')
@@ -2079,7 +2079,7 @@ def upload_additional_document(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def students_additional_documents(request,student_id):
     if Student_Additional_Documents.objects.filter(student_id=student_id).exists():
         docs = Student_Additional_Documents.objects.filter(student_id=student_id)
@@ -2105,12 +2105,11 @@ def students_additional_documents(request,student_id):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def upload_resume(request):
     if request.method == 'POST' and request.FILES.get('resume'):
         student_id = request.data.get('student_id')
         student = Student.objects.get(pk=student_id)
-        
         existing_record, created = Student_Resume.objects.update_or_create(
             student=student,
             defaults={
@@ -2140,7 +2139,7 @@ def upload_resume(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def student_resume(request,student_id):
     if Student_Resume.objects.filter(student_id=student_id).exists():
         docs = Student_Resume.objects.filter(student_id=student_id)
@@ -2166,7 +2165,7 @@ def student_resume(request,student_id):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["PUT"])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def update_offer_latter(request):
     placed_student_id = request.data.get('placed_student_id')
     new_offer_latter = request.FILES.get('offer_latter')
@@ -2201,6 +2200,9 @@ def dashboard_reports(request):
     end_date = request.GET.get('end_date')
     start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
     end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+    placedStudents =[]
+    placedInPrograms = []
+    fiveYearReports = []
     
     if Placed_students.objects.filter().exists():
         placedStudents=Placed_students.objects.filter(recruitment_participated_student__applied_date__range=(start_date, end_date))
