@@ -46,7 +46,7 @@ class Programs(models.Model):
         ('PG', 'PG'),
     )
     program_id = models.CharField(max_length=10, unique=True, null=False)
-    program_name = models.CharField(max_length=50, null=False)
+    program_name = models.CharField(max_length=100, null=False)
     department = models.ForeignKey(Departments, on_delete=models.CASCADE, null=False)
     type=models.CharField(max_length=50,null=True,blank=True,choices=TYPE_CHOICES)
     number_of_semester = models.PositiveIntegerField()

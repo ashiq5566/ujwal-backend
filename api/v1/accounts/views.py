@@ -256,7 +256,7 @@ def user_details(request, pk):
 
 
 @api_view(["POST"])
-@group_required(["student"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def student_register(request):
     # uploaded_image = request.FILES.get('image')
     serializer = StudentSerializer(data=request.data)
@@ -402,7 +402,7 @@ def students(request):
 
 
 @api_view(["GET"])
-@group_required(["student"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def student_details(request, pk):
     if Student.objects.filter(id=pk).exists():
         student = Student.objects.get(id=pk)

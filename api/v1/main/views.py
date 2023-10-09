@@ -1105,7 +1105,7 @@ def student_program_semester_by_program_semester(request, pk):
 
 
 @api_view(['POST'])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def add_recruitment_Participated_Students(request):
     serializer = PostRecruitmentParticipatedStudentsSchedulesSerializer(data=request.data)
     
