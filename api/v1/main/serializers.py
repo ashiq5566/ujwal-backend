@@ -209,7 +209,7 @@ class PlacedStudentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Placed_students
         fields = ['admission_number', 'first_name', 'last_name', 'gender','roll_number',
-                  'recruiter_company_name', 'recruiter_designation', 'program_name', 'department_name', 'placed_date']
+                  'recruiter_company_name', 'recruiter_designation', 'program_name', 'department_name', 'placed_date','offer_latter']
 
 
 class AttendanceSerializer(serializers.ModelSerializer):
