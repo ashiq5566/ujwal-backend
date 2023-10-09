@@ -1349,7 +1349,7 @@ def recruitment_Student_UpdationDetails_by_List_of_Student(request):
     return Response(response_data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def add_selection_update_for_student(request):
     serializer = RecruitmentSelectionUpdatesSchedulesSerializer(data=request.data)
     
