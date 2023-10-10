@@ -256,7 +256,7 @@ def user_details(request, pk):
 
 
 @api_view(["POST"])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def student_register(request):
     # uploaded_image = request.FILES.get('image')
     serializer = StudentSerializer(data=request.data)
@@ -325,7 +325,7 @@ def student_register(request):
                 "statusCode":6001,
                 "data":{
                     "title":"Failed",
-                    "data":"Program not Exists"
+                    "message":"Program not Exists"
                 }
             }      
         else:
@@ -333,7 +333,7 @@ def student_register(request):
             "statusCode":6001,
             "data":{
                 "title":"Failed",
-                "data":"This Admission number already Exists"
+                "message":"This Admission number already Exists"
             }
         }
     else: 
@@ -531,14 +531,14 @@ def student_document_details(request, pk):
 
 
 @api_view(["POST"])
-@group_required(["student"])
+@permission_classes([AllowAny])
 def student_register_with_documents(request):
     # uploaded_image = request.FILES.get('image')
     serializer = StudentSerializer(data=request.data)
     
     if serializer.is_valid():
         admission_number = request.data['admission_number']
-        roll_number = request.data['roll_number']
+        roll_number= request.data['roll_number']
         first_name = request.data['first_name']
         last_name = request.data['last_name']
         date_of_birth = request.data['date_of_birth']
@@ -555,6 +555,17 @@ def student_register_with_documents(request):
         username = request.data['username']
         password = request.data['password']
         # image = request.data['image'] //addd more fields 
+
+        #DOCUMENTS
+        SSLC_Document = request.FILES.get('SSLC_Document')
+        Plus_Two_Document = request.FILES.get('Plus_Two_Document')
+        Degree_Document = request.FILES.get('Degree_Document')
+        Engineering_Document = request.FILES.get('Engineering_Document')
+        SSLC_Mark = request.data['SSLC_Mark']
+        Plus_Two_Mark = request.data['Plus_Two_Mark']
+        Degree_Mark = request.data['Degree_Mark']
+        Engineering_Mark = request.data['Engineering_Mark']
+
         
         if not Student.objects.filter(admission_number=admission_number).exists():
             if Programs.objects.filter(id=program_id).exists():
@@ -580,6 +591,17 @@ def student_register_with_documents(request):
                     username=username,
                     password=password,
                     # image=image    
+                )
+                student_Document = StudentAcademicDetails.objects.create(
+                    student = student,
+                    SSLC_Mark =SSLC_Mark,
+                    SSLC_Document = SSLC_Document,
+                    Plus_Two_Mark = Plus_Two_Mark,
+                    Plus_Two_Document = Plus_Two_Document,
+                    Degree_Mark = Degree_Mark if Degree_Mark else None,
+                    Degree_Document = Degree_Document if Degree_Document else None,
+                    Engineering_Mark = Engineering_Mark if Engineering_Mark else None,
+                    Engineering_Document = Engineering_Document if Engineering_Document else None
                 ) 
                 no_of_semester=Programs.objects.get(id=program_id).number_of_semester
                 for i in range(1,no_of_semester+1):
