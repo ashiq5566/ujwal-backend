@@ -97,5 +97,6 @@ urlpatterns = [
     re_path(r"edit-trainer/(?P<pk>\d+)/$", edit_trainer),
     re_path(r"edit-recruiter/(?P<pk>\d+)/$", edit_recruiter),
     re_path(r"edit-program/(?P<pk>\d+)/$", edit_program),
+    re_path(r"edit-training-schedule/(?P<pk>\d+)/$", edit_training_schedule),
 
 ]

@@ -128,6 +128,26 @@ class TrainingScheduleSerializer(serializers.Serializer):
     venue = serializers.CharField()
     foc_areas_ids = serializers.ListField(child=serializers.IntegerField())
     participants_ids = serializers.ListField(child=serializers.IntegerField())
+    
+
+class EditTrainingScheduleSerializer(serializers.Serializer):
+    trainer_id = serializers.IntegerField()
+    start_date = serializers.CharField()
+    end_date = serializers.CharField()
+    venue = serializers.CharField()
+    focusing_area = serializers.ListField(child=serializers.IntegerField())
+    participants_ids = serializers.ListField(child=serializers.IntegerField())
+    
+    def update(self, instance, validated_data):
+        instance.start_date = validated_data.get('start_date', instance.start_date)
+        instance.end_date = validated_data.get('end_date', instance.end_date)
+        instance.venue = validated_data.get('venue', instance.venue)
+        focusing_area_data = validated_data.get('focusing_area', instance.focusing_area.all())
+        instance.focusing_area.set(focusing_area_data)
+        instance.save()
+        
+        return instance
+    
 
 class TrainingSchedulesSerializer(serializers.ModelSerializer):
     class Meta:
