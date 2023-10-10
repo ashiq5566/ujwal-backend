@@ -146,6 +146,26 @@ class EditTrainingScheduleSerializer(serializers.Serializer):
         instance.focusing_area.set(focusing_area_data)
         instance.save()
         
+        participants_ids = validated_data.get('participants_ids')
+
+        if Program_Semester.objects.filter(id__in=participants_ids).exists():
+
+            training_participants = TrainingParticipant.objects.filter(allot_trainer__pk=instance.pk)
+            participants = Program_Semester.objects.filter(id__in=participants_ids)
+            participants_iterator = iter(participants)
+            
+            # existing program semester ids
+            program_sem_ids = TrainingParticipant.objects.filter(allot_trainer__pk=instance.pk).values_list('program_semester') 
+            
+            for training_participant in training_participants:
+                try:
+                    participant = next(participants_iterator)
+                except StopIteration:
+                    break
+                if not participant in program_sem_ids:
+                    training_participant.program_semester = participant
+                    training_participant.save()
+        
         return instance
     
 
