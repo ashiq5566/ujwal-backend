@@ -456,6 +456,32 @@ def program_list(request):
 
     return Response(response_data,status=status.HTTP_200_OK)
 
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def program_list_without_permission(request):
+    if Programs.objects.filter(is_active=True).exists():
+        programs = Programs.objects.filter(is_active=True)
+        serializer = ProgramsGetWithDepartmentSerializer(programs, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
 
 @api_view(['PUT'])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])

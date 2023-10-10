@@ -21,6 +21,7 @@ urlpatterns = [
     re_path(r"^add_program/$", add_program),
     re_path(r'^update_programs/(?P<program_id>\d+)/$', update_program),
     re_path(r"^programs/$", program_list),
+    re_path(r"^programs_not_auth/$", program_list_without_permission),
     re_path(r'^programs_by_department/(?P<pk>\d+)/$',programs_by_department),
     re_path(r"^semesters/$", semesters),
     re_path(r'^program_semester_by_program/(?P<pk>\d+)/$',program_semester_by_program),
