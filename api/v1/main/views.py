@@ -59,6 +59,47 @@ def create_department(request):
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+def edit_department(request, pk):
+    """
+    View function to get details of particular department.
+
+    """ 
+    if Departments.objects.filter(pk=pk).exists():
+        department = Departments.objects.get(pk=pk)
+        serializer = DepartmentPostSerializer(department, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.update(serializer.instance, serializer.validated_data)
+        
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "message":"Updated successfully",
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":serializer._errors
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "message":"Department not found"
+            }
+        }
+            
+    
+    return Response(response_data, status=status.HTTP_200_OK)
+
 @api_view(["GET"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def department_list(request):
@@ -140,6 +181,49 @@ def add_trainer(request):
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+def edit_trainer(request, pk):
+    """
+    View function to get details of particular trainer.
+
+    """ 
+    if Trainers.objects.filter(pk=pk).exists():
+        trainer = Trainers.objects.get(pk=pk)
+        serializer = TrainerPostSerializer(trainer, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.update(serializer.instance, serializer.validated_data)
+        
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "message":"Updated successfully",
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":serializer._errors
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "message":"trainer not found"
+            }
+        }
+            
+    
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
 @api_view(["GET"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def trainers_list(request):
@@ -193,6 +277,49 @@ def add_recruiter(request):
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+def edit_recruiter(request, pk):
+    """
+    View function to get details of particular recruiter.
+
+    """ 
+    if Recruiters.objects.filter(pk=pk).exists():
+        recruiter = Recruiters.objects.get(pk=pk)
+        serializer = RecruiterPostSerializer(recruiter, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.update(serializer.instance, serializer.validated_data)
+        
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "message":"Updated successfully",
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":serializer._errors
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "message":"recruiter not found"
+            }
+        }
+            
+    
+    return Response(response_data, status=status.HTTP_200_OK)
+
 
 @api_view(["GET"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
@@ -259,6 +386,49 @@ def add_program(request):
         }
     }
     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+def edit_program(request, pk):
+    """
+    View function to get details of particular program.
+
+    """ 
+    if Programs.objects.filter(pk=pk).exists():
+        program = Programs.objects.get(pk=pk)
+        serializer = ProgramPostSerializer(program, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.update(serializer.instance, serializer.validated_data)
+        
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "message":"Updated successfully",
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":serializer._errors
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "message":"program not found"
+            }
+        }
+            
+    
+    return Response(response_data, status=status.HTTP_200_OK)
+
 
 @api_view(["GET"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])

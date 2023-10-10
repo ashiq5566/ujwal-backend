@@ -9,6 +9,12 @@ class DepartmentPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Departments
         exclude = ['department_id']
+        
+    def update(self, instance, validated_data):
+        instance.department_name = validated_data.get('department_name', instance.department_name)
+        instance.save()
+        
+        return instance
 
 class DepartmentsGetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,6 +25,16 @@ class TrainerPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trainers
         exclude = ['trainer_id']
+        
+    def update(self, instance, validated_data):
+        instance.trainer_name = validated_data.get('trainer_name', instance.trainer_name)
+        instance.training_company = validated_data.get('training_company', instance.training_company)
+        instance.email = validated_data.get('email', instance.email)
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.website = validated_data.get('website', instance.website)
+        instance.save()
+        
+        return instance
 
 class TrainersGetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,6 +45,18 @@ class RecruiterPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recruiters
         exclude = ['recruiter_id']
+        
+    def update(self, instance, validated_data):
+        instance.company_name = validated_data.get('company_name', instance.company_name)
+        instance.address = validated_data.get('address', instance.address)
+        instance.email = validated_data.get('email', instance.email)
+        instance.contact_number = validated_data.get('contact_number', instance.contact_number)
+        instance.website = validated_data.get('website', instance.website)
+        instance.save()
+        
+        return instance
+        
+        
 
 class RecruitersGetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,6 +67,19 @@ class ProgramPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Programs
         exclude = ['program_id']
+        
+    def update(self, instance, validated_data):
+        instance.program_name = validated_data.get('program_name', instance.program_name)
+        department = validated_data.get('department', instance.department)
+        department_pk = department.pk
+        if Departments.objects.filter(pk=department_pk).exists():
+            department = Departments.objects.get(pk=department_pk)
+            instance.department = department
+        instance.type = validated_data.get('type', instance.type)
+        instance.number_of_semester = validated_data.get('number_of_semester', instance.number_of_semester)
+        instance.save()
+        
+        return instance
 
 class ProgramsGetSerializer(serializers.ModelSerializer):
     class Meta:

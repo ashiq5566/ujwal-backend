@@ -91,5 +91,11 @@ urlpatterns = [
     #reports
     re_path(r"dashboard_reports/$", dashboard_reports),
     re_path(r"students_report/$", students_report),
+    
+    #edit
+    re_path(r"edit-department/(?P<pk>\d+)/$", edit_department),
+    re_path(r"edit-trainer/(?P<pk>\d+)/$", edit_trainer),
+    re_path(r"edit-recruiter/(?P<pk>\d+)/$", edit_recruiter),
+    re_path(r"edit-program/(?P<pk>\d+)/$", edit_program),
 
 ]
