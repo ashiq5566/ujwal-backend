@@ -317,3 +317,7 @@ class StudentReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = '__all__'
+class StudentAcademicDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentAcademicDetails
+        fields = '__all__'

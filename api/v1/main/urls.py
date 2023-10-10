@@ -84,6 +84,7 @@ urlpatterns = [
     re_path(r"get_applied_placements_by_student/(?P<pk>\d+)/$", get_applied_placements_by_student),
     re_path(r"get_placed_result_by_student/(?P<pk>\d+)/$", get_placed_result_by_student),
     re_path(r"students_additional_documents/(?P<student_id>\d+)/$", students_additional_documents),
+    re_path(r"student_academicDocuments/(?P<student_id>\d+)/$", student_academicDocuments),
     re_path(r"upload_additional_document/$", upload_additional_document),
     re_path(r"upload_resume/$", upload_resume),
     re_path(r"update_offer_latter/$", update_offer_latter),

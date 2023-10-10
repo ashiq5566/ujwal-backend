@@ -2537,3 +2537,29 @@ def students_report(request):
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["student"])
+def student_academicDocuments(request,student_id):
+    if StudentAcademicDetails.objects.filter(student_id=student_id).exists():
+        docs = StudentAcademicDetails.objects.filter(student_id=student_id)
+        serializer = StudentAcademicDocumentSerializer(docs, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
