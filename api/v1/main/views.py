@@ -2379,10 +2379,12 @@ def student_resume(request,student_id):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def update_offer_latter(request):
     placed_student_id = request.data.get('placed_student_id')
+    salary_package= request.data.get('salary_package')
     new_offer_latter = request.FILES.get('offer_latter')
     if Placed_students.objects.filter(pk=placed_student_id).exists() and request.FILES.get('offer_latter'):
         placed_student = Placed_students.objects.get(pk=placed_student_id)
         placed_student.offer_latter = new_offer_latter
+        placed_student.salary_package = salary_package
         placed_student.save()
         response_data = {
             "statusCode":6000,
