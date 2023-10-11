@@ -2219,7 +2219,8 @@ def get_applied_placements_by_student(request,pk):
                 "scheduled_recruitment_name" : appliedPlacement.scheduled_recruitment.recruiter.company_name,
                 "designation" : appliedPlacement.scheduled_recruitment.designation,
                 "status" : appliedPlacement.scheduled_recruitment.status,
-                "student_process_details":updationAll
+                "student_process_details":updationAll,
+                "placed_status" : Placed_students.objects.filter(recruitment_participated_student_id=appliedPlacement.id).exists()
             }
             data.append(instance)
         responce_date_sent=json.dumps(data,indent=4)
