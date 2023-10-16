@@ -71,6 +71,8 @@ urlpatterns = [
     #promote program
     re_path(r"^promote_current_batch/(?P<pk>\d+)/$",promote_current_batch),
     re_path(r"^promote_new_batch/(?P<pk>\d+)/$",promote_new_batch),
+    re_path(r"^promote_student_details/(?P<pk>\d+)/$",promote_student_details),
+    re_path(r"^delete_student/$",delete_student),
 
     #academic year
     re_path(r"get_academic_years/$", get_academic_years),

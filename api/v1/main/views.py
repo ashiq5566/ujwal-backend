@@ -2209,7 +2209,8 @@ def get_applied_placements_by_student(request,pk):
                     "updation_date":studentUpdationItem.date.isoformat()  if studentUpdationItem.date else None,
                     "type_of_selection":studentUpdationItem.type_of_selection,
                     "selected_status":studentUpdationItem.is_selected,
-                    "completed_status" :studentUpdationItem.status
+                    "completed_status" :studentUpdationItem.status,
+                    "others" :studentUpdationItem.others
                 }
                 updationAll.append(updationInstance)
             instance = {
@@ -2563,4 +2564,73 @@ def student_academicDocuments(request,student_id):
             }
         }
 
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+def promote_student_details(request,pk):
+    if Student_program_semester.objects.filter(semester__program__id=pk,semester__semester__semester='Semester 1').exists():
+        students = Student_program_semester.objects.filter(semester__program__id=pk,semester__semester__semester='Semester 1',status='upcoming')
+        # serializer = StudentProgramSemesterSerializer(students, many=True)
+        responce_data =[]
+        for student in students:
+            instance ={
+                "id":student.id,
+                "student_name": student.student.first_name+' ' +student.student.last_name,
+                "student_id": student.student.id,
+                "admission_number":student.student.admission_number,
+                "dob":student.student.date_of_birth.isoformat() if student.student.date_of_birth else None,
+                "gender": student.student.roll_number,
+                "roll_number":student.student.roll_number,
+                "program_semester":student.semester.program.program_name+'-'+student.semester.semester.semester
+            }
+            responce_data.append(instance)
+        responce_data_sorted = sorted(responce_data, key=lambda x: x["roll_number"])
+        responce_data_sent=json.dumps(responce_data_sorted,indent=4)
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":responce_data_sent
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Success",
+                "data":[],
+                "message":"No Student fount"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+@api_view(["DELETE"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+def delete_student(request):
+    username = request.GET.get('username')
+    student_id = request.GET.get('student_id')
+    print(username,"username",student_id,"student_id")
+    if User.objects.filter(username=username).exists() and Student.objects.filter(id=student_id).exists():
+        student_to_delete =Student.objects.get(id=student_id)
+        user_to_delete =User.objects.get(username=username)
+        student_to_delete.delete()
+        user_to_delete.delete()
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":[],
+                "message":"Removed Succesfully"
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":[],
+                "message":"Removed Succesfully"
+            }
+        }
     return Response(response_data,status=status.HTTP_200_OK)
