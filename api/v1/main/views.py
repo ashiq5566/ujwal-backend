@@ -2541,7 +2541,7 @@ def students_report(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@group_required(["student"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator","student"])
 def student_academicDocuments(request,student_id):
     if StudentAcademicDetails.objects.filter(student_id=student_id).exists():
         docs = StudentAcademicDetails.objects.filter(student_id=student_id)
