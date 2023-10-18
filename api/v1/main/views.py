@@ -2605,6 +2605,7 @@ def promote_student_details(request,pk):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
 @api_view(["DELETE"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
 def delete_student(request):
@@ -2626,11 +2627,63 @@ def delete_student(request):
         }
     else:
         response_data = {
-            "statusCode":6000,
+            "statusCode":6001,
             "data":{
-                "title":"Success",
+                "title":"failed",
                 "data":[],
-                "message":"Removed Succesfully"
+                "message":"Soemthing went wrong! please try again"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+def get_recruitment_selected_students(request,pk):
+    if pk and Schedule_Recruitment.objects.filter(id=pk).exists():
+        schedule_instance = Schedule_Recruitment.objects.get(id=pk)
+        if Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule_instance).exists():
+            participated_students = Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule_instance)
+            selected_students =[]
+            for instance in participated_students:
+                if Placed_students.objects.filter(recruitment_participated_student=instance).exists():
+                    placed_details = Placed_students.objects.filter(recruitment_participated_student=instance)
+                    placed_details=placed_details[0]
+                    print(instance,placed_details)
+                    instance_of_placed = {
+                        "admission_number" : instance.student.admission_number,
+                        "program" : instance.student.program.program_name,
+                        "gender" : instance.student.gender,
+                        "student_name" : instance.student.first_name+' '+instance.student.last_name,
+                        "applied_date" : instance.applied_date.isoformat() if instance.applied_date else None,
+                        "placed_date" : placed_details.placed_date.isoformat() if placed_details.placed_date else None,
+                        "status" : "Qualified"
+                    }
+                    selected_students.append(instance_of_placed)
+            responce_data_sent=json.dumps(selected_students,indent=4)
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"success",
+                    "data":responce_data_sent,
+                    "message":"Get succesfull"
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"failed",
+                    "data":[],
+                    "message":"No Students Applied"
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"failed",
+                "data":[],
+                "message":"Not found"
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)

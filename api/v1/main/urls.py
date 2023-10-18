@@ -48,6 +48,7 @@ urlpatterns = [
     re_path(r"^add_selection_update_for_student/$", add_selection_update_for_student),
     re_path(r"^cancel_recruitment_schedule/(?P<pk>\d+)/$", cancel_recruitment_schedule_status),
     re_path(r"^complete_recruitment_schedule/(?P<pk>\d+)/$", complete_recruitment_schedule_status),
+    re_path(r"^get_recruitment_selected_students/(?P<pk>\d+)/$", get_recruitment_selected_students),
 
     
     # attendance
