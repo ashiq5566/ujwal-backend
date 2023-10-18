@@ -2213,6 +2213,7 @@ def get_applied_placements_by_student(request,pk):
                     "others" :studentUpdationItem.others
                 }
                 updationAll.append(updationInstance)
+            sorted_updationAll = sorted(updationAll, key=lambda x: x["updation_date"])
             instance = {
                 "id" : appliedPlacement.id,
                 "applied_date" :  appliedPlacement.applied_date.isoformat() if appliedPlacement.applied_date else None,
@@ -2220,7 +2221,7 @@ def get_applied_placements_by_student(request,pk):
                 "scheduled_recruitment_name" : appliedPlacement.scheduled_recruitment.recruiter.company_name,
                 "designation" : appliedPlacement.scheduled_recruitment.designation,
                 "status" : appliedPlacement.scheduled_recruitment.status,
-                "student_process_details":updationAll,
+                "student_process_details":sorted_updationAll,
                 "placed_status" : Placed_students.objects.filter(recruitment_participated_student_id=appliedPlacement.id).exists()
             }
             data.append(instance)
@@ -2648,7 +2649,6 @@ def get_recruitment_selected_students(request,pk):
                 if Placed_students.objects.filter(recruitment_participated_student=instance).exists():
                     placed_details = Placed_students.objects.filter(recruitment_participated_student=instance)
                     placed_details=placed_details[0]
-                    print(instance,placed_details)
                     instance_of_placed = {
                         "admission_number" : instance.student.admission_number,
                         "program" : instance.student.program.program_name,
