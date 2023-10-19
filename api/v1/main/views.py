@@ -2632,7 +2632,7 @@ def delete_student(request):
             "data":{
                 "title":"failed",
                 "data":[],
-                "message":"Soemthing went wrong! please try again"
+                "message":"Something went wrong! please try again"
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
@@ -2738,4 +2738,125 @@ def get_alumni_batch_details(request):
             }
         }
 
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["POST"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+def alumni_register(request):
+    serializer = AlumniRegisterSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        firstName = request.data['firstName']
+        lastName = request.data['lastName']
+        gender = request.data['gender']
+        dateOfBirth = request.data['dateOfBirth']
+        address = request.data['address']
+        phone = request.data['phone']
+        email = request.data['email']
+        program = request.data['program']
+        startYear = request.data['startYear']
+        endYear = request.data['endYear']
+        batch_instance, created = alumni_batch_details.objects.get_or_create(
+            start_year=startYear, end_year=endYear
+            )
+        program_instance = Programs.objects.get(id=program)
+        alumni_details.objects.create(
+            first_name =firstName,
+            last_name = lastName,
+            date_of_birth =dateOfBirth,
+            address = address,
+            gender = gender,
+            phone =phone,
+            email = email,
+            program = program_instance,
+            batch = batch_instance
+        )
+
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Alumni Registred Succesfully",
+                "data":[],
+                
+            }
+        }  
+    else: 
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "message": "Alumni Registration failed.",
+                "data":[],
+                "error":serializer.errors
+            }
+        }  
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+def get_alumni_details(request):
+    program = request.GET.get('program')
+    startYear = request.GET.get('startYear')
+    endYear = request.GET.get('endYear')
+    if program and startYear and endYear:
+        if alumni_batch_details.objects.filter(start_year=startYear,end_year=endYear).exists():
+            batch = alumni_batch_details.objects.filter(start_year=startYear,end_year=endYear)[0]
+            alumniDetails = alumni_details.objects.filter(batch=batch,program_id=program).order_by('first_name')
+            alumniDetailsdata=[]
+            for i in alumniDetails:
+                jobDetailsData= []
+                if alumni_job.objects.filter(person=i).exists():
+                    jobDetails = alumni_job.objects.filter(person=i).order_by('start_date')
+                    for j in jobDetails:
+
+                        jobInstance ={
+                            "job_title": j.job_title,
+                            "company": j.company,
+                            "start_date":j.start_date.isoformat()  if j.start_date else None,
+                            "end_date":j.end_date.isoformat()  if j.end_date else None
+                        }
+                        jobDetailsData.append(jobInstance)
+                alumniInstance = {
+                    "first_name" : i.first_name,
+                    "last_name" :i.last_name,
+                    "date_of_birth":i.date_of_birth.isoformat()  if i.date_of_birth else None,
+                    "address" :i.address,
+                    "gender" :i.gender,
+                    "phone" :i.phone,
+                    "email" :i.email,
+                    "program" :i.program.program_name,
+                    "department" :i.program.department.department_name,
+                    "batch" : str(i.batch.start_year)+' '+str(i.batch.end_year),
+                    # "photo" : i.photo,
+                    "jobDetails" : jobDetailsData
+                } 
+                alumniDetailsdata.append(alumniInstance)
+            responce_data_sent=json.dumps(alumniDetailsdata,indent=4)   
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":responce_data_sent,
+                    "message":"Succesfull"
+                }
+            }
+        else:
+             response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"failed",
+                "data":[],
+                "message":"Batch Not Exists"
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"failed",
+                "data":[],
+                "message":"Something went wrong! please try again"
+            }
+        }
     return Response(response_data,status=status.HTTP_200_OK)

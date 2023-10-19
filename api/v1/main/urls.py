@@ -109,5 +109,7 @@ urlpatterns = [
 
     #"alumni"
     re_path(r"get_alumni_batch_details/$", get_alumni_batch_details),
+    re_path(r"alumni_register/$", alumni_register),
+    re_path(r"get_alumni_details/$", get_alumni_details),
 
 ]

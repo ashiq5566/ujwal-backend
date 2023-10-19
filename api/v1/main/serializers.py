@@ -326,3 +326,20 @@ class ControlGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Controls
         fields = '__all__'
+class AlumniDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = alumni_details
+        fields = '__all__'
+
+
+class AlumniRegisterSerializer(serializers.Serializer):
+    firstName = serializers.CharField()
+    lastName = serializers.CharField()
+    gender = serializers.CharField()
+    dateOfBirth = serializers.DateField()
+    address = serializers.CharField(required=False, allow_blank=True)
+    phone = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    program = serializers.IntegerField()
+    startYear = serializers.IntegerField()
+    endYear = serializers.IntegerField()
