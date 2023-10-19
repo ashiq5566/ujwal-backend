@@ -2713,3 +2713,29 @@ def constrols(request):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","Student_cordinator"])
+def get_alumni_batch_details(request):
+    if alumni_batch_details.objects.all():
+        sorted_batch_details = alumni_batch_details.objects.all().order_by('-start_year', '-end_year')
+        batch_details_list = [{'startyear': item.start_year, 'endyear': item.end_year} for item in sorted_batch_details]
+        responce_data_sent=json.dumps(batch_details_list,indent=4)
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":responce_data_sent
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)

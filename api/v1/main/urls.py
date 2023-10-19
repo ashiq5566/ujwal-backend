@@ -106,6 +106,8 @@ urlpatterns = [
 
     #controls
     re_path(r"constrols/$", constrols),
-    
+
+    #"alumni"
+    re_path(r"get_alumni_batch_details/$", get_alumni_batch_details),
 
 ]
