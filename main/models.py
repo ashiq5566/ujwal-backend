@@ -375,3 +375,35 @@ class Student_Resume(models.Model):
     def __str__(self):
         return f"{self.student}"
     
+
+class alumni_batch_details(models.Model):
+    start_year = models.PositiveSmallIntegerField()
+    end_year = models.PositiveSmallIntegerField()
+
+    def __str__(self):
+        return f"{self.start_year} - {self.end_year}"
+    
+class alumni_details(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    date_of_birth = models.DateField()
+    address = models.TextField()
+    gender = models.CharField(max_length=15)
+    phone = models.CharField(max_length=15, null=True,blank=True)
+    email = models.EmailField(null=True,blank=True)
+    program = models.ForeignKey(Programs, on_delete=models.CASCADE)
+    batch = models.ForeignKey(alumni_batch_details, on_delete=models.CASCADE)
+    photo = models.ImageField(upload_to='alumni/profile_picture/', null=True,blank=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}:{self.program}"
+    
+class alumni_job(models.Model):
+    job_title = models.CharField(max_length=100)
+    company = models.CharField(max_length=100)
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    person = models.ForeignKey(alumni_details, on_delete=models.CASCADE, null=False)
+
+    def __str__(self):
+        return f"{self.person}{self.job_title} at {self.company}"
