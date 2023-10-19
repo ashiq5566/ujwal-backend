@@ -407,3 +407,6 @@ class alumni_job(models.Model):
 
     def __str__(self):
         return f"{self.person}{self.job_title} at {self.company}"
+
+class Controls(models.Model):
+    register = models.BooleanField(default=False)

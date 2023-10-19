@@ -104,4 +104,8 @@ urlpatterns = [
     re_path(r"edit-program/(?P<pk>\d+)/$", edit_program),
     re_path(r"edit-training-schedule/(?P<pk>\d+)/$", edit_training_schedule),
 
+    #controls
+    re_path(r"constrols/$", constrols),
+    
+
 ]

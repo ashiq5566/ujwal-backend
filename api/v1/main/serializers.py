@@ -321,3 +321,8 @@ class StudentAcademicDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentAcademicDetails
         fields = '__all__'
+
+class ControlGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Controls
+        fields = '__all__'

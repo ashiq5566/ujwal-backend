@@ -2687,3 +2687,29 @@ def get_recruitment_selected_students(request,pk):
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def constrols(request):
+    if Controls.objects.all():
+        departments = Controls.objects.all()  
+        serializer = ControlGetSerializer(departments, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
