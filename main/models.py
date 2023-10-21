@@ -398,7 +398,7 @@ class alumni_details(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}:{self.program}"
     
-class alumni_job(models.Model):
+class   alumni_job(models.Model):
     job_title = models.CharField(max_length=100)
     company = models.CharField(max_length=100)
     start_date = models.DateField()

@@ -111,5 +111,7 @@ urlpatterns = [
     re_path(r"get_alumni_batch_details/$", get_alumni_batch_details),
     re_path(r"alumni_register/$", alumni_register),
     re_path(r"get_alumni_details/$", get_alumni_details),
+    re_path(r"update_job_instance/$", update_job_instance),
+    re_path(r"create_new_job_instance/$", create_new_job_instance),
 
 ]
