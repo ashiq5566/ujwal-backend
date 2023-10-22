@@ -68,7 +68,6 @@ urlpatterns = [
     re_path(r"^add_a_placement/$", add_a_placement),
     re_path(r"^get_placedStudents_by_batch/$", get_placedStudents_by_batch),
 
-
     #promote program
     re_path(r"^promote_current_batch/(?P<pk>\d+)/$",promote_current_batch),
     re_path(r"^promote_new_batch/(?P<pk>\d+)/$",promote_new_batch),
@@ -92,6 +91,8 @@ urlpatterns = [
     re_path(r"upload_resume/$", upload_resume),
     re_path(r"update_offer_latter/$", update_offer_latter),
     re_path(r"student_resume/(?P<student_id>\d+)/$", student_resume),
+    re_path(r"student_instance_semester_marklist_details/(?P<student_id>\d+)/$", student_instance_semester_marklist_details),
+
 
     #reports
     re_path(r"dashboard_reports/$", dashboard_reports),

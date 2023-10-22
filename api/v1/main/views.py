@@ -2949,3 +2949,50 @@ def create_new_job_instance(request):
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+# @group_required(["student"])
+@permission_classes((AllowAny,))
+def student_instance_semester_marklist_details(request,student_id):
+    if student_id:
+        if Student.objects.filter(id=student_id).exists():
+            # student = Student.objects.get(id=student_id)
+            if Student_program_semester.objects.filter(student__id=student_id).exists():
+                student = Student_program_semester.objects.filter(student__id=student_id)
+                serializer = StudentProgramSemesterSerializer(student, many=True)
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "data":serializer.data,
+                        "message":""
+                    }
+                }
+            else:
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "data":[],
+                        "message":""
+                    }
+                }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":[],
+                    "message":"Student non Existing"
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"No student id provided"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
