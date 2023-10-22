@@ -202,12 +202,20 @@ class Student_program_semester(models.Model):
         ('ongoing', 'Ongoing'),
         ('upcoming', 'Upcoming'),
     )
+    APPROVED_CHOICES = (
+        ('pending', 'Pending'),
+        ('rejected', 'Rejected'),
+        ('approved', 'Approved'),
+    )
     student = models.ForeignKey("main.Student",on_delete=models.CASCADE)
     semester = models.ForeignKey("main.Program_Semester",on_delete=models.CASCADE)
     start_date = models.DateField(null=True,blank=True) 
     end_date = models.DateField(null=True,blank=True)     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES,default='upcoming')
-
+    marklist_appove_status = models.CharField(max_length=20, choices=APPROVED_CHOICES,null=True,blank=True)
+    marklist = models.ImageField(upload_to='student_documents/marklist/', null=True,blank=True)
+    backlog_count = models.PositiveSmallIntegerField(null=True,blank=True)
+    cgpa=models.CharField(max_length=30,null=True,blank=True)
     def __str__(self):
         return f"{self.student},{self.semester},{self.status}"
     
