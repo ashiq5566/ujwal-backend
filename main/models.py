@@ -240,6 +240,7 @@ class AllotTrainer(models.Model):
     venue = models.CharField(max_length=100)
     focusing_area = models.ManyToManyField(FocusingArea)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES,default='ongoing')
+    created_date=models.DateField(null=True,blank=True)
 
     def __str__(self):
         return f"{self.trainer}"

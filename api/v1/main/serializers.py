@@ -124,6 +124,7 @@ class ProgramSemesterGetSerializer(serializers.ModelSerializer):
 class TrainingScheduleSerializer(serializers.Serializer):
     trainer_id = serializers.IntegerField()
     start_date_str = serializers.CharField()
+    created_date_str = serializers.CharField()
     end_date_str = serializers.CharField()
     venue = serializers.CharField()
     foc_areas_ids = serializers.ListField(child=serializers.IntegerField())
@@ -343,3 +344,12 @@ class AlumniRegisterSerializer(serializers.Serializer):
     program = serializers.IntegerField()
     startYear = serializers.IntegerField()
     endYear = serializers.IntegerField()
+
+class TrainingParticipantForStudentDetailsSerializer(serializers.Serializer):
+    training_id = serializers.IntegerField()
+    trainer_name = serializers.CharField()
+    venue = serializers.CharField()
+    status = serializers.CharField()
+    focus_areas = serializers.ListField(child=serializers.CharField())
+    start_date =serializers.DateField()
+    end_date =serializers.DateField()

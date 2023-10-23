@@ -92,6 +92,7 @@ urlpatterns = [
     re_path(r"update_offer_latter/$", update_offer_latter),
     re_path(r"student_resume/(?P<student_id>\d+)/$", student_resume),
     re_path(r"student_instance_semester_marklist_details/(?P<student_id>\d+)/$", student_instance_semester_marklist_details),
+    re_path(r"get_training_details_by_student/(?P<student_id>\d+)/$", get_training_details_by_student),
 
 
     #reports

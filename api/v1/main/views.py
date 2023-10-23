@@ -555,7 +555,7 @@ def focusing_areas(request):
 @api_view(["GET"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def programs_by_department(request, pk):
-    if Departments.objects.get(id=pk):
+    if Departments.objects.filter(id=pk).exists():
         department = Departments.objects.get(id=pk)
         program=Programs.objects.filter(department=department)
         serializer = ProgramsGetSerializer(program, many=True)
@@ -608,7 +608,7 @@ def semesters(request):
 @api_view(["GET"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def program_semester_by_program(request, pk):
-    if Programs.objects.get(id=pk):
+    if Programs.objects.filter(id=pk).exists():
         program = Programs.objects.get(id=pk)
         program_semester=Program_Semester.objects.filter(program=program)
         serializer = ProgramSemesterGetSerializer(program_semester, many=True)
@@ -667,6 +667,7 @@ def add_training_schedule(request):
     if serializer.is_valid():
         trainer_id = request.data['trainer_id']
         start_date_str = request.data['start_date_str']
+        created_date_str = request.data['created_date_str']
         end_date_str = request.data['end_date_str']
         venue = request.data['venue']
         foc_areas_ids = request.data['foc_areas_ids']
@@ -683,9 +684,10 @@ def add_training_schedule(request):
                     # Convert date string to the desired format
                     start_date = datetime.strptime(start_date_str, '%d-%m-%Y').strftime('%Y-%m-%d')
                     end_date = datetime.strptime(end_date_str, '%d-%m-%Y').strftime('%Y-%m-%d')
+                    created_date = datetime.strptime(created_date_str, '%d-%m-%Y').strftime('%Y-%m-%d')
 
                     
-                    allot_trainer=AllotTrainer(trainer=trainer,start_date=start_date,end_date=end_date,venue=venue)
+                    allot_trainer=AllotTrainer(trainer=trainer,start_date=start_date,end_date=end_date,venue=venue,created_date=created_date)
                     allot_trainer.save()
                     allot_trainer.focusing_area.set(foc_areas) 
 
@@ -1178,7 +1180,7 @@ def attendance(request, pk):
     serializer = AttendancePostSerializer(data=request.data)
     
     if serializer.is_valid():
-        if TrainingParticipant.objects.get(id=pk):
+        if TrainingParticipant.objects.filter(id=pk).exists():
             training_participant=TrainingParticipant.objects.get(id=pk)
             present_student_ids = request.data['present_student']
             absent_student_ids = request.data['absent_student']
@@ -1948,7 +1950,7 @@ def get_placedStudents_by_batch(request):
 @api_view(['PUT'])
 @permission_classes([AllowAny,])
 def complete_recruitment_schedule_status(request,pk):
-    if Schedule_Recruitment.objects.get(id=pk):
+    if Schedule_Recruitment.objects.filter(id=pk).exists():
         schedule=Schedule_Recruitment.objects.get(id=pk)
         schedule.status="completed"
         schedule.save()
@@ -1975,7 +1977,7 @@ def complete_recruitment_schedule_status(request,pk):
 @api_view(['PUT'])
 @permission_classes([AllowAny,])
 def cancel_recruitment_schedule_status(request,pk):
-    if Schedule_Recruitment.objects.get(id=pk):
+    if Schedule_Recruitment.objects.filter(id=pk).exists():
         schedule=Schedule_Recruitment.objects.get(id=pk)
         schedule.status="cancelled"
         schedule.save()
@@ -2003,7 +2005,7 @@ def cancel_recruitment_schedule_status(request,pk):
 @api_view(['PUT'])
 @permission_classes([AllowAny,])
 def complete_training_schedule_status(request,pk):
-    if AllotTrainer.objects.get(id=pk):
+    if AllotTrainer.objects.filter(id=pk).exists():
         schedule=AllotTrainer.objects.get(id=pk)
         schedule.status="completed"
         schedule.save()
@@ -2030,7 +2032,7 @@ def complete_training_schedule_status(request,pk):
 @api_view(['PUT'])
 @permission_classes([AllowAny,])
 def cancel_training_schedule_status(request,pk):
-    if AllotTrainer.objects.get(id=pk):
+    if AllotTrainer.objects.filter(id=pk).exists():
         schedule=AllotTrainer.objects.get(id=pk)
         schedule.status="cancelled"
         schedule.save()
@@ -2871,7 +2873,7 @@ def update_job_instance(request):
     job_id = request.data.get('job_id')
     end_date = request.data.get('end_date')
     if job_id and end_date:
-        if alumni_job.objects.get(id=job_id):
+        if alumni_job.objects.filter(id=job_id).exists():
             job_instance = alumni_job.objects.get(pk=job_id)
             job_instance.end_date=end_date
             job_instance.save()
@@ -2913,7 +2915,7 @@ def create_new_job_instance(request):
     start_date = request.data.get('start_date')
     if id and job_title and company and start_date:
         person_id = int(id)
-        if alumni_details.objects.get(id=person_id):
+        if alumni_details.objects.filter(id=person_id).exists():
             person = alumni_details.objects.get(id=person_id)
             alumni_job_instance = alumni_job(
                 job_title=job_title,
@@ -2984,6 +2986,72 @@ def student_instance_semester_marklist_details(request,student_id):
                     "title":"Failed",
                     "data":[],
                     "message":"Student non Existing"
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"No student id provided"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
+def get_training_details_by_student(request,student_id):
+    if student_id and Student.objects.filter(id=student_id).exists():
+        student = Student.objects.get(id=student_id)
+        if Student_program_semester.objects.filter(student=student).exists():
+            merged_list=[]
+            student_program_semesters = Student_program_semester.objects.filter(student=student).exclude(status='upcoming')
+            print(student_program_semesters,"student_program_semesters")
+            for student_program_semester in student_program_semesters:
+                if student_program_semester.start_date and student_program_semester.end_date:
+                    training_participant = TrainingParticipant.objects.filter(
+                        program_semester=student_program_semester.semester, 
+                        allot_trainer__start_date__lte=student_program_semester.start_date,  
+                        allot_trainer__end_date__gte=student_program_semester.end_date 
+                        )
+                elif student_program_semester.start_date:
+                    training_participant = TrainingParticipant.objects.filter(
+                        program_semester=student_program_semester.semester, 
+                        allot_trainer__created_date__lte=student_program_semester.start_date 
+                        )
+                training_participant_list = list(training_participant)
+                merged_list=training_participant_list+merged_list
+            res_data=[]
+            for training_participent in merged_list:
+                focus_areas =  list(training_participent.allot_trainer.focusing_area.values_list('area_name', flat=True))
+                instance ={
+                    "training_id":training_participent.allot_trainer.id,
+                    "trainer_name":training_participent.allot_trainer.trainer.trainer_name,
+                    "start_date":training_participent.allot_trainer.start_date,
+                    "end_date":training_participent.allot_trainer.end_date,
+                    "venue":training_participent.allot_trainer.venue,
+                    "status":training_participent.allot_trainer.status,
+                    "focus_areas":focus_areas
+                }
+                res_data.append(instance)
+            sorted_res_data = sorted(res_data, key=lambda x: x['start_date'], reverse=True)
+            responce_data_sent=TrainingParticipantForStudentDetailsSerializer(sorted_res_data,many=True)
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":responce_data_sent.data,
+                    "message":""
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":[],
+                    "message":"Failed to load student program details"
                 }
             }
     else:
