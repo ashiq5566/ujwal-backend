@@ -2490,7 +2490,7 @@ def dashboard_reports(request):
         "statusCode":6000,
         "data":{
             "title":"Success",
-            "message":"NotFound",
+            "message":"",
             "data":{
                 "placedInPrograms":placedInPrograms,
                 "totalPlaced":len(placedStudents),
@@ -2581,7 +2581,7 @@ def promote_student_details(request,pk):
                 "student_id": student.student.id,
                 "admission_number":student.student.admission_number,
                 "dob":student.student.date_of_birth.isoformat() if student.student.date_of_birth else None,
-                "gender": student.student.roll_number,
+                "gender": student.student.gender,
                 "roll_number":student.student.roll_number,
                 "program_semester":student.semester.program.program_name+'-'+student.semester.semester.semester
             }

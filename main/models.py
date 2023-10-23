@@ -42,7 +42,7 @@ class Departments(models.Model):
 class Programs(models.Model):
     TYPE_CHOICES = (
         ('UG', 'UG'),
-        ('PG M-Tech', 'PG M-Tech'),
+        ('PG Engineering', 'PG Engineering'),
         ('PG', 'PG'),
     )
     program_id = models.CharField(max_length=10, unique=True, null=False)
@@ -273,13 +273,13 @@ class Schedule_Recruitment(models.Model):
         ('cancelled', 'Cancelled'),
     )
     recruiter = models.ForeignKey(Recruiters,on_delete=models.CASCADE, null=False)
-    venue = models.CharField(max_length=50, null=True,default="")
+    venue = models.CharField(max_length=50, null=True,blank=True)
     designation=models.CharField(max_length=50)
     date=models.DateField(null=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES,default='ongoing')
     apply_link = models.URLField(null=True,blank=True)
-    apply_last_date=models.DateField(null=True)
-    number_of_hirings = models.PositiveIntegerField(null=True)
+    apply_last_date=models.DateField(null=True,blank=True)
+    number_of_hirings = models.PositiveIntegerField(null=True,blank=True)
     description= models.CharField(null=True)
 
     def __str__(self):
