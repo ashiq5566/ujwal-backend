@@ -2488,6 +2488,8 @@ def dashboard_reports(request):
         fiveYearReports=json.dumps(fiveYearReport,indent=4)
     recruiters=Recruiters.objects.filter(is_active=True)
     trainers=Trainers.objects.filter(is_active=True)
+    programs=Programs.objects.filter(is_active=True)
+    departments=Departments.objects.filter(is_active=True)
     response_data = {
         "statusCode":6000,
         "data":{
@@ -2498,6 +2500,8 @@ def dashboard_reports(request):
                 "totalPlaced":len(placedStudents),
                 "recruiters":len(recruiters),
                 "trainers":len(trainers),
+                "programs":len(programs),
+                "departments":len(departments),
                 "fiveYearReports":fiveYearReports
                 }
         }
@@ -2869,7 +2873,6 @@ def get_alumni_details(request):
 @api_view(["PUT"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def update_job_instance(request):
-    print(request.data.get('job_id'),"fdsgfd")
     job_id = request.data.get('job_id')
     end_date = request.data.get('end_date')
     if job_id and end_date:
