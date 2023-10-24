@@ -419,3 +419,14 @@ class   alumni_job(models.Model):
 
 class Controls(models.Model):
     register = models.BooleanField(default=False)
+    def __str__(self):
+        return f"{self.register}"
+
+class Training_Feedback(models.Model):
+    review = models.CharField(max_length=1010)
+    trainer = models.ForeignKey(AllotTrainer, on_delete=models.CASCADE, null=False)
+    date = models.DateField(null=False)
+
+    def __str__(self):
+        return f"{self.trainer}-{self.date}"
+    

@@ -353,3 +353,13 @@ class TrainingParticipantForStudentDetailsSerializer(serializers.Serializer):
     focus_areas = serializers.ListField(child=serializers.CharField())
     start_date =serializers.DateField()
     end_date =serializers.DateField()
+
+class TrainingReviewForStudentDetailsSerializer(serializers.Serializer):
+    training_id = serializers.IntegerField()
+    trainer_name = serializers.CharField()
+    venue = serializers.CharField()
+    status = serializers.CharField()
+    focus_areas = serializers.ListField(child=serializers.CharField())
+    start_date =serializers.DateField()
+    end_date =serializers.DateField()
+    review_marked =serializers.BooleanField()

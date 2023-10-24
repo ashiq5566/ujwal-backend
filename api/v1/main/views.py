@@ -3003,7 +3003,7 @@ def student_instance_semester_marklist_details(request,student_id):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
+@group_required(["Admin","student"])
 def get_training_details_by_student(request,student_id):
     if student_id and Student.objects.filter(id=student_id).exists():
         student = Student.objects.get(id=student_id)
@@ -3064,6 +3064,128 @@ def get_training_details_by_student(request,student_id):
                 "title":"Failed",
                 "data":[],
                 "message":"No student id provided"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","student"])
+def get_training_details_for_feedback_by_student(request,student_id):
+    if student_id and Student.objects.filter(id=student_id).exists():
+        student = Student.objects.get(id=student_id)
+        if Student_program_semester.objects.filter(student=student).exists():
+            merged_list=[]
+            student_program_semesters = Student_program_semester.objects.filter(student=student).exclude(status='upcoming')
+            print(student_program_semesters,"student_program_semesters")
+            for student_program_semester in student_program_semesters:
+                if student_program_semester.start_date and student_program_semester.end_date:
+                    training_participant = TrainingParticipant.objects.filter(
+                        program_semester=student_program_semester.semester, 
+                        allot_trainer__start_date__lte=student_program_semester.start_date,  
+                        allot_trainer__end_date__gte=student_program_semester.end_date 
+                        )
+                elif student_program_semester.start_date:
+                    training_participant = TrainingParticipant.objects.filter(
+                        program_semester=student_program_semester.semester, 
+                        allot_trainer__created_date__lte=student_program_semester.start_date 
+                        )
+                training_participant_list = list(training_participant)
+                merged_list=training_participant_list+merged_list
+            res_data=[]
+            for training_participent in merged_list:
+                focus_areas =  list(training_participent.allot_trainer.focusing_area.values_list('area_name', flat=True))
+                instance ={
+                    "training_id":training_participent.allot_trainer.id,
+                    "trainer_name":training_participent.allot_trainer.trainer.trainer_name,
+                    "start_date":training_participent.allot_trainer.start_date,
+                    "end_date":training_participent.allot_trainer.end_date,
+                    "venue":training_participent.allot_trainer.venue,
+                    "status":training_participent.allot_trainer.status,
+                    "focus_areas":focus_areas
+                }
+                res_data.append(instance)
+            filtered_instances = []
+
+            # Get the current date
+            current_date = datetime.now().date()
+
+            for instance in res_data:
+                if instance["start_date"] <= current_date <= instance["end_date"]:
+                    if Training_Feedback.objects.filter(date=current_date,trainer__id=instance['training_id']).exists():
+                        instance['review_marked']=True
+                    else:
+                        instance['review_marked']=False
+                    filtered_instances.append(instance)
+            sorted_res_data = sorted(filtered_instances, key=lambda x: x['start_date'], reverse=True)
+            responce_data_sent=TrainingReviewForStudentDetailsSerializer(sorted_res_data,many=True)
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":responce_data_sent.data,
+                    "message":""
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":[],
+                    "message":"Failed to load student program details"
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"No student id provided"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["POST"])
+@group_required(["Admin","student"])
+def post_review_for_training(request):
+    trainerId = request.data.get('trainerId')
+    feedback = request.data.get('feedback')
+    date = request.data.get('date')
+    if trainerId and feedback and date:
+        id = int(trainerId)
+        if AllotTrainer.objects.filter(id=id).exists():
+            trainer = AllotTrainer.objects.get(id=id)
+            feedback_instance = Training_Feedback(
+                review=feedback,
+                trainer=trainer,
+                date=date,
+            )
+            feedback_instance.save()
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":[],
+                    "message":"Feedback Submitted succesfully"
+                }
+            }
+        else:
+            response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"Something went wrong. Please Try again"
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"Something went wrong. Please Try again"
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)

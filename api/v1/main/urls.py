@@ -89,10 +89,12 @@ urlpatterns = [
     re_path(r"student_academicDocuments/(?P<student_id>\d+)/$", student_academicDocuments),
     re_path(r"upload_additional_document/$", upload_additional_document),
     re_path(r"upload_resume/$", upload_resume),
+    re_path(r"post_review_for_training/$", post_review_for_training),
     re_path(r"update_offer_latter/$", update_offer_latter),
     re_path(r"student_resume/(?P<student_id>\d+)/$", student_resume),
     re_path(r"student_instance_semester_marklist_details/(?P<student_id>\d+)/$", student_instance_semester_marklist_details),
     re_path(r"get_training_details_by_student/(?P<student_id>\d+)/$", get_training_details_by_student),
+    re_path(r"get_training_details_for_feedback_by_student/(?P<student_id>\d+)/$", get_training_details_for_feedback_by_student),
 
 
     #reports
