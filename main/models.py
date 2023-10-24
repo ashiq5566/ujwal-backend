@@ -425,6 +425,7 @@ class Controls(models.Model):
 class Training_Feedback(models.Model):
     review = models.CharField(max_length=1010)
     trainer = models.ForeignKey(AllotTrainer, on_delete=models.CASCADE, null=False)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=False)
     date = models.DateField(null=False)
 
     def __str__(self):

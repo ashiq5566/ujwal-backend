@@ -3111,7 +3111,7 @@ def get_training_details_for_feedback_by_student(request,student_id):
 
             for instance in res_data:
                 if instance["start_date"] <= current_date <= instance["end_date"]:
-                    if Training_Feedback.objects.filter(date=current_date,trainer__id=instance['training_id']).exists():
+                    if Training_Feedback.objects.filter(date=current_date,trainer__id=instance['training_id'],student__id=student_id).exists():
                         instance['review_marked']=True
                     else:
                         instance['review_marked']=False
@@ -3152,24 +3152,37 @@ def post_review_for_training(request):
     trainerId = request.data.get('trainerId')
     feedback = request.data.get('feedback')
     date = request.data.get('date')
-    if trainerId and feedback and date:
+    student_id = request.data.get('student_id')
+    if trainerId and feedback and date and student_id:
         id = int(trainerId)
         if AllotTrainer.objects.filter(id=id).exists():
-            trainer = AllotTrainer.objects.get(id=id)
-            feedback_instance = Training_Feedback(
-                review=feedback,
-                trainer=trainer,
-                date=date,
-            )
-            feedback_instance.save()
-            response_data = {
-                "statusCode":6000,
-                "data":{
-                    "title":"Success",
-                    "data":[],
-                    "message":"Feedback Submitted succesfully"
+            if Student.objects.filter(id=student_id):
+                student= Student.objects.get(id=student_id)
+                trainer = AllotTrainer.objects.get(id=id)
+                feedback_instance = Training_Feedback(
+                    review=feedback,
+                    trainer=trainer,
+                    date=date,
+                    student=student,
+                )
+                feedback_instance.save()
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "data":[],
+                        "message":"Feedback Submitted succesfully"
+                    }
                 }
-            }
+            else:
+                response_data = {
+                    "statusCode":6001,
+                    "data":{
+                        "title":"Failed",
+                        "data":[],
+                        "message":"Something went wrong. Please Try again"
+                    }
+                }
         else:
             response_data = {
             "statusCode":6001,
