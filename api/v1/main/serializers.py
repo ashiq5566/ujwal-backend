@@ -363,3 +363,9 @@ class TrainingReviewForStudentDetailsSerializer(serializers.Serializer):
     start_date =serializers.DateField()
     end_date =serializers.DateField()
     review_marked =serializers.BooleanField()
+
+
+class TrainingFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Training_Feedback
+        fields = '__all__'

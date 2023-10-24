@@ -3202,3 +3202,82 @@ def post_review_for_training(request):
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def getReviews(request):
+    training_id = request.GET.get('training_id')
+    date = request.GET.get('date')
+    print(training_id,date,"training_id")
+    if training_id and date:
+        if AllotTrainer.objects.filter(id=training_id).exists():
+            if Training_Feedback.objects.filter(trainer__id=training_id,date=date).exists():
+                feedback = Training_Feedback.objects.filter(trainer__id=training_id,date=date)
+                serializer = TrainingFeedbackSerializer(feedback,many=True)
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "data":serializer.data,
+                        "message":""
+                    }
+                }
+            else:
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "data":[],
+                        "message":""
+                    }
+                }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":[],
+                    "message":"Trainer not exists"
+                }
+            }
+    elif training_id:
+        if AllotTrainer.objects.filter(id=training_id).exists():
+            if Training_Feedback.objects.filter(trainer__id=training_id).exists():
+                feedback = Training_Feedback.objects.filter(trainer__id=training_id)
+                serializer = TrainingFeedbackSerializer(feedback,many=True)
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "data":serializer.data,
+                        "message":""
+                    }
+                }
+            else:
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "data":[],
+                        "message":""
+                    }
+                }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":[],
+                    "message":"Trainer not exists"
+                }
+            }
+    else:
+         response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":[],
+                    "message":"Trainer id not exists"
+                }
+            }
+    return Response(response_data,status=status.HTTP_200_OK)

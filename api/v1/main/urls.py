@@ -32,6 +32,7 @@ urlpatterns = [
     re_path(r"^training/schedules/$", training_schedule),
     re_path(r"^training/schedules/(?P<pk>\d+)/$", training_schedule_detail),
     re_path(r"^focusing_areas/$", focusing_areas),
+    re_path(r"^getTrainingReviews/$", getReviews),
     re_path(r"^training_participents/$", training_participents_details),
     re_path(r"^cancel_training_schedule/(?P<pk>\d+)/$", cancel_training_schedule_status),
     re_path(r"^complete_training_schedule/(?P<pk>\d+)/$", complete_training_schedule_status),
