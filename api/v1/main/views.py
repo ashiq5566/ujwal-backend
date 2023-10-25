@@ -2962,7 +2962,7 @@ def student_semester_marklist_details(request,student_id):
         if Student.objects.filter(id=student_id).exists():
             # student = Student.objects.get(id=student_id)
             if Student_program_semester.objects.filter(student__id=student_id).exists():
-                student = Student_program_semester.objects.filter(student__id=student_id)
+                student = Student_program_semester.objects.filter(student__id=student_id,status='completed')
                 res_data =[]
                 for instance in student:
                     instance_data = {
