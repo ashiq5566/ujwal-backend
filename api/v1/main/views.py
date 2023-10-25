@@ -2349,7 +2349,7 @@ def students_additional_documents(request,student_id):
 @api_view(['POST'])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
 def upload_resume(request):
-    if request.method == 'POST' and request.FILES.get('resume'):
+    if request.method == 'POST' and request.FILES.get('resume') and Student.objects.filter(pk=student_id).exists():
         student_id = request.data.get('student_id')
         student = Student.objects.get(pk=student_id)
         existing_record, created = Student_Resume.objects.update_or_create(
@@ -3295,4 +3295,50 @@ def getReviews(request):
                     "message":"Trainer id not exists"
                 }
             }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
+def upload_makelist_details(request):
+    try:
+        student_program_semester_id = request.data.get('id')
+        marklist = request.FILES.get('marklist')
+        backlog_count_str = request.data.get('backlog_count')
+        
+        cgpa = request.data.get('cgpa')
+
+        # Retrieve the Student_program_semester instance
+        sps = Student_program_semester.objects.get(pk=student_program_semester_id)
+
+        # Update the fields
+        if marklist:
+            sps.marklist = marklist
+        if backlog_count_str:
+            backlog_count=int(backlog_count_str)
+            sps.backlog_count = backlog_count
+        if cgpa:
+            cgpa_float=float(cgpa)
+            sps.cgpa = cgpa_float
+
+        sps.save()
+
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "message": "Marklist updated successfully.",
+                "data": []
+            }
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    except :
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
     return Response(response_data,status=status.HTTP_200_OK)
