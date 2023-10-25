@@ -369,3 +369,14 @@ class TrainingFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Training_Feedback
         fields = '__all__'
+
+class StudentMarklistSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    start_date = serializers.DateField(allow_null=True, format="%Y-%m-%d")
+    end_date = serializers.DateField(allow_null=True, format="%Y-%m-%d")
+    sem_status = serializers.CharField()
+    marklist_appove_status = serializers.CharField()
+    marklist = serializers.CharField(allow_blank=True)
+    backlog_count = serializers.IntegerField()
+    cgpa = serializers.FloatField()
+    semester = serializers.CharField()

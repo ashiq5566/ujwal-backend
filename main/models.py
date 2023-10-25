@@ -203,9 +203,9 @@ class Student_program_semester(models.Model):
         ('upcoming', 'Upcoming'),
     )
     APPROVED_CHOICES = (
-        ('pending', 'Pending'),
-        ('rejected', 'Rejected'),
-        ('approved', 'Approved'),
+        ('Pending', 'Pending'),
+        ('Rejected', 'Rejected'),
+        ('Approved', 'Approved'),
     )
     student = models.ForeignKey("main.Student",on_delete=models.CASCADE)
     semester = models.ForeignKey("main.Program_Semester",on_delete=models.CASCADE)

@@ -2956,15 +2956,30 @@ def create_new_job_instance(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-# @group_required(["student"])
-@permission_classes((AllowAny,))
-def student_instance_semester_marklist_details(request,student_id):
+@group_required(["student"])
+def student_semester_marklist_details(request,student_id):
     if student_id:
         if Student.objects.filter(id=student_id).exists():
             # student = Student.objects.get(id=student_id)
             if Student_program_semester.objects.filter(student__id=student_id).exists():
                 student = Student_program_semester.objects.filter(student__id=student_id)
-                serializer = StudentProgramSemesterSerializer(student, many=True)
+                res_data =[]
+                for instance in student:
+                    instance_data = {
+                        "id":instance.id,
+                        "start_date":instance.start_date.isoformat()  if instance.start_date else None,
+                        "end_date":instance.end_date.isoformat()  if instance.end_date else None,
+                        "sem_status":instance.status,
+                        "marklist_appove_status":instance.marklist_appove_status,
+                        "marklist":instance.marklist,
+                        "backlog_count":instance.backlog_count,
+                        "cgpa":instance.cgpa,
+                        "semester":instance.semester.semester.semester,
+                    }
+                    res_data.append(instance_data)
+                sorted_res_data = sorted(res_data, key=lambda instance: instance["semester"])
+                serializer = StudentMarklistSerializer(sorted_res_data,many=True)
+                # serializer = StudentProgramSemesterSerializer(student, many=True)
                 response_data = {
                     "statusCode":6000,
                     "data":{
