@@ -380,3 +380,51 @@ class StudentMarklistSerializer(serializers.Serializer):
     backlog_count = serializers.IntegerField()
     cgpa = serializers.FloatField()
     semester = serializers.CharField()
+
+# class StudentProgramMarklistSemesterSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Student_program_semester
+#         fields = ('start_date', 'end_date', 'semester')
+
+#     def to_representation(self, instance):
+#         return {
+#             'start_date': instance['start_date'],
+#             'end_date': instance['end_date'],
+#             'semester': instance['semester'],
+#         }
+
+# class StudentProgramMarklistSemesterSerializer(serializers.ModelSerializer):
+#     semester = serializers.SerializerMethodField()
+#     semester_name = serializers.SerializerMethodField()
+#     program_name = serializers.SerializerMethodField()
+
+#     class Meta:
+#         model = Student_program_semester
+#         fields = ('start_date', 'end_date', 'semester_name', 'program_name', 'semester')
+
+#     def get_semester(self, instance):
+#         return instance['semester'],
+
+#     def get_semester_name(self, instance):
+#         return instance['semester__semester__semester'],
+
+
+#     def get_program_name(self, instance):
+#         return instance['semester__program__program_name']
+
+#     def to_representation(self, instance):
+#         representation = super().to_representation(instance)
+#         representation['id'] = self.get_semester(instance)
+#         representation['semester_name'] = self.get_semester_name(instance)
+#         representation['program_name'] = self.get_program_name(instance)
+        # return representation
+    
+class DistinctCombinationsSerializer(serializers.Serializer):
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    semester_name = serializers.CharField(source='semester__semester__semester')
+    program_name = serializers.CharField(source='semester__program__program_name')
+    program_semester_id = serializers.IntegerField(source='semester')
+
+    class Meta:
+        fields = ('start_date', 'end_date', 'semester_name', 'program_name', 'semester_id')

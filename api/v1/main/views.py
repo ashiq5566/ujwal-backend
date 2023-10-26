@@ -3342,3 +3342,94 @@ def upload_makelist_details(request):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def get_uploaded_marklist_details(request):
+#     filtered_objects = Student_program_semester.objects.exclude(marklist__exact='').filter(
+#     Q(marklist_appove_status__isnull=True) | Q(marklist_appove_status='Rejected') )
+#     distinct_combinationss = filtered_objects.values('start_date', 'end_date', 'semester__semester__semester','semester__program__program_name', 'semester').distinct()
+#     serializer = DistinctCombinationsSerializer(distinct_combinationss,many=True)
+#     response_data = {
+#             "statusCode":6000,
+#             "data":{
+#                 "title":"Success",
+#                 "data":serializer.data,
+#                 "message":"NotFound"
+#             }
+#         }
+
+#     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
+def get_uploaded_marklist_details(request):
+    try:
+        filtered_objects = Student_program_semester.objects.exclude(marklist='').order_by('-end_date').filter(
+            Q(marklist_appove_status__isnull=True) | Q(marklist_appove_status='Rejected')
+        ).prefetch_related('semester__semester', 'semester__program')
+
+        distinct_combinationss = filtered_objects.values(
+            'start_date',
+            'end_date',
+            'semester__semester__semester',
+            'semester__program__program_name',
+            'semester'
+        ).distinct()
+
+        serializer = DistinctCombinationsSerializer(distinct_combinationss, many=True)
+        
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "data": serializer.data,
+                "message": "NotFound"
+            }
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    except :
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Error",
+                "message": "Something went wrong",
+                "data":[]
+            }
+        }
+        return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+# @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
+@permission_classes([AllowAny])
+def get__marklist_varification_details_by_stu_pro_sem(request):
+    try:
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        pgmSemId = request.GET.get('pgmSemId')
+        pgmsem = Program_Semester.objects.get(id=pgmSemId)
+        details = Student_program_semester.objects.filter(semester=pgmsem,start_date=start_date,end_date=end_date).exclude(marklist='').filter(
+            Q(marklist_appove_status__isnull=True) | Q(marklist_appove_status='Rejected')
+        )
+        serializer = StudentProgramSemesterSerializer(details,many=True)
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "data": serializer.data,
+                "message": "NotFound"
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    except:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "message": "Something went wrong",
+                "data":[]
+            }
+        }
+        return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
