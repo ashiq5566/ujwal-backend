@@ -428,3 +428,15 @@ class DistinctCombinationsSerializer(serializers.Serializer):
 
     class Meta:
         fields = ('start_date', 'end_date', 'semester_name', 'program_name', 'semester_id')
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = ['admission_number','first_name','last_name','date_of_birth','gender','roll_number']
+
+class StudentProgramSemesterMarklistSerializer(serializers.ModelSerializer):
+    student_details = StudentSerializer(source='student', read_only=True)
+
+    class Meta:
+        model = Student_program_semester
+        fields = '__all__'

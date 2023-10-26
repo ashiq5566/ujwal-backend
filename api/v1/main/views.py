@@ -3362,7 +3362,7 @@ def upload_makelist_details(request):
 #     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def get_uploaded_marklist_details(request):
     try:
         filtered_objects = Student_program_semester.objects.exclude(marklist='').order_by('-end_date').filter(
@@ -3384,7 +3384,7 @@ def get_uploaded_marklist_details(request):
             "data": {
                 "title": "Success",
                 "data": serializer.data,
-                "message": "NotFound"
+                "message": ""
             }
         }
 
@@ -3402,8 +3402,7 @@ def get_uploaded_marklist_details(request):
         return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
-# @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
-@permission_classes([AllowAny])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def get__marklist_varification_details_by_stu_pro_sem(request):
     try:
         start_date = request.GET.get('start_date')
@@ -3413,13 +3412,13 @@ def get__marklist_varification_details_by_stu_pro_sem(request):
         details = Student_program_semester.objects.filter(semester=pgmsem,start_date=start_date,end_date=end_date).exclude(marklist='').filter(
             Q(marklist_appove_status__isnull=True) | Q(marklist_appove_status='Rejected')
         )
-        serializer = StudentProgramSemesterSerializer(details,many=True)
+        serializer = StudentProgramSemesterMarklistSerializer(details,many=True)
         response_data = {
             "statusCode": 6000,
             "data": {
                 "title": "Success",
                 "data": serializer.data,
-                "message": "NotFound"
+                "message": ""
             }
         }
         return Response(response_data, status=status.HTTP_200_OK)
