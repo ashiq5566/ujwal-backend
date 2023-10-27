@@ -2618,7 +2618,6 @@ def promote_student_details(request,pk):
 def delete_student(request):
     username = request.GET.get('username')
     student_id = request.GET.get('student_id')
-    print(username,"username",student_id,"student_id")
     if User.objects.filter(username=username).exists() and Student.objects.filter(id=student_id).exists():
         student_to_delete =Student.objects.get(id=student_id)
         user_to_delete =User.objects.get(username=username)
@@ -3025,7 +3024,6 @@ def get_training_details_by_student(request,student_id):
         if Student_program_semester.objects.filter(student=student).exists():
             merged_list=[]
             student_program_semesters = Student_program_semester.objects.filter(student=student).exclude(status='upcoming')
-            print(student_program_semesters,"student_program_semesters")
             for student_program_semester in student_program_semesters:
                 if student_program_semester.start_date and student_program_semester.end_date:
                     training_participant = TrainingParticipant.objects.filter(
@@ -3091,7 +3089,6 @@ def get_training_details_for_feedback_by_student(request,student_id):
         if Student_program_semester.objects.filter(student=student).exists():
             merged_list=[]
             student_program_semesters = Student_program_semester.objects.filter(student=student).exclude(status='upcoming')
-            print(student_program_semesters,"student_program_semesters")
             for student_program_semester in student_program_semesters:
                 if student_program_semester.start_date and student_program_semester.end_date:
                     training_participant = TrainingParticipant.objects.filter(
@@ -3223,7 +3220,6 @@ def post_review_for_training(request):
 def getReviews(request):
     training_id = request.GET.get('training_id')
     date = request.GET.get('date')
-    print(training_id,date,"training_id")
     if training_id and date:
         if AllotTrainer.objects.filter(id=training_id).exists():
             if Training_Feedback.objects.filter(trainer__id=training_id,date=date).exists():
@@ -3419,6 +3415,39 @@ def get__marklist_varification_details_by_stu_pro_sem(request):
                 "title": "Success",
                 "data": serializer.data,
                 "message": ""
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    except:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "message": "Something went wrong",
+                "data":[]
+            }
+        }
+        return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+@api_view(['POST'])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def student_marklist_verification(request):
+    try:
+        student_program_semester_id = request.data.get('id')
+        updateStatus = request.data.get('status')
+        print(status,student_program_semester_id,"sdfsfd")
+        instance = Student_program_semester.objects.get(pk=int(student_program_semester_id))
+
+        instance.marklist_appove_status = updateStatus
+        if updateStatus=='Rejected':
+            instance.marklist = None
+        instance.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "data": [],
+                "message": "Marklist Verified Succesfully"
             }
         }
         return Response(response_data, status=status.HTTP_200_OK)

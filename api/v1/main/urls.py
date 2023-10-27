@@ -123,6 +123,7 @@ urlpatterns = [
     #marklist varification
     re_path(r"get_uploaded_marklist_details/$", get_uploaded_marklist_details),
     re_path(r"get__marklist_varification_details_by_stu_pro_sem/$", get__marklist_varification_details_by_stu_pro_sem),
+    re_path(r"student_marklist_verification/$", student_marklist_verification),
 
 
 ]
