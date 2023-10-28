@@ -2654,10 +2654,15 @@ def delete_student(request):
 @api_view(["GET"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def get_recruitment_selected_students(request,pk):
+    department_id = request.GET.get('department_id')
     if pk and Schedule_Recruitment.objects.filter(id=pk).exists():
         schedule_instance = Schedule_Recruitment.objects.get(id=pk)
         if Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule_instance).exists():
-            participated_students = Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule_instance)
+            if department_id:
+                department_id = int(department_id)
+                participated_students = Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule_instance,student__program__department__id=department_id)
+            else:
+                participated_students = Recruitment_Participated_Students.objects.filter(scheduled_recruitment=schedule_instance)
             selected_students =[]
             for instance in participated_students:
                 if Placed_students.objects.filter(recruitment_participated_student=instance).exists():
