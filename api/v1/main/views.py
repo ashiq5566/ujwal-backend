@@ -818,6 +818,7 @@ def training_schedule(request):
                     if training_participant.program_semester.program.department.id == department_id:
                         departmentCheck=True
                     pgmSem={
+                        "id":training_participant.id,
                         "program_semester":training_participant.program_semester.id,
                         "department":training_participant.program_semester.program.department.id,
                         "department_name":training_participant.program_semester.program.department.department_name,
@@ -826,8 +827,10 @@ def training_schedule(request):
                         "semester":training_participant.program_semester.semester.id,
                         "semester_name":training_participant.program_semester.semester.semester
                     }
-                    
-                    pgmSems.append(pgmSem)
+                    if training_participant.program_semester.program.department.id==department_id:
+                        pgmSems.append(pgmSem)
+                        print(training_participant.program_semester.program.department.id,department_id,"department_iddepartment_iddepartment_id")
+
                 instance["program_semesters"]=pgmSems
                 if departmentCheck:
                     data.append(instance)
@@ -874,6 +877,7 @@ def training_schedule(request):
                 pgmSems=[]
                 for training_participant in allot_trainer.trainingparticipant_set.all():
                     pgmSem={
+                        "id":training_participant.id,
                         "program_semester":training_participant.program_semester.id,
                         "department":training_participant.program_semester.program.department.id,
                         "department_name":training_participant.program_semester.program.department.department_name,
@@ -1110,10 +1114,15 @@ def recruitment_schedule_detail(request, pk):
 @api_view(["GET"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def training_participents_details(request):
+    department_id = request.GET.get('department_id')
     allot_tariner_id = request.GET.get('allot_tariner_id')
     if allot_tariner_id:
         allot_tariner_id = int(allot_tariner_id)
-        training_participant = TrainingParticipant.objects.filter(allot_trainer__id=allot_tariner_id) ;  
+        if department_id:
+            department_id = int(department_id)
+            training_participant = TrainingParticipant.objects.filter(allot_trainer__id=allot_tariner_id,program_semester__program__department__id=department_id) 
+        else:
+            training_participant = TrainingParticipant.objects.filter(allot_trainer__id=allot_tariner_id) 
         serializer = TrainingParticipentsSerializer(training_participant, many=True)
         
         response_data = {
@@ -3360,10 +3369,18 @@ def upload_makelist_details(request):
 @api_view(['GET'])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def get_uploaded_marklist_details(request):
+    department_id = request.GET.get('department_id')
+    print(department_id)
     try:
-        filtered_objects = Student_program_semester.objects.exclude(marklist='').order_by('-end_date').filter(
-            Q(marklist_appove_status__isnull=True) | Q(marklist_appove_status='Rejected')
-        ).prefetch_related('semester__semester', 'semester__program')
+        if department_id:
+            print(department_id)
+            filtered_objects = Student_program_semester.objects.exclude(marklist='').order_by('-end_date').filter(
+                Q(marklist_appove_status__isnull=True) | Q(marklist_appove_status='Rejected'),semester__program__department__id=department_id
+            ).prefetch_related('semester__semester', 'semester__program')
+        else:
+            filtered_objects = Student_program_semester.objects.exclude(marklist='').order_by('-end_date').filter(
+                Q(marklist_appove_status__isnull=True) | Q(marklist_appove_status='Rejected')
+            ).prefetch_related('semester__semester', 'semester__program')
 
         distinct_combinationss = filtered_objects.values(
             'start_date',
@@ -3435,9 +3452,7 @@ def student_marklist_verification(request):
     try:
         student_program_semester_id = request.data.get('id')
         updateStatus = request.data.get('status')
-        print(status,student_program_semester_id,"sdfsfd")
         instance = Student_program_semester.objects.get(pk=int(student_program_semester_id))
-
         instance.marklist_appove_status = updateStatus
         if updateStatus=='Rejected':
             instance.marklist = None
