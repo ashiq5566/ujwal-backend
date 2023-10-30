@@ -47,6 +47,7 @@ urlpatterns = [
     re_path(r"^recruitment_Student_UpdationDetails_by_Participated_Student/(?P<pk>\d+)/$", recruitment_Student_UpdationDetails_by_Participated_Student),  
     re_path(r"^recruitment_Student_UpdationDetails_by_List_of_Student/$", recruitment_Student_UpdationDetails_by_List_of_Student),
     re_path(r"^add_selection_update_for_student/$", add_selection_update_for_student),
+    re_path(r"^update_recruitment_participation_student/$", update_recruitment_participation_student),
     re_path(r"^cancel_recruitment_schedule/(?P<pk>\d+)/$", cancel_recruitment_schedule_status),
     re_path(r"^complete_recruitment_schedule/(?P<pk>\d+)/$", complete_recruitment_schedule_status),
     re_path(r"^get_recruitment_selected_students/(?P<pk>\d+)/$", get_recruitment_selected_students),

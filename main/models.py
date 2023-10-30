@@ -303,9 +303,14 @@ class Attendence(models.Model):
         return f"{self.date}-{self.training_participant}"
     
 class Recruitment_Participated_Students(models.Model):
+    status_choices =(
+        ('Applied','Applied'),
+        ('Rejected','Rejected')
+    )
     scheduled_recruitment=models.ForeignKey(Schedule_Recruitment,on_delete=models.CASCADE, null=False)
     student = models.ForeignKey(Student,on_delete=models.CASCADE, null=False)
     applied_date=models.DateField(null=True)
+    status = models.CharField(max_length=30, choices=status_choices, default='Applied')
 
     def __str__(self):
         return f"{self.student}:{self.scheduled_recruitment}"

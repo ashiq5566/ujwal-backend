@@ -2209,8 +2209,13 @@ def get_placement_details_by_student(request,pk):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
 def get_applied_placements_by_student(request,pk):
     student_id = int(pk)
+    statusOfStudent = request.GET.get('status')
     if Recruitment_Participated_Students.objects.filter(student__id=student_id).exists():
-        appliedPlacements=Recruitment_Participated_Students.objects.filter(student__id=student_id)
+        if statusOfStudent:
+            appliedPlacements=Recruitment_Participated_Students.objects.filter(student__id=student_id,status=statusOfStudent)
+        else:
+            appliedPlacements=Recruitment_Participated_Students.objects.filter(student__id=student_id)
+
         data=[]
         for appliedPlacement in appliedPlacements:
             studentUpdationItems= Recruitment_Student_Updations.objects.filter(recruitment_participated_student=appliedPlacement)
@@ -2221,7 +2226,8 @@ def get_applied_placements_by_student(request,pk):
                     "type_of_selection":studentUpdationItem.type_of_selection,
                     "selected_status":studentUpdationItem.is_selected,
                     "completed_status" :studentUpdationItem.status,
-                    "others" :studentUpdationItem.others
+                    "others" :studentUpdationItem.others,
+                    
                 }
                 updationAll.append(updationInstance)
             sorted_updationAll = sorted(updationAll, key=lambda x: x["updation_date"])
@@ -2233,7 +2239,8 @@ def get_applied_placements_by_student(request,pk):
                 "designation" : appliedPlacement.scheduled_recruitment.designation,
                 "status" : appliedPlacement.scheduled_recruitment.status,
                 "student_process_details":sorted_updationAll,
-                "placed_status" : Placed_students.objects.filter(recruitment_participated_student_id=appliedPlacement.id).exists()
+                "placed_status" : Placed_students.objects.filter(recruitment_participated_student_id=appliedPlacement.id).exists(),
+                "applied_status" : appliedPlacement.status
             }
             data.append(instance)
         responce_date_sent=json.dumps(data,indent=4)
@@ -3375,10 +3382,8 @@ def upload_makelist_details(request):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def get_uploaded_marklist_details(request):
     department_id = request.GET.get('department_id')
-    print(department_id)
     try:
         if department_id:
-            print(department_id)
             filtered_objects = Student_program_semester.objects.exclude(marklist='').order_by('-end_date').filter(
                 Q(marklist_appove_status__isnull=True) | Q(marklist_appove_status='Rejected'),semester__program__department__id=department_id
             ).prefetch_related('semester__semester', 'semester__program')
@@ -3564,6 +3569,49 @@ def student_search(request):
                 "title": "Failed",
                 "data": [],
                 "message": ""
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["PUT"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def update_recruitment_participation_student(request):
+    rec_stud_id = request.data.get('rec_stud_id')
+    statusOfUpdation = request.data.get('status')
+    if rec_stud_id and statusOfUpdation:
+        if Recruitment_Participated_Students.objects.filter(id=rec_stud_id).exists():
+            recruitment_instance = Recruitment_Participated_Students.objects.get(pk=rec_stud_id)
+            recruitment_instance.status=statusOfUpdation
+            recruitment_instance.save()
+            if statusOfUpdation=='Rejected':
+                if Placed_students.objects.filter(recruitment_participated_student__id=rec_stud_id).exists():
+                    Placed_students.objects.filter(recruitment_participated_student__id=rec_stud_id).delete()
+                if Recruitment_Student_Updations.objects.filter(recruitment_participated_student__id=rec_stud_id).exists():
+                    Recruitment_Student_Updations.objects.filter(recruitment_participated_student__id=rec_stud_id).delete()
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":[],
+                    "message":"Updated succesfully"
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":[],
+                    "message":"Something went wrong. Please Try again"
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"Something went wrong. Please Try again"
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
