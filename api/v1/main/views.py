@@ -3481,3 +3481,89 @@ def student_marklist_verification(request):
             }
         }
         return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def student_search(request):
+    search_value = request.GET.get("search_value", "")
+    if search_value:
+        students = Student.objects.filter(
+            Q(admission_number__icontains=search_value) |
+            Q(first_name__icontains=search_value) |
+            Q(last_name__icontains=search_value) |
+            Q(email__icontains=search_value) |
+            Q(phone__icontains=search_value) |
+            (Q(first_name__iexact=search_value.split()[0]) &
+            Q(last_name__icontains=search_value.split()[-1]))
+        )
+
+        serializer = StudentSerializer(students, many=True)
+        dataSend=[]
+        for student in students:
+            semester = ''
+            if Student_program_semester.objects.filter(student=student,status='ongoing').exists():
+                semester=Student_program_semester.objects.filter(student=student,status='ongoing')[0].semester.semester.semester
+            # if Student_Resume.objects.filter(student=student).exists():
+            resumeSeralizer = searchResumeSerialiser(Student_Resume.objects.filter(student=student),many=True)
+            # if Student_program_semester.objects.filter(student=student).exists():
+            marklist = []
+            for instance in Student_program_semester.objects.filter(student=student):
+                instance_data = {
+                        "id":instance.id,
+                        "start_date":instance.start_date.isoformat()  if instance.start_date else None,
+                        "end_date":instance.end_date.isoformat()  if instance.end_date else None,
+                        "sem_status":instance.status,
+                        "marklist_appove_status":instance.marklist_appove_status,
+                        "marklist":instance.marklist,
+                        "backlog_count":instance.backlog_count,
+                        "cgpa":instance.cgpa,
+                        "semester":instance.semester.semester.semester,
+                    }
+                marklist.append(instance_data)
+            sorted_res_data = sorted(marklist, key=lambda instance: instance["semester"])
+            marklistToSend = StudentMarklistSerializer(sorted_res_data,many=True)
+            # if Student_Additional_Documents.objects.filter(student=student).exists():
+            additionalDocumentSerialiser = searchAdditionalDocumentSerialiser(Student_Additional_Documents.objects.filter(student=student),many=True)
+            studentAcademicDocumentSerializer = StudentAcademicDocumentSerializer(StudentAcademicDetails.objects.filter(student=student),many=True)
+            resDataInstance={
+                "admission_number" : student.admission_number,
+                "first_name" : student.first_name,
+                "last_name" : student.last_name,
+                "date_of_birth" : student.date_of_birth.isoformat() if student.date_of_birth else None,
+                "address" : student.address,
+                "gender" : student.gender,
+                "phone" : student.phone,
+                "email" : student.email,
+                "marital_status" : student.marital_status,
+                "admission_year" : student.admission_year,
+                "roll_number" : student.roll_number,
+                "parent_name" : student.parent_name,
+                "parent_phone_number" : student.parent_phone_number,
+                "parent_email" : student.parent_email,
+                "program" : student.program.program_name,
+                "semester":semester if semester else None,
+                "resume" : resumeSeralizer.data,
+                "marklist" :marklistToSend.data,
+                "additional" : additionalDocumentSerialiser.data,
+                "studentAcademicDocuments":studentAcademicDocumentSerializer.data
+            }
+            dataSend.append(resDataInstance)
+        responce_data_sent=json.dumps(dataSend,indent=4) 
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "data": responce_data_sent,
+                "message": "Search Succesfull"
+            }
+        }
+    else:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "data": [],
+                "message": ""
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)

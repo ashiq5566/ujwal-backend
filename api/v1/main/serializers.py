@@ -440,3 +440,18 @@ class StudentProgramSemesterMarklistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student_program_semester
         fields = '__all__'
+
+class searchResumeSerialiser(serializers.ModelSerializer):
+    class Meta:
+        model = Student_Resume
+        fields = ['resume']
+
+class searchMarklisteSerialiser(serializers.ModelSerializer):
+    class Meta:
+        model = Student_program_semester
+        fields = ['marklist_appove_status','marklist','backlog_count','cgpa']
+class searchAdditionalDocumentSerialiser(serializers.ModelSerializer):
+    class Meta:
+        model = Student_Additional_Documents
+        fields = ['document','document_name']
+
