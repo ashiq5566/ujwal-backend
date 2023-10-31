@@ -3495,17 +3495,28 @@ def student_marklist_verification(request):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def student_search(request):
     search_value = request.GET.get("search_value", "")
+    department_id = request.GET.get("department_id")
     if search_value:
-        students = Student.objects.filter(
-            Q(admission_number__icontains=search_value) |
-            Q(first_name__icontains=search_value) |
-            Q(last_name__icontains=search_value) |
-            Q(email__icontains=search_value) |
-            Q(phone__icontains=search_value) |
-            (Q(first_name__iexact=search_value.split()[0]) &
-            Q(last_name__icontains=search_value.split()[-1]))
-        )
-
+        if department_id:
+            students = Student.objects.filter(
+                Q(admission_number__icontains=search_value) |
+                Q(first_name__icontains=search_value) |
+                Q(last_name__icontains=search_value) |
+                Q(email__icontains=search_value) |
+                Q(phone__icontains=search_value) |
+                (Q(first_name__iexact=search_value.split()[0]) &
+                Q(last_name__icontains=search_value.split()[-1]))
+            ).filter(program__department__id=department_id)
+        else:
+             students = Student.objects.filter(
+                Q(admission_number__icontains=search_value) |
+                Q(first_name__icontains=search_value) |
+                Q(last_name__icontains=search_value) |
+                Q(email__icontains=search_value) |
+                Q(phone__icontains=search_value) |
+                (Q(first_name__iexact=search_value.split()[0]) &
+                Q(last_name__icontains=search_value.split()[-1]))
+            )
         serializer = StudentSerializer(students, many=True)
         dataSend=[]
         for student in students:
