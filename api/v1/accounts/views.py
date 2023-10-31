@@ -194,7 +194,7 @@ def user_register(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def user_list(request):
-    users = User.objects.filter(user_active=True).exclude(role__in=['student', 'Admin'])
+    users = User.objects.exclude(role__in=['student', 'Admin'])
 
     user_data = []
 
@@ -642,3 +642,33 @@ def student_register_with_documents(request):
             }
         }       
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@group_required(["Admin","Placement_officer"])
+def control_user(request):
+    username = request.data.get('username')
+    try:
+        instance = User.objects.get(username=username)
+        activeOfUser = instance.user_active
+        instance.user_active = not activeOfUser
+        instance.is_active  = not activeOfUser
+        instance.save()
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "data": [],
+                "message": "User Active status Updated Succesfully"
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    except:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "message": "Something went wrong",
+                "data":[]
+            }
+        }
+        return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
