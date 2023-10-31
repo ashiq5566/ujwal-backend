@@ -194,7 +194,9 @@ def user_register(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def user_list(request):
-    users = User.objects.exclude(role__in=['student', 'Admin'])
+    current_user = request.user
+    print(current_user,"current_user")
+    users = User.objects.exclude(role__in=['student', 'Admin']).exclude(pk=current_user.pk).order_by('-date_joined')
 
     user_data = []
 

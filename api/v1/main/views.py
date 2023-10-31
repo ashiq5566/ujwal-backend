@@ -2474,34 +2474,35 @@ def dashboard_reports(request):
             for placStud in placedStudents:
                 if(placStud.recruitment_participated_student.student.program.id==pgm.id):
                     pgmPlcedList[pgm.program_name]=pgmPlcedList[pgm.program_name]+1
-
-        start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
-
-        # Initialize a dictionary to store the results
-        fiveYearReport = {}
-
-        # Iterate over the previous five years
-        for i in range(5):
-            academic_year = start_date.year+1
-            previous_academic_year = academic_year-1 
-            year_range = f"{academic_year}-{previous_academic_year}"
-            
-            # Count placed students within the academic year range
-            placed_count = (
-                Placed_students.objects
-                .filter(placed_date__gte=start_date, placed_date__lt=end_date)
-                .aggregate(count=Count('id'))
-            )['count'] or 0
-
-            fiveYearReport[year_range] = placed_count
-
-            # Update start_date and end_date for the next iteration
-            start_date -= timedelta(days=365)
-            end_date -= timedelta(days=365)
-
         placedInPrograms=json.dumps(pgmPlcedList,indent=4)
-        fiveYearReports=json.dumps(fiveYearReport,indent=4)
+
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+    # Initialize a dictionary to store the results
+    fiveYearReport = {}
+
+    # Iterate over the previous five years
+    for i in range(5):
+        academic_year = start_date.year+1
+        previous_academic_year = academic_year-1 
+        year_range = f"{academic_year}-{previous_academic_year}"
+        
+        # Count placed students within the academic year range
+        placed_count = (
+            Placed_students.objects
+            .filter(placed_date__gte=start_date, placed_date__lt=end_date)
+            .aggregate(count=Count('id'))
+        )['count'] or 0
+
+        fiveYearReport[year_range] = placed_count
+
+        # Update start_date and end_date for the next iteration
+        start_date -= timedelta(days=365)
+        end_date -= timedelta(days=365)
+
+        
+    fiveYearReports=json.dumps(fiveYearReport,indent=4)
     recruiters=Recruiters.objects.filter(is_active=True)
     trainers=Trainers.objects.filter(is_active=True)
     programs=Programs.objects.filter(is_active=True)
@@ -2686,20 +2687,23 @@ def get_recruitment_selected_students(request,pk):
                     }
                     selected_students.append(instance_of_placed)
             responce_data_sent=json.dumps(selected_students,indent=4)
+            total_applied_students = Recruitment_Participated_Students.objects.filter(scheduled_recruitment__id=pk)
             response_data = {
                 "statusCode":6000,
                 "data":{
                     "title":"success",
                     "data":responce_data_sent,
+                    "total_applied_students" : len(total_applied_students),
                     "message":"Get succesfull"
                 }
             }
         else:
             response_data = {
-                "statusCode":6001,
+                "statusCode":6000,
                 "data":{
-                    "title":"failed",
+                    "title":"success",
                     "data":[],
+                    "total_applied_students":0,
                     "message":"No Students Applied"
                 }
             }
