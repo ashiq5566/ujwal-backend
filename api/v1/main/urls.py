@@ -20,7 +20,8 @@ urlpatterns = [
     #program
     re_path(r"^add_program/$", add_program),
     re_path(r'^update_programs/(?P<program_id>\d+)/$', update_program),
-    re_path(r"^programs/$", program_list),
+    re_path(r"^programs_active/$", program_list), #// active only
+    re_path(r"^program_list_all/$", program_list_all),# 
     re_path(r"^programs_not_auth/$", program_list_without_permission),
     re_path(r'^programs_by_department/(?P<pk>\d+)/$',programs_by_department),
     re_path(r"^semesters/$", semesters),
@@ -108,11 +109,11 @@ urlpatterns = [
     re_path(r"students_report/$", students_report),
     
     #edit
-    re_path(r"edit-department/(?P<pk>\d+)/$", edit_department),
-    re_path(r"edit-trainer/(?P<pk>\d+)/$", edit_trainer),
-    re_path(r"edit-recruiter/(?P<pk>\d+)/$", edit_recruiter),
-    re_path(r"edit-program/(?P<pk>\d+)/$", edit_program),
-    re_path(r"edit-training-schedule/(?P<pk>\d+)/$", edit_training_schedule),
+    re_path(r"edit_department/(?P<pk>\d+)/$", edit_department),
+    re_path(r"edit_trainer/(?P<pk>\d+)/$", edit_trainer),
+    re_path(r"edit_recruiter/(?P<pk>\d+)/$", edit_recruiter),
+    re_path(r"edit_program/(?P<pk>\d+)/$", edit_program),
+    re_path(r"edit_training-schedule/(?P<pk>\d+)/$", edit_training_schedule),
 
     #controls
     re_path(r"constrols/$", constrols),

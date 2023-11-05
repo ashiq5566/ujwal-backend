@@ -104,7 +104,7 @@ def edit_department(request, pk):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def department_list(request):
     if Departments.objects.all():
-        departments = Departments.objects.all()  
+        departments = Departments.objects.all().order_by('department_name')  
         serializer = DepartmentsGetSerializer(departments, many=True)
         
         response_data = {
@@ -228,7 +228,7 @@ def edit_trainer(request, pk):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def trainers_list(request):
     if Trainers.objects.all():
-        trainers = Trainers.objects.all()  
+        trainers = Trainers.objects.all().order_by('-id')  
         serializer = TrainersGetSerializer(trainers, many=True)
         
         response_data = {
@@ -324,8 +324,8 @@ def edit_recruiter(request, pk):
 @api_view(["GET"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def recruiters_list(request):
-    if Recruiters.objects.all():
-        recruiter = Recruiters.objects.all()  
+    if Recruiters.objects.filter().exists():
+        recruiter = Recruiters.objects.all().order_by('-id')
         serializer = RecruitersGetSerializer(recruiter, many=True)
         
         response_data = {
@@ -397,6 +397,19 @@ def edit_program(request, pk):
     """ 
     if Programs.objects.filter(pk=pk).exists():
         program = Programs.objects.get(pk=pk)
+        department_id = request.data.get('department')
+        if Departments.objects.filter(id=department_id).exists():
+            dep = Departments.objects.get(id=department_id)
+        if(not dep.is_active):
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":"Cannot Proceed. Department is Inactive",
+                }
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
         serializer = ProgramPostSerializer(program, data=request.data, partial=True)
 
         if serializer.is_valid():
@@ -434,7 +447,7 @@ def edit_program(request, pk):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def program_list(request):
     if Programs.objects.filter(is_active=True).exists():
-        programs = Programs.objects.filter(is_active=True)
+        programs = Programs.objects.filter(is_active=True).order_by('program_name')
         serializer = ProgramsGetWithDepartmentSerializer(programs, many=True)
         
         response_data = {
@@ -460,7 +473,7 @@ def program_list(request):
 @permission_classes([AllowAny])
 def program_list_without_permission(request):
     if Programs.objects.filter(is_active=True).exists():
-        programs = Programs.objects.filter(is_active=True)
+        programs = Programs.objects.filter(is_active=True).order_by('program_name')
         serializer = ProgramsGetWithDepartmentSerializer(programs, many=True)
         
         response_data = {
@@ -2365,8 +2378,8 @@ def students_additional_documents(request,student_id):
 @api_view(['POST'])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
 def upload_resume(request):
+    student_id = request.data.get('student_id')
     if request.method == 'POST' and request.FILES.get('resume') and Student.objects.filter(pk=student_id).exists():
-        student_id = request.data.get('student_id')
         student = Student.objects.get(pk=student_id)
         existing_record, created = Student_Resume.objects.update_or_create(
             student=student,
@@ -3629,4 +3642,30 @@ def update_recruitment_participation_student(request):
                 "message":"Something went wrong. Please Try again"
             }
         }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def program_list_all(request):
+    if Programs.objects.filter(is_active=True).exists():
+        programs = Programs.objects.all().order_by('program_name')
+        serializer = ProgramsGetWithDepartmentSerializer(programs, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
     return Response(response_data,status=status.HTTP_200_OK)

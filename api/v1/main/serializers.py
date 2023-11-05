@@ -12,6 +12,7 @@ class DepartmentPostSerializer(serializers.ModelSerializer):
         
     def update(self, instance, validated_data):
         instance.department_name = validated_data.get('department_name', instance.department_name)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()
         
         return instance
@@ -32,6 +33,7 @@ class TrainerPostSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.phone_number = validated_data.get('phone_number', instance.phone_number)
         instance.website = validated_data.get('website', instance.website)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()
         
         return instance
@@ -52,6 +54,7 @@ class RecruiterPostSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.contact_number = validated_data.get('contact_number', instance.contact_number)
         instance.website = validated_data.get('website', instance.website)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()
         
         return instance
@@ -76,6 +79,7 @@ class ProgramPostSerializer(serializers.ModelSerializer):
             department = Departments.objects.get(pk=department_pk)
             instance.department = department
         instance.type = validated_data.get('type', instance.type)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.number_of_semester = validated_data.get('number_of_semester', instance.number_of_semester)
         instance.save()
         
