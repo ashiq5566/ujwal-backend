@@ -3722,3 +3722,30 @@ def alumni_search(request):
             }
         }
     return Response(response_data,status=status.HTTP_200_OK)
+    
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def active_recruiters_list(request):
+    if Recruiters.objects.filter().exists():
+        recruiter = Recruiters.objects.filter(is_active=True).order_by('-id')
+        serializer = RecruitersGetSerializer(recruiter, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)

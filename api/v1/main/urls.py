@@ -16,6 +16,7 @@ urlpatterns = [
     #recruiter
     re_path(r"^add_recruiter/$", add_recruiter),
     re_path(r"^recruiters/$", recruiters_list),
+    re_path(r"^active_recruiters/$", active_recruiters_list),
     
     #program
     re_path(r"^add_program/$", add_program),

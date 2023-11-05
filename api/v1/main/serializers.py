@@ -257,9 +257,22 @@ class RecruitmentParticipatedStudentsSchedulesSerializer(serializers.ModelSerial
     gender = serializers.CharField(source='student.gender')
     roll_number = serializers.CharField(source='student.roll_number')
     designation = serializers.CharField(source='scheduled_recruitment.designation')
+    semester_marks = serializers.SerializerMethodField()
+    resume = serializers.SerializerMethodField()
     class Meta:
         model = Recruitment_Participated_Students
         fields = '__all__'
+
+    def get_semester_marks(self, instance):
+        marks = Student_program_semester.objects.filter(student=instance.student)
+        seralizer = searchMarklisteSerialiser(marks,many=True)
+        return seralizer.data
+    def get_resume(self, instance):
+        if Student_Resume.objects.filter(student=instance.student).exists():
+            reusme = Student_Resume.objects.filter(student=instance.student)
+            seralizer = StudentResumeSerializer(reusme,many=True)
+            return seralizer.data
+        return None
     
 class PostRecruitmentParticipatedStudentsSchedulesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -477,9 +490,12 @@ class searchResumeSerialiser(serializers.ModelSerializer):
         fields = ['resume']
 
 class searchMarklisteSerialiser(serializers.ModelSerializer):
+    semester_name = serializers.SerializerMethodField()
     class Meta:
         model = Student_program_semester
-        fields = ['marklist_appove_status','marklist','backlog_count','cgpa']
+        fields = ['marklist_appove_status','marklist','backlog_count','cgpa','semester_name']
+    def get_semester_name(self, instance):
+        return instance.semester.semester.semester
 class searchAdditionalDocumentSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Student_Additional_Documents
