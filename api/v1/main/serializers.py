@@ -501,3 +501,10 @@ class searchAdditionalDocumentSerialiser(serializers.ModelSerializer):
         model = Student_Additional_Documents
         fields = ['document','document_name']
 
+class MarklistDetailsStudentSeralizer(serializers.ModelSerializer):
+    semester_name = serializers.SerializerMethodField()
+    class Meta:
+        model = Student_program_semester
+        fields = '__all__'
+    def get_semester_name(self, instance):
+        return instance.semester.semester.semester
