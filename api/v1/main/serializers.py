@@ -264,7 +264,7 @@ class RecruitmentParticipatedStudentsSchedulesSerializer(serializers.ModelSerial
         fields = '__all__'
 
     def get_semester_marks(self, instance):
-        marks = Student_program_semester.objects.filter(student=instance.student)
+        marks = Student_program_semester.objects.filter(student=instance.student).order_by('semester__semester__semester')
         seralizer = searchMarklisteSerialiser(marks,many=True)
         return seralizer.data
     def get_resume(self, instance):

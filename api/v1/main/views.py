@@ -2582,13 +2582,16 @@ def students_report(request):
 def student_academicDocuments(request,student_id):
     if StudentAcademicDetails.objects.filter(student_id=student_id).exists():
         docs = StudentAcademicDetails.objects.filter(student_id=student_id)
-        serializer = StudentAcademicDocumentSerializer(docs, many=True)
+        marks = Student_program_semester.objects.filter(student_id=student_id).order_by('semester__semester__semester')
+        serializer1 = StudentAcademicDocumentSerializer(docs, many=True)
+        serializer2 = searchMarklisteSerialiser(marks, many=True)
         
         response_data = {
             "statusCode":6000,
             "data":{
                 "title":"Success",
-                "data":serializer.data
+                "data":serializer1.data,
+                "semester_marks":serializer2.data
             }
         }
     else:
