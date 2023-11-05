@@ -3669,3 +3669,56 @@ def program_list_all(request):
         }
 
     return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def alumni_search(request):
+    search_value = request.GET.get("search_value", "")
+    department_id = request.GET.get("department_id")
+    if search_value:
+        if department_id:
+            alumni = alumni_details.objects.filter(
+                Q(first_name__icontains=search_value) |
+                Q(last_name__icontains=search_value) |
+                Q(email__icontains=search_value) |
+                Q(phone__icontains=search_value) |
+                (Q(first_name__iexact=search_value.split()[0]) &
+                Q(last_name__icontains=search_value.split()[-1]))
+            ).filter(program__department__id=department_id)
+            serializer = AlumniDetailsSerializer(alumni,many=True)
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
+            }
+            return Response(response_data,status=status.HTTP_200_OK)
+        else:
+            alumni = alumni_details.objects.filter(
+                Q(first_name__icontains=search_value) |
+                Q(last_name__icontains=search_value) |
+                Q(email__icontains=search_value) |
+                Q(phone__icontains=search_value) |
+                (Q(first_name__iexact=search_value.split()[0]) &
+                Q(last_name__icontains=search_value.split()[-1]))
+            )
+            serializer = AlumniDetailsSerializer(alumni,many=True)
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
+            }
+            return Response(response_data,status=status.HTTP_200_OK)
+    else:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "data": [],
+                "message": ""
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)

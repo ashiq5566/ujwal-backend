@@ -124,6 +124,7 @@ urlpatterns = [
     re_path(r"get_alumni_details/$", get_alumni_details),
     re_path(r"update_job_instance/$", update_job_instance),
     re_path(r"create_new_job_instance/$", create_new_job_instance),
+    re_path(r"alumni_search/$", alumni_search),
 
     #marklist varification
     re_path(r"get_uploaded_marklist_details/$", get_uploaded_marklist_details),

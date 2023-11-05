@@ -332,8 +332,34 @@ class ControlGetSerializer(serializers.ModelSerializer):
         model = Controls
         fields = '__all__'
 class AlumniDetailsSerializer(serializers.ModelSerializer):
+    batch_start = serializers.SerializerMethodField()
+    batch_end = serializers.SerializerMethodField()
+    jobDetails = serializers.SerializerMethodField()
+    program_name = serializers.SerializerMethodField()
+
     class Meta:
         model = alumni_details
+        fields = '__all__'
+    
+
+    def get_program_name(self, instance):
+        return instance.program.program_name
+    
+    def get_batch_start(self, instance):
+        return instance.batch.start_year
+
+    def get_batch_end(self, instance):
+        return instance.batch.end_year
+
+    def get_jobDetails(self, instance):
+        job_details = alumni_job.objects.filter(person=instance)
+        job_details_serializer = AlumniJobSeraliser(job_details, many=True)
+        return job_details_serializer.data
+
+
+class AlumniJobSeraliser(serializers.ModelSerializer):
+     class Meta:
+        model = alumni_job
         fields = '__all__'
 
 
