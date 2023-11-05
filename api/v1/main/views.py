@@ -2996,7 +2996,7 @@ def create_new_job_instance(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@group_required(["student"])
+@group_required(["student","Admin","Placement_officer","HOD","Staff_Coordinator"])
 def student_semester_marklist_details(request,student_id):
     if student_id:
         if Student.objects.filter(id=student_id).exists():
