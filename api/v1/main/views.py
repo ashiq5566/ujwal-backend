@@ -104,7 +104,7 @@ def edit_department(request, pk):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def department_list(request):
     if Departments.objects.all():
-        departments = Departments.objects.all()  
+        departments = Departments.objects.all().order_by('department_name')  
         serializer = DepartmentsGetSerializer(departments, many=True)
         
         response_data = {
@@ -228,7 +228,7 @@ def edit_trainer(request, pk):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def trainers_list(request):
     if Trainers.objects.all():
-        trainers = Trainers.objects.all()  
+        trainers = Trainers.objects.all().order_by('-id')  
         serializer = TrainersGetSerializer(trainers, many=True)
         
         response_data = {
@@ -324,8 +324,8 @@ def edit_recruiter(request, pk):
 @api_view(["GET"])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def recruiters_list(request):
-    if Recruiters.objects.all():
-        recruiter = Recruiters.objects.all()  
+    if Recruiters.objects.filter().exists():
+        recruiter = Recruiters.objects.all().order_by('-id')
         serializer = RecruitersGetSerializer(recruiter, many=True)
         
         response_data = {
@@ -397,6 +397,19 @@ def edit_program(request, pk):
     """ 
     if Programs.objects.filter(pk=pk).exists():
         program = Programs.objects.get(pk=pk)
+        department_id = request.data.get('department')
+        if Departments.objects.filter(id=department_id).exists():
+            dep = Departments.objects.get(id=department_id)
+        if(not dep.is_active):
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":"Cannot Proceed. Department is Inactive",
+                }
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
         serializer = ProgramPostSerializer(program, data=request.data, partial=True)
 
         if serializer.is_valid():
@@ -434,7 +447,7 @@ def edit_program(request, pk):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def program_list(request):
     if Programs.objects.filter(is_active=True).exists():
-        programs = Programs.objects.filter(is_active=True)
+        programs = Programs.objects.filter(is_active=True).order_by('program_name')
         serializer = ProgramsGetWithDepartmentSerializer(programs, many=True)
         
         response_data = {
@@ -460,7 +473,7 @@ def program_list(request):
 @permission_classes([AllowAny])
 def program_list_without_permission(request):
     if Programs.objects.filter(is_active=True).exists():
-        programs = Programs.objects.filter(is_active=True)
+        programs = Programs.objects.filter(is_active=True).order_by('program_name')
         serializer = ProgramsGetWithDepartmentSerializer(programs, many=True)
         
         response_data = {
@@ -2209,8 +2222,13 @@ def get_placement_details_by_student(request,pk):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
 def get_applied_placements_by_student(request,pk):
     student_id = int(pk)
+    statusOfStudent = request.GET.get('status')
     if Recruitment_Participated_Students.objects.filter(student__id=student_id).exists():
-        appliedPlacements=Recruitment_Participated_Students.objects.filter(student__id=student_id)
+        if statusOfStudent:
+            appliedPlacements=Recruitment_Participated_Students.objects.filter(student__id=student_id,status=statusOfStudent)
+        else:
+            appliedPlacements=Recruitment_Participated_Students.objects.filter(student__id=student_id)
+
         data=[]
         for appliedPlacement in appliedPlacements:
             studentUpdationItems= Recruitment_Student_Updations.objects.filter(recruitment_participated_student=appliedPlacement)
@@ -2221,7 +2239,8 @@ def get_applied_placements_by_student(request,pk):
                     "type_of_selection":studentUpdationItem.type_of_selection,
                     "selected_status":studentUpdationItem.is_selected,
                     "completed_status" :studentUpdationItem.status,
-                    "others" :studentUpdationItem.others
+                    "others" :studentUpdationItem.others,
+                    
                 }
                 updationAll.append(updationInstance)
             sorted_updationAll = sorted(updationAll, key=lambda x: x["updation_date"])
@@ -2233,7 +2252,8 @@ def get_applied_placements_by_student(request,pk):
                 "designation" : appliedPlacement.scheduled_recruitment.designation,
                 "status" : appliedPlacement.scheduled_recruitment.status,
                 "student_process_details":sorted_updationAll,
-                "placed_status" : Placed_students.objects.filter(recruitment_participated_student_id=appliedPlacement.id).exists()
+                "placed_status" : Placed_students.objects.filter(recruitment_participated_student_id=appliedPlacement.id).exists(),
+                "applied_status" : appliedPlacement.status
             }
             data.append(instance)
         responce_date_sent=json.dumps(data,indent=4)
@@ -2358,8 +2378,8 @@ def students_additional_documents(request,student_id):
 @api_view(['POST'])
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator","student"])
 def upload_resume(request):
+    student_id = request.data.get('student_id')
     if request.method == 'POST' and request.FILES.get('resume') and Student.objects.filter(pk=student_id).exists():
-        student_id = request.data.get('student_id')
         student = Student.objects.get(pk=student_id)
         existing_record, created = Student_Resume.objects.update_or_create(
             student=student,
@@ -2467,34 +2487,35 @@ def dashboard_reports(request):
             for placStud in placedStudents:
                 if(placStud.recruitment_participated_student.student.program.id==pgm.id):
                     pgmPlcedList[pgm.program_name]=pgmPlcedList[pgm.program_name]+1
-
-        start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
-
-        # Initialize a dictionary to store the results
-        fiveYearReport = {}
-
-        # Iterate over the previous five years
-        for i in range(5):
-            academic_year = start_date.year+1
-            previous_academic_year = academic_year-1 
-            year_range = f"{academic_year}-{previous_academic_year}"
-            
-            # Count placed students within the academic year range
-            placed_count = (
-                Placed_students.objects
-                .filter(placed_date__gte=start_date, placed_date__lt=end_date)
-                .aggregate(count=Count('id'))
-            )['count'] or 0
-
-            fiveYearReport[year_range] = placed_count
-
-            # Update start_date and end_date for the next iteration
-            start_date -= timedelta(days=365)
-            end_date -= timedelta(days=365)
-
         placedInPrograms=json.dumps(pgmPlcedList,indent=4)
-        fiveYearReports=json.dumps(fiveYearReport,indent=4)
+
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+    # Initialize a dictionary to store the results
+    fiveYearReport = {}
+
+    # Iterate over the previous five years
+    for i in range(5):
+        academic_year = start_date.year+1
+        previous_academic_year = academic_year-1 
+        year_range = f"{academic_year}-{previous_academic_year}"
+        
+        # Count placed students within the academic year range
+        placed_count = (
+            Placed_students.objects
+            .filter(placed_date__gte=start_date, placed_date__lt=end_date)
+            .aggregate(count=Count('id'))
+        )['count'] or 0
+
+        fiveYearReport[year_range] = placed_count
+
+        # Update start_date and end_date for the next iteration
+        start_date -= timedelta(days=365)
+        end_date -= timedelta(days=365)
+
+        
+    fiveYearReports=json.dumps(fiveYearReport,indent=4)
     recruiters=Recruiters.objects.filter(is_active=True)
     trainers=Trainers.objects.filter(is_active=True)
     programs=Programs.objects.filter(is_active=True)
@@ -2561,13 +2582,16 @@ def students_report(request):
 def student_academicDocuments(request,student_id):
     if StudentAcademicDetails.objects.filter(student_id=student_id).exists():
         docs = StudentAcademicDetails.objects.filter(student_id=student_id)
-        serializer = StudentAcademicDocumentSerializer(docs, many=True)
+        marks = Student_program_semester.objects.filter(student_id=student_id).order_by('semester__semester__semester')
+        serializer1 = StudentAcademicDocumentSerializer(docs, many=True)
+        serializer2 = searchMarklisteSerialiser(marks, many=True)
         
         response_data = {
             "statusCode":6000,
             "data":{
                 "title":"Success",
-                "data":serializer.data
+                "data":serializer1.data,
+                "semester_marks":serializer2.data
             }
         }
     else:
@@ -2679,20 +2703,23 @@ def get_recruitment_selected_students(request,pk):
                     }
                     selected_students.append(instance_of_placed)
             responce_data_sent=json.dumps(selected_students,indent=4)
+            total_applied_students = Recruitment_Participated_Students.objects.filter(scheduled_recruitment__id=pk)
             response_data = {
                 "statusCode":6000,
                 "data":{
                     "title":"success",
                     "data":responce_data_sent,
+                    "total_applied_students" : len(total_applied_students),
                     "message":"Get succesfull"
                 }
             }
         else:
             response_data = {
-                "statusCode":6001,
+                "statusCode":6000,
                 "data":{
-                    "title":"failed",
+                    "title":"success",
                     "data":[],
+                    "total_applied_students":0,
                     "message":"No Students Applied"
                 }
             }
@@ -2969,29 +2996,14 @@ def create_new_job_instance(request):
     return Response(response_data,status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-@group_required(["student"])
+@group_required(["student","Admin","Placement_officer","HOD","Staff_Coordinator"])
 def student_semester_marklist_details(request,student_id):
     if student_id:
         if Student.objects.filter(id=student_id).exists():
             # student = Student.objects.get(id=student_id)
             if Student_program_semester.objects.filter(student__id=student_id).exists():
-                student = Student_program_semester.objects.filter(student__id=student_id,status='completed')
-                res_data =[]
-                for instance in student:
-                    instance_data = {
-                        "id":instance.id,
-                        "start_date":instance.start_date.isoformat()  if instance.start_date else None,
-                        "end_date":instance.end_date.isoformat()  if instance.end_date else None,
-                        "sem_status":instance.status,
-                        "marklist_appove_status":instance.marklist_appove_status,
-                        "marklist":instance.marklist,
-                        "backlog_count":instance.backlog_count,
-                        "cgpa":instance.cgpa,
-                        "semester":instance.semester.semester.semester,
-                    }
-                    res_data.append(instance_data)
-                sorted_res_data = sorted(res_data, key=lambda instance: instance["semester"])
-                serializer = StudentMarklistSerializer(sorted_res_data,many=True)
+                student = Student_program_semester.objects.filter(student__id=student_id,status='completed').order_by('semester__semester__semester')
+                serializer = MarklistDetailsStudentSeralizer(student,many=True)
                 # serializer = StudentProgramSemesterSerializer(student, many=True)
                 response_data = {
                     "statusCode":6000,
@@ -3375,10 +3387,8 @@ def upload_makelist_details(request):
 @group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
 def get_uploaded_marklist_details(request):
     department_id = request.GET.get('department_id')
-    print(department_id)
     try:
         if department_id:
-            print(department_id)
             filtered_objects = Student_program_semester.objects.exclude(marklist='').order_by('-end_date').filter(
                 Q(marklist_appove_status__isnull=True) | Q(marklist_appove_status='Rejected'),semester__program__department__id=department_id
             ).prefetch_related('semester__semester', 'semester__program')
@@ -3481,3 +3491,249 @@ def student_marklist_verification(request):
             }
         }
         return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def student_search(request):
+    search_value = request.GET.get("search_value", "")
+    department_id = request.GET.get("department_id")
+    if search_value:
+        if department_id:
+            students = Student.objects.filter(
+                Q(admission_number__icontains=search_value) |
+                Q(first_name__icontains=search_value) |
+                Q(last_name__icontains=search_value) |
+                Q(email__icontains=search_value) |
+                Q(phone__icontains=search_value) |
+                (Q(first_name__iexact=search_value.split()[0]) &
+                Q(last_name__icontains=search_value.split()[-1]))
+            ).filter(program__department__id=department_id)
+        else:
+             students = Student.objects.filter(
+                Q(admission_number__icontains=search_value) |
+                Q(first_name__icontains=search_value) |
+                Q(last_name__icontains=search_value) |
+                Q(email__icontains=search_value) |
+                Q(phone__icontains=search_value) |
+                (Q(first_name__iexact=search_value.split()[0]) &
+                Q(last_name__icontains=search_value.split()[-1]))
+            )
+        serializer = StudentSerializer(students, many=True)
+        dataSend=[]
+        for student in students:
+            semester = ''
+            if Student_program_semester.objects.filter(student=student,status='ongoing').exists():
+                semester=Student_program_semester.objects.filter(student=student,status='ongoing')[0].semester.semester.semester
+            # if Student_Resume.objects.filter(student=student).exists():
+            resumeSeralizer = searchResumeSerialiser(Student_Resume.objects.filter(student=student),many=True)
+            # if Student_program_semester.objects.filter(student=student).exists():
+            marklist = []
+            for instance in Student_program_semester.objects.filter(student=student):
+                instance_data = {
+                        "id":instance.id,
+                        "start_date":instance.start_date.isoformat()  if instance.start_date else None,
+                        "end_date":instance.end_date.isoformat()  if instance.end_date else None,
+                        "sem_status":instance.status,
+                        "marklist_appove_status":instance.marklist_appove_status,
+                        "marklist":instance.marklist,
+                        "backlog_count":instance.backlog_count,
+                        "cgpa":instance.cgpa,
+                        "semester":instance.semester.semester.semester,
+                    }
+                marklist.append(instance_data)
+            sorted_res_data = sorted(marklist, key=lambda instance: instance["semester"])
+            marklistToSend = StudentMarklistSerializer(sorted_res_data,many=True)
+            # if Student_Additional_Documents.objects.filter(student=student).exists():
+            additionalDocumentSerialiser = searchAdditionalDocumentSerialiser(Student_Additional_Documents.objects.filter(student=student),many=True)
+            studentAcademicDocumentSerializer = StudentAcademicDocumentSerializer(StudentAcademicDetails.objects.filter(student=student),many=True)
+            resDataInstance={
+                "admission_number" : student.admission_number,
+                "first_name" : student.first_name,
+                "last_name" : student.last_name,
+                "date_of_birth" : student.date_of_birth.isoformat() if student.date_of_birth else None,
+                "address" : student.address,
+                "gender" : student.gender,
+                "phone" : student.phone,
+                "email" : student.email,
+                "marital_status" : student.marital_status,
+                "admission_year" : student.admission_year,
+                "roll_number" : student.roll_number,
+                "parent_name" : student.parent_name,
+                "parent_phone_number" : student.parent_phone_number,
+                "parent_email" : student.parent_email,
+                "program" : student.program.program_name,
+                "semester":semester if semester else None,
+                "resume" : resumeSeralizer.data,
+                "marklist" :marklistToSend.data,
+                "additional" : additionalDocumentSerialiser.data,
+                "studentAcademicDocuments":studentAcademicDocumentSerializer.data
+            }
+            dataSend.append(resDataInstance)
+        responce_data_sent=json.dumps(dataSend,indent=4) 
+        response_data = {
+            "statusCode": 6000,
+            "data": {
+                "title": "Success",
+                "data": responce_data_sent,
+                "message": "Search Succesfull"
+            }
+        }
+    else:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "data": [],
+                "message": ""
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["PUT"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def update_recruitment_participation_student(request):
+    rec_stud_id = request.data.get('rec_stud_id')
+    statusOfUpdation = request.data.get('status')
+    if rec_stud_id and statusOfUpdation:
+        if Recruitment_Participated_Students.objects.filter(id=rec_stud_id).exists():
+            recruitment_instance = Recruitment_Participated_Students.objects.get(pk=rec_stud_id)
+            recruitment_instance.status=statusOfUpdation
+            recruitment_instance.save()
+            if statusOfUpdation=='Rejected':
+                if Placed_students.objects.filter(recruitment_participated_student__id=rec_stud_id).exists():
+                    Placed_students.objects.filter(recruitment_participated_student__id=rec_stud_id).delete()
+                if Recruitment_Student_Updations.objects.filter(recruitment_participated_student__id=rec_stud_id).exists():
+                    Recruitment_Student_Updations.objects.filter(recruitment_participated_student__id=rec_stud_id).delete()
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":[],
+                    "message":"Updated succesfully"
+                }
+            }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "data":[],
+                    "message":"Something went wrong. Please Try again"
+                }
+            }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"Something went wrong. Please Try again"
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def program_list_all(request):
+    if Programs.objects.filter(is_active=True).exists():
+        programs = Programs.objects.all().order_by('program_name')
+        serializer = ProgramsGetWithDepartmentSerializer(programs, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def alumni_search(request):
+    search_value = request.GET.get("search_value", "")
+    department_id = request.GET.get("department_id")
+    if search_value:
+        if department_id:
+            alumni = alumni_details.objects.filter(
+                Q(first_name__icontains=search_value) |
+                Q(last_name__icontains=search_value) |
+                Q(email__icontains=search_value) |
+                Q(phone__icontains=search_value) |
+                (Q(first_name__iexact=search_value.split()[0]) &
+                Q(last_name__icontains=search_value.split()[-1]))
+            ).filter(program__department__id=department_id)
+            serializer = AlumniDetailsSerializer(alumni,many=True)
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
+            }
+            return Response(response_data,status=status.HTTP_200_OK)
+        else:
+            alumni = alumni_details.objects.filter(
+                Q(first_name__icontains=search_value) |
+                Q(last_name__icontains=search_value) |
+                Q(email__icontains=search_value) |
+                Q(phone__icontains=search_value) |
+                (Q(first_name__iexact=search_value.split()[0]) &
+                Q(last_name__icontains=search_value.split()[-1]))
+            )
+            serializer = AlumniDetailsSerializer(alumni,many=True)
+            response_data = {
+                "statusCode":6000,
+                "data":{
+                    "title":"Success",
+                    "data":serializer.data
+                }
+            }
+            return Response(response_data,status=status.HTTP_200_OK)
+    else:
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Failed",
+                "data": [],
+                "message": ""
+            }
+        }
+    return Response(response_data,status=status.HTTP_200_OK)
+    
+
+@api_view(["GET"])
+@group_required(["Admin","Placement_officer","HOD","Staff_Coordinator"])
+def active_recruiters_list(request):
+    if Recruiters.objects.filter().exists():
+        recruiter = Recruiters.objects.filter(is_active=True).order_by('-id')
+        serializer = RecruitersGetSerializer(recruiter, many=True)
+        
+        response_data = {
+            "statusCode":6000,
+            "data":{
+                "title":"Success",
+                "data":serializer.data
+            }
+        }
+    else:
+        response_data = {
+            "statusCode":6001,
+            "data":{
+                "title":"Failed",
+                "data":[],
+                "message":"NotFound"
+            }
+        }
+
+    return Response(response_data,status=status.HTTP_200_OK)

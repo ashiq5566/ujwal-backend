@@ -16,11 +16,13 @@ urlpatterns = [
     #recruiter
     re_path(r"^add_recruiter/$", add_recruiter),
     re_path(r"^recruiters/$", recruiters_list),
+    re_path(r"^active_recruiters/$", active_recruiters_list),
     
     #program
     re_path(r"^add_program/$", add_program),
     re_path(r'^update_programs/(?P<program_id>\d+)/$', update_program),
-    re_path(r"^programs/$", program_list),
+    re_path(r"^programs_active/$", program_list), #// active only
+    re_path(r"^program_list_all/$", program_list_all),# 
     re_path(r"^programs_not_auth/$", program_list_without_permission),
     re_path(r'^programs_by_department/(?P<pk>\d+)/$',programs_by_department),
     re_path(r"^semesters/$", semesters),
@@ -47,6 +49,7 @@ urlpatterns = [
     re_path(r"^recruitment_Student_UpdationDetails_by_Participated_Student/(?P<pk>\d+)/$", recruitment_Student_UpdationDetails_by_Participated_Student),  
     re_path(r"^recruitment_Student_UpdationDetails_by_List_of_Student/$", recruitment_Student_UpdationDetails_by_List_of_Student),
     re_path(r"^add_selection_update_for_student/$", add_selection_update_for_student),
+    re_path(r"^update_recruitment_participation_student/$", update_recruitment_participation_student),
     re_path(r"^cancel_recruitment_schedule/(?P<pk>\d+)/$", cancel_recruitment_schedule_status),
     re_path(r"^complete_recruitment_schedule/(?P<pk>\d+)/$", complete_recruitment_schedule_status),
     re_path(r"^get_recruitment_selected_students/(?P<pk>\d+)/$", get_recruitment_selected_students),
@@ -58,6 +61,9 @@ urlpatterns = [
     # re_path(r'^update_attendance_marked/$', update_attendance_marked),
     re_path(r"^attendenceMarkedOrNot/$", attendenceMarkedOrNot),
     re_path(r"^getAttendence/$", getAttendence),
+
+    #student
+    re_path(r"^student_search/$", student_search),
 
     #student program semester
     re_path(r"^student_program_semester_details/$", student_program_semester_details),
@@ -104,11 +110,11 @@ urlpatterns = [
     re_path(r"students_report/$", students_report),
     
     #edit
-    re_path(r"edit-department/(?P<pk>\d+)/$", edit_department),
-    re_path(r"edit-trainer/(?P<pk>\d+)/$", edit_trainer),
-    re_path(r"edit-recruiter/(?P<pk>\d+)/$", edit_recruiter),
-    re_path(r"edit-program/(?P<pk>\d+)/$", edit_program),
-    re_path(r"edit-training-schedule/(?P<pk>\d+)/$", edit_training_schedule),
+    re_path(r"edit_department/(?P<pk>\d+)/$", edit_department),
+    re_path(r"edit_trainer/(?P<pk>\d+)/$", edit_trainer),
+    re_path(r"edit_recruiter/(?P<pk>\d+)/$", edit_recruiter),
+    re_path(r"edit_program/(?P<pk>\d+)/$", edit_program),
+    re_path(r"edit_training-schedule/(?P<pk>\d+)/$", edit_training_schedule),
 
     #controls
     re_path(r"constrols/$", constrols),
@@ -119,6 +125,7 @@ urlpatterns = [
     re_path(r"get_alumni_details/$", get_alumni_details),
     re_path(r"update_job_instance/$", update_job_instance),
     re_path(r"create_new_job_instance/$", create_new_job_instance),
+    re_path(r"alumni_search/$", alumni_search),
 
     #marklist varification
     re_path(r"get_uploaded_marklist_details/$", get_uploaded_marklist_details),

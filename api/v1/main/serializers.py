@@ -12,6 +12,7 @@ class DepartmentPostSerializer(serializers.ModelSerializer):
         
     def update(self, instance, validated_data):
         instance.department_name = validated_data.get('department_name', instance.department_name)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()
         
         return instance
@@ -32,6 +33,7 @@ class TrainerPostSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.phone_number = validated_data.get('phone_number', instance.phone_number)
         instance.website = validated_data.get('website', instance.website)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()
         
         return instance
@@ -52,6 +54,7 @@ class RecruiterPostSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.contact_number = validated_data.get('contact_number', instance.contact_number)
         instance.website = validated_data.get('website', instance.website)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()
         
         return instance
@@ -76,6 +79,7 @@ class ProgramPostSerializer(serializers.ModelSerializer):
             department = Departments.objects.get(pk=department_pk)
             instance.department = department
         instance.type = validated_data.get('type', instance.type)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.number_of_semester = validated_data.get('number_of_semester', instance.number_of_semester)
         instance.save()
         
@@ -252,9 +256,22 @@ class RecruitmentParticipatedStudentsSchedulesSerializer(serializers.ModelSerial
     gender = serializers.CharField(source='student.gender')
     roll_number = serializers.CharField(source='student.roll_number')
     designation = serializers.CharField(source='scheduled_recruitment.designation')
+    semester_marks = serializers.SerializerMethodField()
+    resume = serializers.SerializerMethodField()
     class Meta:
         model = Recruitment_Participated_Students
         fields = '__all__'
+
+    def get_semester_marks(self, instance):
+        marks = Student_program_semester.objects.filter(student=instance.student).order_by('semester__semester__semester')
+        seralizer = searchMarklisteSerialiser(marks,many=True)
+        return seralizer.data
+    def get_resume(self, instance):
+        if Student_Resume.objects.filter(student=instance.student).exists():
+            reusme = Student_Resume.objects.filter(student=instance.student)
+            seralizer = StudentResumeSerializer(reusme,many=True)
+            return seralizer.data
+        return None
     
 class PostRecruitmentParticipatedStudentsSchedulesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -327,8 +344,34 @@ class ControlGetSerializer(serializers.ModelSerializer):
         model = Controls
         fields = '__all__'
 class AlumniDetailsSerializer(serializers.ModelSerializer):
+    batch_start = serializers.SerializerMethodField()
+    batch_end = serializers.SerializerMethodField()
+    jobDetails = serializers.SerializerMethodField()
+    program_name = serializers.SerializerMethodField()
+
     class Meta:
         model = alumni_details
+        fields = '__all__'
+    
+
+    def get_program_name(self, instance):
+        return instance.program.program_name
+    
+    def get_batch_start(self, instance):
+        return instance.batch.start_year
+
+    def get_batch_end(self, instance):
+        return instance.batch.end_year
+
+    def get_jobDetails(self, instance):
+        job_details = alumni_job.objects.filter(person=instance)
+        job_details_serializer = AlumniJobSeraliser(job_details, many=True)
+        return job_details_serializer.data
+
+
+class AlumniJobSeraliser(serializers.ModelSerializer):
+     class Meta:
+        model = alumni_job
         fields = '__all__'
 
 
@@ -439,3 +482,28 @@ class StudentProgramSemesterMarklistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student_program_semester
         fields = '__all__'
+
+class searchResumeSerialiser(serializers.ModelSerializer):
+    class Meta:
+        model = Student_Resume
+        fields = ['resume']
+
+class searchMarklisteSerialiser(serializers.ModelSerializer):
+    semester_name = serializers.SerializerMethodField()
+    class Meta:
+        model = Student_program_semester
+        fields = ['marklist_appove_status','marklist','backlog_count','cgpa','semester_name']
+    def get_semester_name(self, instance):
+        return instance.semester.semester.semester
+class searchAdditionalDocumentSerialiser(serializers.ModelSerializer):
+    class Meta:
+        model = Student_Additional_Documents
+        fields = ['document','document_name']
+
+class MarklistDetailsStudentSeralizer(serializers.ModelSerializer):
+    semester_name = serializers.SerializerMethodField()
+    class Meta:
+        model = Student_program_semester
+        fields = '__all__'
+    def get_semester_name(self, instance):
+        return instance.semester.semester.semester

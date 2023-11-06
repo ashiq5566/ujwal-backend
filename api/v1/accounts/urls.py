@@ -12,6 +12,7 @@ urlpatterns = [
     re_path(r"^register/$", user_register),
     re_path(r"^users/$", user_list),
     re_path(r"^edit-password/$", edit_password),
+    re_path(r"^control_user/$", control_user),
     
     #studentside
     re_path(r"^students/register/$", student_register),
