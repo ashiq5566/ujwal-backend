@@ -155,7 +155,6 @@ class EditTrainingScheduleSerializer(serializers.Serializer):
             participants = Program_Semester.objects.filter(id__in=participants_ids)
             participants_iterator = iter(participants)
             
-            # existing program semester ids
             program_sem_ids = TrainingParticipant.objects.filter(allot_trainer__pk=instance.pk).values_list('program_semester') 
             
             for training_participant in training_participants:

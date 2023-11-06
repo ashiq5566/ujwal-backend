@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate
 
 
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
 
@@ -641,4 +641,56 @@ def student_register_with_documents(request):
                 "errors": serializer.errors
             }
         }       
+    return Response(response_data,status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated, ])
+def edit_password(request):
+    serializer = EditUserPassword(data=request.data)
+    
+    if serializer.is_valid():
+        old_password = request.data['old_password']
+        new_password = request.data['new_password']
+        
+        if User.objects.filter(pk=request.user.pk).exists():
+            user = User.objects.get(pk=request.user.pk)
+            bool = user.check_password(old_password)
+            
+            if bool == True:
+                user.set_password(new_password)
+                user.save()
+                response_data = {
+                    "statusCode":6000,
+                    "data":{
+                        "title":"Success",
+                        "message":"Password changed Successfully",
+                    }
+                }
+            else:
+                response_data = {
+                    "statusCode":6001,
+                    "data":{
+                        "title":"Failed",
+                        "message" : "old password matching failed",
+                    }
+                }
+        else:
+            response_data = {
+                "statusCode":6001,
+                "data":{
+                    "title":"Failed",
+                    "message":"user not found",
+                }
+            }
+    else: 
+        response_data = {
+            "statusCode": 6001,
+            "data": {
+                "title": "Validation Error",
+                "message": "Upadate failed.",
+                "errors": serializer.errors
+            }
+        }       
+
     return Response(response_data,status=status.HTTP_200_OK)

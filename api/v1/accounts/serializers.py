@@ -48,3 +48,8 @@ class DepartmentsGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Departments
         fields = ['department_name']
+        
+class EditUserPassword(serializers.Serializer):
+    old_password = serializers.CharField()
+    new_password = serializers.CharField()
+        
